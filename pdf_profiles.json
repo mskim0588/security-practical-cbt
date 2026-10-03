@@ -1,0 +1,122 @@
+[
+  {
+    "id": "SRC-01",
+    "filename": "보안기사 실기 단답형.pdf",
+    "title": "정보보안기사 실기 단답형 기출모음 (1~28회)",
+    "group": "exam",
+    "role": "primary_exam",
+    "subject": "전과목",
+    "total_pages": 73,
+    "sample": "\n--- Page 1 ---\n■ 출처 : 13-28회 온계절님 블로그(https://blog.naver.com/stereok2) \n1-12회 https://information-security.tistory.com/m ■ 제작 : https://thodi-lab.tistory.com/ \n1. 개인정보보호위원회와 \n한국인터넷진흥원에서 발간한 \n\"개인정보영향평가 수행 안내서\"에 따르면 \n위험도 산정 공식을 다음과 같이 제시하고 \n있다. ( )에 들어갈 항목명을 기술하시오.  \n[위험도 산정 공식] 위험도 = \n자산가치(영향도) + ((A) * (B)) * (C) \n--- Page 2 ---\n■ 출처 : 13-28회 온계절님 블로그(https://blog.naver.com/stereok2) \n1-12회 https://information-security.tistory.com/m ■ 제작 : https://thodi-lab.tistory.com/ \n5. VLAN(Virtual LAN) 의 주소 할당 방법에 \n대한 설명이다. ( ) 에 해당하는 방식명을 \n기술하시오. \n( A ) : VLAN 할당을 관리자가 각 스위치에서 \n직접 할당하는 방식 \n( B ) : MAC주소 등을 기반으로 VLAN 할당이 \n자동으로 이루어지는 방\n--- Page 3 ---\n■ 출처 : 13-28회 온계절님 블로그(https://blog.naver.com/stereok2) \n1-12회 https://information-security.tistory.com/m ■ 제작 : https://thodi-lab.tistory.com/ \n9. 유닉스에서 현재 실행되고 있는 프로세스 \n정보가 기록되며, 숨겨진 프로세스를 찾기 \n위해 참조하는 경로는 ( A )이다.  \n(답) /proc \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n10. 개인정보 가명처리 기법 중 수치 \n데이터를 임의의 수인 자리 수\n--- Page 4 ---\n■ 출처 : 13-28회 온계절님 블로그(https://blog.naver.com/stereok2) \n1-12회 https://information-security.tistory.com/m ■ 제작 : https://thodi-lab.tistory.com/ \n13. xinetd 서비스에 대한 환경설정 파일에서 \n(1) ~(4)에 적절한 값을 기술하시오. \n# cd /etc/xinetd.d/ \n# cat telnet \ns"
+  },
+  {
+    "id": "SRC-02",
+    "filename": "보안기사 실기 서술형.pdf",
+    "title": "정보보안기사 실기 서술형 기출모음 (1~28회)",
+    "group": "exam",
+    "role": "primary_exam",
+    "subject": "전과목",
+    "total_pages": 108,
+    "sample": "\n--- Page 1 ---\n■ 출처 : 13-28 회 온계절님 블로그(https://blog.naver.com/stereok2)  \n1-12 회 https://information-security.tistory.com/ ■ 제작 : https://thodi-lab.tistory.com/ \n1. 다음 아파치 로그를 보고 물음에 답하시오 \n[아파치 로그] \n200.3.1.4 - - [30/May/2023:01:20:01 +09:00] \"(1) GET \n/bulletin/read.php?no=101&item=book (2) HTTP/1.1\" 200 3549 (3)\n--- Page 2 ---\n■ 출처 : 13-28 회 온계절님 블로그(https://blog.naver.com/stereok2)  \n1-12 회 https://information-security.tistory.com/ ■ 제작 : https://thodi-lab.tistory.com/ \n3. rsh, rlogin, rexec 등은 인증 없이 관리자의 원격접속을 가능하게 하는 명령어들이므로 \n사용하지 않는 것이 안전하다. 불가피하게 사용하는 경우 /etc/hosts.equiv, \n$HOME/.rhosts 파일의 소유자, 권한, 파일 내 보안 설정을 어떻게 해\n--- Page 3 ---\n■ 출처 : 13-28 회 온계절님 블로그(https://blog.naver.com/stereok2)  \n1-12 회 https://information-security.tistory.com/ ■ 제작 : https://thodi-lab.tistory.com/ \n5. SNMP 서비스 사용 시 적용되어야 하는 보안 설정 4 가지를 설명하시오.  \n(답)  \n1) 커뮤니티 스트링을 default 값이 아닌 유추하기 어려운 값으로 변경한다. \n \n2) 암호화가 지원되는 SNMP 버전 3 을 사용한다. \n \n3) ACL 을 적용하여 SNM\n--- Page 4 ---\n■ 출처 : 13-28 회 온계절님 블로그(https://blog.naver.com/stereok2)  \n1-12 회 https://information-security.tistory.com/ ■ 제작 : https://thodi-lab.tistory.com/ \n7. PHP 로 작성된 게시판의 소스코드이다. 해당 게시판의 취약점명, 업로드 로직을 \n우회하는 기법, 공격이 성공하기 위한 조건을 설명하시오.  \n<? \n//"
+  },
+  {
+    "id": "SRC-03",
+    "filename": "정보보안기사 실기 서술형 TOP 20.pdf",
+    "title": "정보보안기사 실기 서술형 TOP 20",
+    "group": "exam",
+    "role": "deep_dive",
+    "subject": "전과목 빈출",
+    "total_pages": 36,
+    "sample": "\n--- Page 1 ---\n순위 핵심  키워드 관련  주요  내용\n1 위 SQL 인젝션 Error-based, Blind, Prepared Statement 원리\n2 위 XSS ( 크로스  사이트  스크립트 ) Stored, Reflected, DOM 기반 , 대응  방안\n3 위 Snort 룰 (Rule) 설정 content, offset, depth, msg 등  옵션  분석\n4 위 디지털  포렌식  5 대  원칙 정당성 , 재현성 , 무결성 , 신속성 , 연계  보관성\n5 위 위험  분석  (ALE/SLE) ALE, SLE, ARO 계산  및  정량적  \n--- Page 2 ---\nSQL 인젝션은  웹  애플리케이션이  사용자로부터  입력받은  데이터를  적절한  검증  없이  데이터베이스  질의\n문 (SQL) 의  일부로  포함할  때  발생합니다 .\n1. 동작  방식 : 공격자가  ID 칸에  ' or 1=1--와  같은  값을  넣으면 , 내부  쿼리는  SELECT * FROM \nmember WHERE id='' or 1=1--' AND pass='...'로  변합니다 . 이때  or 1=1에  의해  조건절이 \n항상  참이  되어  비밀번호  없이도  로그인이  성공합니다 .\n2. 공격  유형 :\n에\n--- Page 3 ---\n1. SQL 인젝션  정의  및  원리\n답안 : 웹  애플리케이션이  사용자  입력값에  대한  적절한  검증  없이 이를  SQL 질의문  생성에  사용할 \n때  발생하며 , 공격자는  WHERE 절의  조건식을  ' or 1=1--과  같이  항상  참이  되도록  조작하여  인증 \n절차를  우회하고  데이터베이스의  내용을  무단  조회하거나  변조한다 .\n2. Blind SQL Injection 의  차이점  및  핵심  함수\n답안 : 데이터베이스  에러  메시지가  화면에  출력되지  않는  경우에도  쿼리  결과의  참 \n--- Page 4 ---\n시험  포인트\n유형  구분 : Stored 와  Reflected 의  차이 (DB 저장  여부 ) 를  묻는  문제가  자주  나옵니다 .\nHttpOnly 와  Secure 속성 : 각  속성의  정확한  명칭과  보안  효과 (XSS 대응  vs 스니핑  대응 ) 를  연결해\n서  암기하세요 .\n방어  함수 : PHP 의  htmlspecialchars()나  strip_tags()와  같은  필터링  함수의  원리"
+  },
+  {
+    "id": "SRC-04",
+    "filename": "4과목.pdf",
+    "title": "수제비 정보보안 실기 - 4과목 보안 운영 도구",
+    "group": "theory",
+    "role": "practical_reference",
+    "subject": "보안 운영 및 침해대응",
+    "total_pages": 181,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\nModSecurity의 개념[★]\n보안 운영 도구 – ModSecurity\n Apache와 같은 웹 서버에서실행되며애플리케이션을보호하는\nTrustwave 사에서개발한오픈 소스 기반 웹 방화벽\n\n--- Page 3 ---\nModSecurity의 환경 설정\n보안 운영 도구 – ModSecurity\n ModSecurity의규칙엔진을활성화또는비활성화하는설정옵션\n ModSecurity의감사로그기능을제어하는옵션\nOn  활성화\nOff  비활성화\nDetectionOnly  활성화는하지만차단하지않고탐지만수행\nOn  모든트랜잭션로깅\nOff  로깅하지않음\nRelevantOnly\n Error, Warning의 트랜잭션, \nSecAuditLogRelevantStatus에정의된\n상태코드와일치하는트랜잭션만로깅\n\n--- Page 4 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 5 ---\nSuricata의 개념\n보안 운영 도구 – Suricata\n 실시간으로네트워크트래픽을분석해악성 행위나침입을탐지하거나\n차단하는오픈소스IDS/IPS 엔진\n OISF에서 개발·유지보수하는오픈소스IDS/IPS 엔진\n"
+  },
+  {
+    "id": "SRC-05",
+    "filename": "00. 정보보안기사_실기_요약_v1.0.pdf",
+    "title": "정보보안기사 실기 대비 시스템 보안 단권화 요약노트",
+    "group": "theory",
+    "role": "core_summary",
+    "subject": "시스템 보안",
+    "total_pages": 62,
+    "sample": "\n--- Page 1 ---\n정보보안기사\t실기\t대비\n시스템\t보안\n시스템\t보안\n단권화\t노트\n단권화\t노트\n자주\t출제되는\t핵심\t개념\t선별\t정리\t·\t정의\t/\t핵심\t개념\t/\t기출\t포인트\t/\t암기\t팁\nWindows\t인증\t&\t계정\nWindows\t인증\t&\t계정\nLSA·SAM·SRM\t·\tSID\t·\t크래킹\nLinux\t계정\t파일\nLinux\t계정\t파일\npasswd\t·\tshadow\t·\tgroup\t·\t계정\t보안\n파일시스템\t&\t권한\n파일시스템\t&\t권한\ninode·MAC\ttime\t·\t링크\t·\tSUID/umask\n프로세스\t&\t스케줄러\n프로세스\t&\t스케줄러\n좀비/고아\t·\t시그널\t·\tcron\n\n--- Page 2 ---\n목차\n목차\n시스템\t보안\t핵심\t개념\t25선\nWindows\t인증\t&\t계정\nWindows\t인증\t&\t계정\n01\n01\nWindows\t인증\t구성요소\t&\tSID\n02\n02\n인증\t구조\t&\t암호\t알고리즘\n03\n03\n패스워드\t크래킹\n04\n04\nWindows\t서버\t계정·공유\t보안\nLinux\t계정\t파일\nLinux\t계정\t파일\n05\n05\n/etc/passwd\t(7\t필드)\n06\n06\n/etc/shadow\t(9\t필드)·암호화\n07\n07\n/etc/group·계정\t관리\t명령\n08\n08\nUnix/Linux\t계정\t보안\t설정\n파일시스템\t&\t권한\n파일시스템\t&\t권한\n09\n--- Page 3 ---\n01\n01\nWindows\t인증\t구성요소\t&\tSID\nWindows\t인증\t구성요소\t&\tSID\n출제\n★★★\n정의\n\t—\tWindows\t로컬\t인증은\t\nLSA·SAM·SRM\n\t세\t구성요소가\t담당하며,\t인증된\t사용자에게\t부여되는\t\nSID\n를\t기반으로\t자원\t접근을\t제어한다.\n구성요소\n역할\nLSA\n(Local\tSecurity\tAuthority)\n로그인\t검증,\t접근\t권한\t검사,\tSRM이\t생성한\t감사\t로그\t기록\t—\t\n보안\t서브시스템\nSAM\n(Security\tAccount\tManager)\n계정\t정보\tDB\t관리,\t인증\t여부\t결정.\t\nSAM\t파일\n=사용자·\n--- Page 4 ---\n04\n04\nWindows\t서버\t계정·공유\t보안\nWindows\t서버\t계정·공유\t보안\n출제\n★★\n정의\n\t—\tWindows\t서버\t취약점\t점검의\t대표\t항목.\t계정\t정리·패스워드/잠금\t정책·기본\t공유\t제거가\t실기\t서술로\t나온다.\n항목\n조치\n계정\nAdministrator\t이름\t변경,\t\nGuest\t비활성화\n,\t불필요\t계정\t제거,\tAdministrators\t그룹\t최소화\n패스워드\t정책\n복잡성\t사용,\t기억\t4개↑,\t최대\t90일↓,\t최소\t"
+  },
+  {
+    "id": "SRC-06",
+    "filename": "1과목.pdf",
+    "title": "수제비 정보보안 실기 - 1과목 시스템 보안",
+    "group": "theory",
+    "role": "theory",
+    "subject": "시스템 보안",
+    "total_pages": 302,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\n운영체제(OS; Operating System)의 개념\n운영체제 개론 – 운영체제\n 사용자가컴퓨터의하드웨어를쉽게 사용할수 있도록인터페이스를제공해\n주는 소프트웨어\n 하드웨어는컴퓨터의장치를제어하고데이터를처리하는중앙 처리 장치, \n데이터를저장하는기억 장치, 외부와의통신을담당하는통신 장치, 데이터\n입력과출력을담당하는입출력장치 등으로구분될수 있음\n\n--- Page 3 ---\n운영체제특징\n운영체제 개론 – 운영체제\n사용자편리성  한정된시스템자원을효과적으로사용할수 있도록관리및 운영\n인터페이스기능  컴퓨터시스템과사용자를연결\n스케줄링  다중 사용자와 다중 응용 프로그램환경하에서자원의 현재 상태를 파악하고\n자원분배를위한스케줄링을담당\n자원관리  CPU,메모리공간, 기억장치, 입출력장치등의자원을관리\n제어기능  입출력장치와사용자프로그램을제어\n\n--- Page 4 ---\n운영체제의쉘과 커널\n운영체제 개론 – 운영체제\n쉘 [★]\n명령어해석기기능\n 사용자가 입력한 명령어를 해석하여 커널에 전달하고, 그 결과를 다시\n사용자에게보여주는명령어 해석기(Interpreter)또는 번역기(Translator)\n역할을수행\n프로그래밍기능  쉘 자체적으로 제어문, 반복문, 변수 등을 지원하여 스크립트 형태의\n프로그램을작성하고실행할수 있음\n사용자환경설정\n기능  초기화파일기능을이용해사용자맞춤환경을설정할수 있음\n쉘 기능\n쉘(Shell) 개념\n 사용자가입력한명령어를읽어서해석하는프로그램\n 시스템과사용자간의인터페이스를제\n--- Page 5 ---\n운영체제의쉘과 커널\n운영체제 개론 – 운영체제\n커널\n커널기능[★]\n커널(Kernel) 개념\n 운영체제의핵심이되는기능들이모여있는소프트웨어\n 컴퓨터가부팅될때 주기억장치에적재된후 상주하면서실행하며, 프로그램과\n하드웨어간의인터페이스역할을담당\n프로세스관리  프로세스스케줄링및 동기화관리담당\n 프로세스생성과제거, 시작과정지, 메시지전달등의기능담당\n기억장치관리  메모리할당및 회수관리담당\n주변장치관리  입·출력장치스케줄링및 전반적인관리담당\n파일관리  파일의생성과삭제, 변경, 유지등의관리담당\n"
+  },
+  {
+    "id": "SRC-07",
+    "filename": "2과목.pdf",
+    "title": "수제비 정보보안 실기 - 2과목 네트워크 보안",
+    "group": "theory",
+    "role": "theory",
+    "subject": "네트워크 보안",
+    "total_pages": 457,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\nOSI 7계층\n네트워크 개념 이해 – 네트워크 개요\nOSI 7계층의개념\n 국제 표준화기구인ISO(International Standardization \nOrganization)에서개발한컴퓨터네트워크프로토콜디자인과통신을\n계층으로나누어설명한개방형시스템상호 연결 모델\n 각 계층은서로 독립적으로구성되며, 하위 계층의기능을활용하여상위\n계층에서비스를제공\n\n--- Page 3 ---\n네트워크 개념 이해 – 네트워크 개요\nOSI 7계층의구조\n순서 계층 프로토콜 전송단위 주소\n7  HTTP, FTP, SMTP, Telnet,\nDNS,SNMP\nPort \n주소\n6  JPEG,MPEG\n5  RPC,NetBIOS\n4  TCP,UDP\n3  IP,IPSec,ICMP,IGMP IP주소\n2  HDLC,PPP,L2TP,LLC MAC\n주소\n1  RS-232C -\nOSI 7계층\n\n--- Page 4 ---\n역캡슐화\nOSI 7계층\n네트워크 개념 이해 – 네트워크 개요\n헤더 헤더 헤더 헤더 헤더 데이터 트레일러\n헤더 헤더 헤더 헤더 데이터\n헤더 헤더 헤더 데이터\n헤더 헤더 데이터\n헤더 데이터\n데이터\n캡슐화\n응용 계층\n표현 계층\n세션 계층\n전송 계층\n네트워크 계층\n데이터 링크 계층\n물리 계층\nOSI 7계층\nOSI 7계층캡슐화(Encapsulation)/역 캡슐화(De-Capsulation)\n 캡슐화는하위 계층으로전달(7계층에서1계층으로전달)하는 과정에서\n계층마다인식할수 있는 헤더, 트레일러를붙이는과정\n 역 캡슐화는상위 계층으로전달(1계\n--- Page 5 ---\n네트워크 개념 이해 – 네트워크 개요\nwww . soojebi . co . kr\n호스트컴퓨터이름 소속기관 단체성격 국가구분\nOSI 7계층\nOSI 7계층주소\n도메인주소(Domain Name)\n 네트워크상에서컴퓨터를식별하는호스트명\n 사람이기억하기쉽게만들어놓은주소체계이며응용계층(7계층)에서사용\n"
+  },
+  {
+    "id": "SRC-08",
+    "filename": "3과목.pdf",
+    "title": "수제비 정보보안 실기 - 3과목 애플리케이션 보안",
+    "group": "theory",
+    "role": "theory",
+    "subject": "애플리케이션 보안",
+    "total_pages": 598,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\nFTP 보안 – FTP\nFTP(File Transfer Protocol)의 개념\n TCP/IP 프로토콜을기반으로서버, 클라이언트사이에서파일 송수신을\n하기 위한 프로토콜\nFTP의 구성[★]\nServer PI\nServer DTP\nClient PI\nClient DTP\nControl Channel\nData Channel\nFTP Server FTP Client\n\n--- Page 3 ---\nFTP의 구성\nFTP의 구성\nFTP 보안 – FTP\n모듈\n 제어명령을송수신하는모듈\n 데이터를송수신하는모듈\n채널(연결)\n 클라이언트에서서버로의 명령과 서버 응답을 위한\n연결\n TCP( )번 포트사용\n 파일이전송될때 데이터를주고받는연결\n TCP( )번 포트사용, PassiveMode에서는( )\n번 이상의임의포트사용\n운영모드\n 서버에서Data채널연결을시도하는모드\n 클라이언트에서Data채널연결을시도하는모드\n\n--- Page 4 ---\nFTP 운영 모드\nFTP 운영 모드 절차[★]\nFTP 보안 – FTP\nFTP Server FTP Client FTP Server FTP Client\n20\nData\n21\nCOMMAND 5150 5151 20\nData\n21\nCOMMAND 5150 5151\n3267\n\n--- Page 5 ---\nFTP 운영 모드\nFTP 운영 모드별문제점\nFTP 보안 – FTP\nActive FTP 모드\n 3단계에서서버가클라이언트로접속을시도하는것이문제\n 클라이언트PC에 방화벽이 설치되어 있다면 3단계 프로세스는방화벽에\n의해차단되어FTP접속에문제가발생\nPassive FTP 모드\n Data포트로Active모드에서사용했던20번을사용하지않고1024이후의\n임의의 포트 사용하므로, 서버의 임의의 포트(1024~65535)를 서버 및\n네트워크 방화벽에서 모두 열어야 한다는 문제가 발생(대부분의 FTP\n데몬에서Passive모드접속시 사용포트제한설정으로"
+  },
+  {
+    "id": "SRC-09",
+    "filename": "5과목.pdf",
+    "title": "수제비 정보보안 실기 - 5과목 정보보안 일반 및 암호학",
+    "group": "theory",
+    "role": "theory",
+    "subject": "정보보안 일반 및 암호학",
+    "total_pages": 217,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\n암호 알고리즘 – 암호 개요\n암호학(Cryptography) 개념\n 정보를보호하기위한 언어학적및 수학적방법론을다루는학문\n\n--- Page 3 ---\n암호 알고리즘 – 암호 개요\n암호 시스템\n암호 시스템(Cryptosystem) 개념\n 데이터의기밀성, 무결성, 인증 등을 보호하기위해 설계된암호화기술과\n관련된시스템\n암호 시스템구성요소\n평문(P) 암호문(C)\n암호화(E)\n복호화(D)\n암호화키(e)\n복호화키(d)\n\n--- Page 4 ---\n암호 알고리즘 – 암호 개요\n암호 공격\n암호 공격(Cryptogram Attack) 개념\n 암호 시스템의약점을찾아내거나암호화된데이터를해독하기위한 과정\n\n--- Page 5 ---\n암호 알고리즘 – 암호 개요\n암호 공격\n암호 공격의유형\n<Alice> <Bob><Eve>\n암호문(C)\n암호문(C)\n평문(P)\n암호문(C)\n평문(P)\n암호문(C)\n평문(P)\nCOA\n암호문단독공격(COA; CiphertextOnly Attack)\n 공격자가암호문만을가지고, 암호시스템을분석하거나평문을추측하는공격\n 암호문만을이용하여평문이나키를찾아내는방법으로평문의통계적성질과문자의\n특성등을추정하여해독하는공격방법\n"
+  },
+  {
+    "id": "SRC-10",
+    "filename": "6과목.pdf",
+    "title": "수제비 정보보안 실기 - 6과목 정보보호 관리",
+    "group": "theory",
+    "role": "theory",
+    "subject": "정보보호 관리",
+    "total_pages": 194,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\n정보보호 관리 – 정보보호\n정보보호(Information Security) 개념\n 정보의수집, 저장, 송수신등 처리 과정 중에 생기는정보의위·변조, 훼손, \n유출, 사용 방해 등을 방지하기위해 정보의흐름 전체를보호하는활동\n\n--- Page 3 ---\n정보보호 관리 – 정보보호\n정보보호목표[★]\n 인가된 사용자나 시스템만이 정보에 대한 접근이\n가능하도록보호하는특성\n 정보가비 인가된자에게노출되지않도록보장하는\n특성\n암호화, 접근 제어,\n비밀번호\n 비인가된 자에 의한 정보의 변경, 삭제, 생성\n등으로부터 보호하여 정보의 정확성과 완전성이\n보장되어야한다는특성\n 정보의정확성과신뢰성을유지하고, 허가되지않은\n변경이나손상으로부터정보를보호하는특성\n체크섬, 해시 함수,\n디지털서명\n 정당한 권한을 가진 사용자가 필요할 때 정보와\n시스템에 접근하여 서비스를 지속해서 사용할 수\n있도록보장하는특\n--- Page 4 ---\n정보보호 관리 – 정보보호\n정보보안속성[★]\n 시스템 내의 사용자 또는 프로세스가수행한\n작업을추적하고, 해당 행위에대해책임질수\n있도록보장하는속성\n로그 관리, 사용자 식별\n(User Identification),침\n입 탐지시스템(IDS),디지\n털 서명\n 정보의 송신자나 수신자가 자신의 행위를\n부인하지못하도록보장하는특성\n전자서명, 인증기관(CA;\nCertificationAuthority),\n로그및 감사추적\n 사용자나시스템의신원을 확인하여, 요청자\n가 실제권한이있는주체인지검증하는과정\n단일 인증, 다중 인증, 생\n체 인증, 공개 키 \n--- Page 5 ---\n정보보호 관리 – 정보보호\n정보보호예방 대책\n 보안 사고를사전에방지하고, 조직의정보 자산을안전하게보호하기위해\n설계된조치와활동\n 보안 사고의발생 가능성을최소화하고, 시스템과데이터의기밀성, 무결성, \n가용성을유지하는데 중점을둠\n"
+  },
+  {
+    "id": "SRC-11",
+    "filename": "7과목.pdf",
+    "title": "수제비 정보보안 실기 - 7과목 국가 기반 및 서비스 보안 법규",
+    "group": "theory",
+    "role": "theory",
+    "subject": "정보보호 법규",
+    "total_pages": 185,
+    "sample": "\n--- Page 1 ---\n정보보안 실기\n본 교안의모든 이미지, 내용에대한저작권은수제비에있으며, 무단전재, 배포및 영리목적의\n사용을금합니다.\n이를위반했을경우 민·형사상의책임을질 수 있습니다.\n\n--- Page 2 ---\n국가 기반 및 서비스 보안 법규 – 정보통신기반 보호법\n정보통신기반보호법구성\n제1장 제1조~제2조  총칙\n제2장 제3조~제7조  주요정보통신기반시설의보호체계\n제3장 제8조~제9조  주요정보통신기반시설의지정및 취약점분석\n제4장 제10조~제16조  주요정보통신기반시설의보호및 침해사고의대응\n제5장 제17조~제23조  삭제\n제6장 제24조~제27조  기술지원및 민간협력등\n제7장 제28조~제30조  벌칙\n\n--- Page 3 ---\n국가 기반 및 서비스 보안 법규 – 정보통신기반 보호법\n총칙(제1장)\n이 법은 전자적 침해행위에대비하여주요정보통신기반시설의보호에 관한 대책을 수립ㆍ시행함으로써\n동 시설을안정적으로운용하도록하여국가의안전과국민생활의안정을보장하는것을목적으로한다.\n목적(제1조) [★]\n용어(제2조) [★]\n 국가안전보장ㆍ행정ㆍ국방ㆍ치안ㆍ금융ㆍ통신ㆍ운송ㆍ에너지등의\n업무와관련된전자적제어ㆍ관리시스템\n 전기통신설비를 이용하거나 전기통신설비와 컴퓨터 및 컴퓨터의\n이용기술을 활용하여 정보를 수집ㆍ가공ㆍ저장ㆍ검색ㆍ송신 또는\n수신하는정보통신체제\n 정보통신기반시설을공\n--- Page 4 ---\n국가 기반 및 서비스 보안 법규 – 정보통신기반 보호법\n주요정보통신기반시설의보호체계(제2장)\n① 주요정보통신기반시설의보호에관한사항을심의하기위하여(                       )소속하에\n정보통신기반보호위원회를둔다.\n② 위원회의위원은위원장1인을포함한(             )인 이내의위원으로구성한다.\n③ 위원회의위원장은(                       )이 되고, 위원회의위원은대통령령으로정하는중앙행정기관의\n(                       )과 (                                 \n--- Page 5 ---\n국가 기반 및 서비스 보안 법규 – 정보통신기반 보호법\n주요정보통신기반시설의보호체계(제2장)\n① 관계중앙행정기관의장은제5조제2항에따라제출받은주요정보통신기반시설보호대책을\n종합ㆍ조정하여소관분야에대한주요정보통신기반시설에관한보호계획을수립ㆍ시행하여야한다.\n② 관계중앙행정기관의장은전년도주요정보통신기반시설보호계획의추진실적과다음연도의\n주요정보통신기반시설보호계획을위원회"
+  },
+  {
+    "id": "SRC-12",
+    "filename": "정보보안기사 정리_260214.pdf",
+    "title": "정보보안기사 실기 전과목 핵심 정리 (260214)",
+    "group": "theory",
+    "role": "core_summary",
+    "subject": "전과목",
+    "total_pages": 110,
+    "sample": "\n--- Page 1 ---\n \n페이지 1/110 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n정보보안 정리 \n \n--- Page 2 ---\n \n페이지 2/110 \n목차 \n1. 시스템 \n⚫ 윈도우 기본 \n⚫ 윈도우 관리 \n⚫ 리눅스 기본 \n⚫ 리눅스 관리 \n⚫ 모바일 기본 \n⚫ 시스템 공격 \n⚫ 시스템 보안 \n \n2. 네트워크 \n⚫ 네트워크 기본 \n⚫ 네트워크 장비 \n⚫ 프로토콜 \n⚫ 네트워크 관리 \n⚫ 무선 네트워크 기본 \n⚫ 무선 프로토콜 \n⚫ 네트워크 공격 \n⚫ 네트워크 보안 \n \n3. 어플리케이션 \n⚫ 어플리케이션 기본 \n⚫ 웹 공격 \n⚫ 웹 보안 \n⚫ 데이터베이스 \n⚫ 어플리케이션 응용 \n--- Page 3 ---\n \n페이지 3/110 \n \n4. 침해사고 분석 및 대응 \n⚫ 패킷 탐지/차단 도구 \n⚫ 보안 솔루션 \n⚫ 보안 장비 운영 \n⚫ 취약점 점검 \n⚫ 무결성 점검 \n⚫ 루트킷 점검 \n⚫ 취약점 정보 분류 체계 \n⚫ 쉘 획득 \n⚫ 취약점 익스플로잇 \n⚫ 난독화 \n⚫ 악성코드 \n⚫ 침해사고 종류 \n \n \n \n \n \n \n \n \n \n \n \n--- Page 4 ---\n \n페이지 4/110 \n시스템 \n윈도우 기본 \n인증 구성요소 설명 \n비고 \nLSA \n모든 계정의 로그인에 대한 검증 및 시스템 자원에 대한 접근 권한을 검사 \n- 로컬 및 원격 로그인 포함 \nSAM \n사용자 로그인 정보와 SAM 파일에 있는 저장된 사용자 패스워드 정보를 비교해 인증 \n여부를 결정 \n- SAM 파일은 사용자와 그룹 계정의 패스워드를 관리 \n- LSA 를 통한 인증을 제공하는 중요한 파일이므로 적절한 접근통제가 필요 \nSRM \n인증된 사용자에게 SID 를 부여 \n- SID 를 기반하여 파일이나 디렉터리에 대한 접근을 \n--- Page 5 ---\n \n페이지 5/110 \n인증 암호 알고리즘 설명 \nLM 해시 비스타 이전 운영체제에서 사용하고 구조적으로 취약한 알고리즘 \nNTLM 해시 LM 해시에 MD4 해시가 추가된 형태 \nNTLMv2 해시 비스타 이후 기본 인증 프로토콜로 현재까지 복잡도가 충분함 \nLan Manager \n네트워크를 통한 파일 및 프린터 공유 등과 같은 작업 시 인증을 담당하는 서비스 \n로컬 보안 정책 -> 보안설정 -> 로컬 정책 -> 보안옵션 -> LAN Manager 인증 수준 \n속성(NTLMv2 사용) \n \n계정/그룹 설명 \n기본 사용자 \nAdmini"
+  }
+]

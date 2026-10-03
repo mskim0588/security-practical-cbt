@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}답안 검토 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<div class="card hero-card">
+  <h1 class="hero-title">답안 최종 검토</h1>
+  <p class="hero-desc">
+    제출하기 전에 작성하신 답안과 실무형 선택 문항을 확인하십시오.
+  </p>
+
+  <div class="spec-grid">
+    <div class="spec-item">
+      <h4>응시 대상 문항</h4>
+      <div class="value">17문항</div>
+      <div class="sub">단답 12 + 서술 4 + 실무 1택</div>
+    </div>
+    <div class="spec-item">
+      <h4>작성 완료 문항</h4>
+      <div class="value" style="color: var(--primary-color);">{{ complete_count }} / 17</div>
+      <div class="sub">미완료: {{ 17 - complete_count }}문항</div>
+    </div>
+    <div class="spec-item" style="border-color: #86efac; background: #f0fdf4;">
+      <h4 style="color: #15803d;">실무형 선택</h4>
+      <div class="value" style="font-size: 16px; color: #15803d; margin-top: 4px;">
+        {% if selected_practical_id == 'Q-PRAC-001' %}
+          17번 (IPTables) 선택됨
+        {% elif selected_practical_id == 'Q-PRAC-002' %}
+          18번 (Snort IDS) 선택됨
+        {% elif selected_prac_title %}
+          {{ selected_prac_title }} 선택됨
+        {% else %}
+          선택되지 않음 (0점 처리)
+        {% endif %}
+      </div>
+      <div class="sub">선택된 문항만 16점 채점</div>
+    </div>
+  </div>
+
+  {% if complete_count < 17 %}
+  <div style="background: var(--warning-bg); border-left: 4px solid var(--warning-color); padding: 12px 16px; border-radius: 4px; margin-bottom: 20px;">
+    <strong style="color: var(--warning-color);">주의:</strong> 아직 작성 완료되지 않은 문항({{ 17 - complete_count }}문항)이 있습니다. 제출 시 미작성된 입력란은 0점으로 처리됩니다.
+  </div>
+  {% endif %}
+
+  <!-- Submit / Back Actions -->
+  <form id="submit-form" method="POST" action="/submit">
+    <!-- Pass through all form inputs -->
+    {% for key, val in raw_form_data.items() %}
+    <input type="hidden" name="{{ key }}" value="{{ val }}">
+    {% endfor %}
+
+    <div style="display: flex; gap: 12px; margin-top: 20px;">
+      <a href="javascript:history.back()" class="btn btn-secondary btn-lg">&larr; 수정하러 가기</a>
+      <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('정말 답안을 제출하고 채점을 진행하시겠습니까?');">
+        최종 답안 제출 및 채점하기 &rarr;
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Detailed Table of Questions Status -->
+<div class="card">
+  <h2 style="font-size: 18px; margin-bottom: 16px; color: var(--gray-800);">문항별 작성 상태 세부내역</h2>
+  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--gray-200); background: var(--gray-50);">
+        <th style="padding: 10px 12px;">번호</th>
+        <th style="padding: 10px 12px;">유형</th>
+        <th style="padding: 10px 12px;">과목/분야</th>
+        <th style="padding: 10px 12px;">배점</th>
+        <th style="padding: 10px 12px;">작성 상태</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in review_items %}
+      <tr style="border-bottom: 1px solid var(--gray-200); {% if item.type == 'practical' and not item.is_selected_practical %}background: #f8fafc; opacity: 0.6;{% endif %}">
+        <td style="padding: 10px 12px; font-weight: 700;">{{ item.index }}번</td>
+        <td style="padding: 10px 12px;">
+          {% if item.type == 'short' %}<span class="q-badge badge-short">단답형</span>
+          {% elif item.type == 'descriptive' %}<span class="q-badge badge-desc">서술형</span>
+          {% else %}<span class="q-badge badge-prac">실무형</span>{% endif %}
+        </td>
+        <td style="padding: 10px 12px; color: var(--gray-700);">{{ item.category }}</td>
+        <td style="padding: 10px 12px; font-weight: 600;">{{ item.score }}점</td>
+        <td style="padding: 10px 12px;">
+          {% if item.status_code == 'complete' %}
+            <span style="color: var(--success-color); font-weight: 600;">✓ {{ item.status_text }}</span>
+          {% elif item.status_code == 'partial' %}
+            <span style="color: var(--warning-color); font-weight: 600;">△ {{ item.status_text }}</span>
+          {% elif item.status_code == 'empty' %}
+            <span style="color: var(--danger-color); font-weight: 600;">✕ {{ item.status_text }}</span>
+          {% else %}
+            <span style="color: var(--gray-600); font-weight: 500;">{{ item.status_text }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

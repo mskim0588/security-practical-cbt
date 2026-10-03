@@ -1,0 +1,176 @@
+{
+  "findings": [
+    {
+      "id": "Q-SHORT-001, Q-SHORT-002, Q-SHORT-003",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.1 has 3 derived questions (Q-SHORT-001, Q-SHORT-002, Q-SHORT-003). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-004, Q-SHORT-005, Q-SHORT-006, Q-SHORT-007",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.2 has 4 derived questions (Q-SHORT-004, Q-SHORT-005, Q-SHORT-006, Q-SHORT-007). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-008, Q-SHORT-009, Q-SHORT-010",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.3 has 3 derived questions (Q-SHORT-008, Q-SHORT-009, Q-SHORT-010). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-012, Q-SHORT-030, Q-SHORT-031, Q-SHORT-032",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.6 has 4 derived questions (Q-SHORT-012, Q-SHORT-030, Q-SHORT-031, Q-SHORT-032). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-013, Q-SHORT-014, Q-SHORT-015",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.7 has 3 derived questions (Q-SHORT-013, Q-SHORT-014, Q-SHORT-015). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-016, Q-SHORT-017, Q-SHORT-018, Q-SHORT-019",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.8 has 4 derived questions (Q-SHORT-016, Q-SHORT-017, Q-SHORT-018, Q-SHORT-019). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-023, Q-SHORT-024, Q-SHORT-025",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.10 has 3 derived questions (Q-SHORT-023, Q-SHORT-024, Q-SHORT-025). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-038, Q-SHORT-039, Q-SHORT-040",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.17 has 3 derived questions (Q-SHORT-038, Q-SHORT-039, Q-SHORT-040). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-043, Q-SHORT-044, Q-SHORT-045, Q-SHORT-046",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-01 p.22 has 4 derived questions (Q-SHORT-043, Q-SHORT-044, Q-SHORT-045, Q-SHORT-046). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-061, Q-SHORT-062, Q-PRAC-013",
+      "type": "multiple",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "SRC-05 p.10 has 3 derived questions (Q-SHORT-061, Q-SHORT-062, Q-PRAC-013). Check for over-concentration."
+    },
+    {
+      "id": "Q-SHORT-052",
+      "type": "short",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "Contains legal criteria/period/officer requirements (['ciso']). Verify alignment with PDF baseline vs latest statutory revisions."
+    },
+    {
+      "id": "Q-SHORT-085",
+      "type": "short",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "Contains legal criteria/period/officer requirements (['개인정보', '보호법', '유출']). Verify alignment with PDF baseline vs latest statutory revisions."
+    },
+    {
+      "id": "Q-DESC-031",
+      "type": "descriptive",
+      "verdict": "WARNING",
+      "priority": "P2",
+      "issue": "Contains legal criteria/period/officer requirements (['정보통신망법', '망법', '보호최고책임자']). Verify alignment with PDF baseline vs latest statutory revisions."
+    }
+  ],
+  "duplicate_candidates": [
+    {
+      "q1_id": "Q-SHORT-063",
+      "q2_id": "Q-SHORT-064",
+      "q1_type": "short",
+      "q2_type": "short",
+      "similarity": 0.238,
+      "core_ans_match": false,
+      "q1_source": "SRC-09 p.20",
+      "q2_source": "SRC-09 p.21",
+      "q1_concept": "CON-CRY-01",
+      "q2_concept": "CON-CRY-01",
+      "shared_tokens": [
+        "다음",
+        "동작한다",
+        "비트",
+        "알고리즘의",
+        "블록",
+        "영문",
+        "구조로",
+        "설명에"
+      ]
+    }
+  ],
+  "over_concentrated": {
+    "SRC-01_p1": [
+      "Q-SHORT-001",
+      "Q-SHORT-002",
+      "Q-SHORT-003"
+    ],
+    "SRC-01_p2": [
+      "Q-SHORT-004",
+      "Q-SHORT-005",
+      "Q-SHORT-006",
+      "Q-SHORT-007"
+    ],
+    "SRC-01_p3": [
+      "Q-SHORT-008",
+      "Q-SHORT-009",
+      "Q-SHORT-010"
+    ],
+    "SRC-01_p6": [
+      "Q-SHORT-012",
+      "Q-SHORT-030",
+      "Q-SHORT-031",
+      "Q-SHORT-032"
+    ],
+    "SRC-01_p7": [
+      "Q-SHORT-013",
+      "Q-SHORT-014",
+      "Q-SHORT-015"
+    ],
+    "SRC-01_p8": [
+      "Q-SHORT-016",
+      "Q-SHORT-017",
+      "Q-SHORT-018",
+      "Q-SHORT-019"
+    ],
+    "SRC-01_p10": [
+      "Q-SHORT-023",
+      "Q-SHORT-024",
+      "Q-SHORT-025"
+    ],
+    "SRC-01_p17": [
+      "Q-SHORT-038",
+      "Q-SHORT-039",
+      "Q-SHORT-040"
+    ],
+    "SRC-01_p22": [
+      "Q-SHORT-043",
+      "Q-SHORT-044",
+      "Q-SHORT-045",
+      "Q-SHORT-046"
+    ],
+    "SRC-05_p10": [
+      "Q-SHORT-061",
+      "Q-SHORT-062",
+      "Q-PRAC-013"
+    ]
+  },
+  "total_questions": 180
+}

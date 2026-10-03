@@ -1,0 +1,332 @@
+[
+  {
+    "id": "CON-SYS-01",
+    "name": "유닉스/리눅스 계정 및 접근통제",
+    "category": "시스템 보안",
+    "summary": "PAM 모듈(auth/account/session), r-commands(hosts.equiv) 보안설정, 사용자 계정 및 권한 관리",
+    "primary_source_id": "SRC-02",
+    "related_sources": [
+      "SRC-01",
+      "SRC-05",
+      "SRC-06"
+    ],
+    "description": "PAM 모듈(auth/account/session), r-commands(hosts.equiv) 보안설정, 사용자 계정 및 권한 관리",
+    "source_ids": [
+      "SRC-02",
+      "SRC-01",
+      "SRC-05",
+      "SRC-06"
+    ]
+  },
+  {
+    "id": "CON-SYS-02",
+    "name": "Windows 로컬 인증 및 로그 관리",
+    "category": "시스템 보안",
+    "summary": "LSA, SAM, SRM 인증 서브시스템, SID 구조, IIS 및 HTTPERR/DHCP 로그 경로",
+    "primary_source_id": "SRC-05",
+    "related_sources": [
+      "SRC-01",
+      "SRC-06"
+    ],
+    "description": "LSA, SAM, SRM 인증 서브시스템, SID 구조, IIS 및 HTTPERR/DHCP 로그 경로",
+    "source_ids": [
+      "SRC-05",
+      "SRC-01",
+      "SRC-06"
+    ]
+  },
+  {
+    "id": "CON-SYS-03",
+    "name": "파일시스템 권한 및 프로세스 관리",
+    "category": "시스템 보안",
+    "summary": "/proc 가상파일시스템, 프로세스 상태전이 및 은닉 추적, inode, MAC Time, SUID/SGID/Sticky bit 특수권한, umask",
+    "primary_source_id": "SRC-06",
+    "related_sources": [
+      "SRC-01",
+      "SRC-05",
+      "SRC-12"
+    ],
+    "description": "/proc 가상파일시스템, 프로세스 상태전이 및 은닉 추적, inode, MAC Time, SUID/SGID/Sticky bit 특수권한, umask",
+    "source_ids": [
+      "SRC-06",
+      "SRC-01",
+      "SRC-05",
+      "SRC-12"
+    ]
+  },
+  {
+    "id": "CON-NET-01",
+    "name": "네트워크 패킷 분석 및 방화벽/탐지",
+    "category": "네트워크 보안",
+    "summary": "IPTables 3대 체인(INPUT/FORWARD/OUTPUT) 및 상태추적(state NEW !--syn), Snort IDS 룰 헤더",
+    "primary_source_id": "SRC-04",
+    "related_sources": [
+      "SRC-02",
+      "SRC-03",
+      "SRC-07"
+    ],
+    "description": "IPTables 3대 체인(INPUT/FORWARD/OUTPUT) 및 상태추적(state NEW !--syn), Snort IDS 룰 헤더",
+    "source_ids": [
+      "SRC-04",
+      "SRC-02",
+      "SRC-03",
+      "SRC-07"
+    ]
+  },
+  {
+    "id": "CON-NET-02",
+    "name": "무선랜 보안 및 네트워크 인증",
+    "category": "네트워크 보안",
+    "summary": "WPA2(IEEE 802.11i), IEEE 802.1X, EAP 프로토콜, AES-CCMP 암호화, 무선랜 보안 통제",
+    "primary_source_id": "SRC-07",
+    "related_sources": [
+      "SRC-01",
+      "SRC-02"
+    ],
+    "description": "WPA2(IEEE 802.11i), IEEE 802.1X, EAP 프로토콜, AES-CCMP 암호화, 무선랜 보안 통제",
+    "source_ids": [
+      "SRC-07",
+      "SRC-01",
+      "SRC-02"
+    ]
+  },
+  {
+    "id": "CON-NET-03",
+    "name": "네트워크 서비스 및 라우팅 프로토콜",
+    "category": "네트워크 보안",
+    "summary": "SNMP v1/v2c/v3 보안설정(Community String, RO모드), DNS 53번 포트/TTL, 라우팅 RIP/OSPF/EIGRP",
+    "primary_source_id": "SRC-02",
+    "related_sources": [
+      "SRC-01",
+      "SRC-07"
+    ],
+    "description": "SNMP v1/v2c/v3 보안설정(Community String, RO모드), DNS 53번 포트/TTL, 라우팅 RIP/OSPF/EIGRP",
+    "source_ids": [
+      "SRC-02",
+      "SRC-01",
+      "SRC-07"
+    ]
+  },
+  {
+    "id": "CON-APP-01",
+    "name": "웹 애플리케이션 취약점 및 웹서버 분석",
+    "category": "애플리케이션 보안",
+    "summary": "아파치 access.log 분석, SQL Injection 원리, Blind SQLi, Prepared Statement 방어 기법",
+    "primary_source_id": "SRC-03",
+    "related_sources": [
+      "SRC-01",
+      "SRC-02",
+      "SRC-08"
+    ],
+    "description": "아파치 access.log 분석, SQL Injection 원리, Blind SQLi, Prepared Statement 방어 기법",
+    "source_ids": [
+      "SRC-03",
+      "SRC-01",
+      "SRC-02",
+      "SRC-08"
+    ]
+  },
+  {
+    "id": "CON-APP-02",
+    "name": "웹 보안 및 크롤러 배제 표준",
+    "category": "애플리케이션 보안",
+    "summary": "robots.txt 로봇 배제 표준, XSS(Stored/Reflected/DOM), CSRF, HTTP 응답 분할(CRLF)",
+    "primary_source_id": "SRC-08",
+    "related_sources": [
+      "SRC-01",
+      "SRC-03"
+    ],
+    "description": "robots.txt 로봇 배제 표준, XSS(Stored/Reflected/DOM), CSRF, HTTP 응답 분할(CRLF)",
+    "source_ids": [
+      "SRC-08",
+      "SRC-01",
+      "SRC-03"
+    ]
+  },
+  {
+    "id": "CON-APP-03",
+    "name": "데이터베이스 보안 및 암호화 기법",
+    "category": "애플리케이션 보안",
+    "summary": "DB 암호화 3대 방식(API, Plug-in, TDE/커널), SQL 안전한 파라미터 바인딩",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-08"
+    ],
+    "description": "DB 암호화 3대 방식(API, Plug-in, TDE/커널), SQL 안전한 파라미터 바인딩",
+    "source_ids": [
+      "SRC-01",
+      "SRC-08"
+    ]
+  },
+  {
+    "id": "CON-CRY-01",
+    "name": "대칭키 및 공개키 암호 시스템",
+    "category": "정보보안 일반 및 암호학",
+    "summary": "블록 암호 모드(CBC, CTR, GCM), 대칭키 vs 비대칭키 구조, Diffie-Hellman 키 교환",
+    "primary_source_id": "SRC-09",
+    "related_sources": [
+      "SRC-12"
+    ],
+    "description": "블록 암호 모드(CBC, CTR, GCM), 대칭키 vs 비대칭키 구조, Diffie-Hellman 키 교환",
+    "source_ids": [
+      "SRC-09",
+      "SRC-12"
+    ]
+  },
+  {
+    "id": "CON-CRY-02",
+    "name": "해시 함수, 전자서명 및 PKI",
+    "category": "정보보안 일반 및 암호학",
+    "summary": "일방향 해시 함수, 전자서명 생성 및 검증 절차, 공인인증 체계 및 인증서 폐기 목록(CRL/OCSP)",
+    "primary_source_id": "SRC-09",
+    "related_sources": [
+      "SRC-12"
+    ],
+    "description": "일방향 해시 함수, 전자서명 생성 및 검증 절차, 공인인증 체계 및 인증서 폐기 목록(CRL/OCSP)",
+    "source_ids": [
+      "SRC-09",
+      "SRC-12"
+    ]
+  },
+  {
+    "id": "CON-CRY-03",
+    "name": "암호 분석 및 공격 기법",
+    "category": "정보보안 일반 및 암호학",
+    "summary": "암호 해독 공격 4대 유형: COA(암호문 단독), KPA(알려진 평문), CPA(선택 평문), CCA(선택 암호문)",
+    "primary_source_id": "SRC-09",
+    "related_sources": [
+      "SRC-12"
+    ],
+    "description": "암호 해독 공격 4대 유형: COA(암호문 단독), KPA(알려진 평문), CPA(선택 평문), CCA(선택 암호문)",
+    "source_ids": [
+      "SRC-09",
+      "SRC-12"
+    ]
+  },
+  {
+    "id": "CON-MGT-01",
+    "name": "위험관리 및 위험평가 방법론",
+    "category": "정보보호 관리 및 법규",
+    "summary": "개인정보영향평가 위험도 산정공식, ISO 31000 3단계(식별/분석/평가), 정량 위험분석(ALE=SLE*ARO)",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-03",
+      "SRC-10"
+    ],
+    "description": "개인정보영향평가 위험도 산정공식, ISO 31000 3단계(식별/분석/평가), 정량 위험분석(ALE=SLE*ARO)",
+    "source_ids": [
+      "SRC-01",
+      "SRC-03",
+      "SRC-10"
+    ]
+  },
+  {
+    "id": "CON-MGT-02",
+    "name": "개인정보 보호 및 가명처리 기법",
+    "category": "정보보호 관리 및 법규",
+    "summary": "개인정보 가명처리 5대 기술(랜덤 라운딩, 마스킹, 가명화, 총계처리, 데이터값 삭제)",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-11"
+    ],
+    "description": "개인정보 가명처리 5대 기술(랜덤 라운딩, 마스킹, 가명화, 총계처리, 데이터값 삭제)",
+    "source_ids": [
+      "SRC-01",
+      "SRC-11"
+    ]
+  },
+  {
+    "id": "CON-MGT-03",
+    "name": "정보보호 법규 및 ISMS-P 인증",
+    "category": "정보보호 관리 및 법규",
+    "summary": "ISMS-P 3개 영역 102개 인증기준(관리체계, 보호대책, 개인정보 처리), 안전성 확보조치 접속기록 보관",
+    "primary_source_id": "SRC-03",
+    "related_sources": [
+      "SRC-01",
+      "SRC-11"
+    ],
+    "description": "ISMS-P 3개 영역 102개 인증기준(관리체계, 보호대책, 개인정보 처리), 안전성 확보조치 접속기록 보관",
+    "source_ids": [
+      "SRC-03",
+      "SRC-01",
+      "SRC-11"
+    ]
+  },
+  {
+    "id": "CON-SEC-01",
+    "name": "데이터 유출 방지(DLP) 및 엔드포인트 보안",
+    "category": "정보보안 일반 및 암호학",
+    "summary": "DLP(Data Loss Prevention) 이동식 매체/네트워크 유출 통제, 엔드포인트 매체제어, 개인정보 필터링",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-11"
+    ],
+    "description": "DLP(Data Loss Prevention) 이동식 매체/네트워크 유출 통제, 엔드포인트 매체제어, 개인정보 필터링",
+    "source_ids": [
+      "SRC-01",
+      "SRC-11"
+    ]
+  },
+  {
+    "id": "CON-NET-04",
+    "name": "스위칭 인프라 및 가상 LAN (VLAN)",
+    "category": "네트워크 보안",
+    "summary": "정적 VLAN(포트 기반) 및 동적 VLAN(MAC 기반) 주소 할당, IEEE 802.1Q 트렁킹, L2 스위칭 보안",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-07"
+    ],
+    "description": "정적 VLAN(포트 기반) 및 동적 VLAN(MAC 기반) 주소 할당, IEEE 802.1Q 트렁킹, L2 스위칭 보안",
+    "source_ids": [
+      "SRC-01",
+      "SRC-07"
+    ]
+  },
+  {
+    "id": "CON-APP-04",
+    "name": "오픈소스 컴포넌트 및 소프트웨어 공급망 취약점",
+    "category": "애플리케이션 보안",
+    "summary": "Apache Log4j 원격 코드 실행(RCE, CVE-2021-44228), JNDI Lookup 인젝션 취약점, 서드파티 라이브러리 결함",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-08"
+    ],
+    "description": "Apache Log4j 원격 코드 실행(RCE, CVE-2021-44228), JNDI Lookup 인젝션 취약점, 서드파티 라이브러리 결함",
+    "source_ids": [
+      "SRC-01",
+      "SRC-08"
+    ]
+  },
+  {
+    "id": "CON-SEC-02",
+    "name": "디지털 포렌식 및 침해사고 증거 분석",
+    "category": "정보보안 일반 및 암호학",
+    "summary": "디지털 포렌식 5대 기본 원칙(정당성, 재현성, 신속성, 연계보관성, 무결성), 안티포렌식 대응, 증거 수집 절차",
+    "primary_source_id": "SRC-03",
+    "related_sources": [
+      "SRC-09",
+      "SRC-12"
+    ],
+    "description": "디지털 포렌식 5대 기본 원칙(정당성, 재현성, 신속성, 연계보관성, 무결성), 안티포렌식 대응, 증거 수집 절차",
+    "source_ids": [
+      "SRC-03",
+      "SRC-09",
+      "SRC-12"
+    ]
+  },
+  {
+    "id": "CON-MGT-04",
+    "name": "업무 연속성 관리(BCP) 및 재해복구(DR)",
+    "category": "정보보호 관리 및 법규",
+    "summary": "BIA(업무 영향 분석), RTO(목표 복구 시간), RPO(목표 복구 시점), 재해복구센터 구축 유형(Mirror, Hot, Warm, Cold)",
+    "primary_source_id": "SRC-01",
+    "related_sources": [
+      "SRC-10"
+    ],
+    "description": "BIA(업무 영향 분석), RTO(목표 복구 시간), RPO(목표 복구 시점), 재해복구센터 구축 유형(Mirror, Hot, Warm, Cold)",
+    "source_ids": [
+      "SRC-01",
+      "SRC-10"
+    ]
+  }
+]

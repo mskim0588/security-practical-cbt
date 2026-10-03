@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}정보보안기사 실기시험 대비 CBT{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-area">
+        <span class="logo-badge">실기 CBT</span>
+        <a href="/" class="logo-title">정보보안기사 실기시험 CBT</a>
+      </div>
+      <div class="header-actions">
+        {% block header_actions %}
+        <span style="font-size: 14px; color: var(--gray-600);">총 100점 만점 / 합격 기준 60점</span>
+        {% endblock %}
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer style="text-align: center; padding: 40px 20px; color: var(--gray-600); font-size: 13px;">
+    <p>정보보안기사 실기 CBT 시스템 MVP &copy; 2026</p>
+    <p style="margin-top: 4px;">출처: 12개 실기 대비 PDF 문서 기반 정밀 검증 데이터 탑재</p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}채점 결과 리포트 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<div class="score-summary-card">
+  <div style="font-size: 16px; font-weight: 700; color: var(--gray-600); text-transform: uppercase;">
+    정보보안기사 실기 모의고사 채점 결과
+  </div>
+
+  <div class="score-main">
+    {{ result.total_score }} <span class="unit">/ 100점</span>
+  </div>
+
+  <div>
+    {% if result.is_passed %}
+      <span class="pass-badge pass">🎉 합격권입니다! (기준: 60점 이상)</span>
+    {% else %}
+      <span class="pass-badge fail">불합격권입니다 (기준: 60점 이상 필요)</span>
+    {% endif %}
+  </div>
+
+  <div class="section-score-grid">
+    <div class="section-score-box">
+      <div style="font-size: 13px; color: var(--primary-color); font-weight: 700;">1. 단답형 (12문항)</div>
+      <div style="font-size: 24px; font-weight: 800; color: var(--gray-900); margin: 6px 0;">
+        {{ result.summary.short.earned }} <span style="font-size: 14px; color: var(--gray-600);">/ 36점</span>
+      </div>
+      <div style="font-size: 13px; color: var(--gray-600);">득점률 {{ result.summary.short.percentage }}%</div>
+    </div>
+
+    <div class="section-score-box">
+      <div style="font-size: 13px; color: #b45309; font-weight: 700;">2. 서술형 (4문항)</div>
+      <div style="font-size: 24px; font-weight: 800; color: var(--gray-900); margin: 6px 0;">
+        {{ result.summary.descriptive.earned }} <span style="font-size: 14px; color: var(--gray-600);">/ 48점</span>
+      </div>
+      <div style="font-size: 13px; color: var(--gray-600);">득점률 {{ result.summary.descriptive.percentage }}%</div>
+    </div>
+
+    <div class="section-score-box">
+      <div style="font-size: 13px; color: #15803d; font-weight: 700;">3. 실무형 (선택 1문항)</div>
+      <div style="font-size: 24px; font-weight: 800; color: var(--gray-900); margin: 6px 0;">
+        {{ result.summary.practical.earned }} <span style="font-size: 14px; color: var(--gray-600);">/ 16점</span>
+      </div>
+      <div style="font-size: 13px; color: var(--gray-600);">
+        {% if result.summary.practical.selected_id %}
+          선택: {{ result.summary.practical.selected_id }}
+        {% else %}
+          선택 안 함
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px;">
+    <a href="/exam" class="btn btn-primary btn-lg">모의고사 다시 응시하기</a>
+    <a href="/" class="btn btn-secondary btn-lg" style="margin-left: 10px;">홈으로</a>
+  </div>
+</div>
+
+<h2 style="font-size: 20px; margin-bottom: 20px; color: var(--gray-900);">📝 문항별 상세 채점 내역 및 해설</h2>
+
+{% for item in result.details %}
+{% set is_full = (item.earned_score == item.max_score) %}
+{% set is_zero = (item.earned_score == 0) %}
+{% set card_status = 'unselected' if (item.type == 'practical' and not item.is_selected) else ('correct' if is_full else ('incorrect' if is_zero else 'partial')) %}
+
+<div class="result-item-card {{ card_status }}">
+  <div class="question-header">
+    <div class="q-meta">
+      <span class="q-badge {% if item.type == 'short' %}badge-short{% elif item.type == 'descriptive' %}badge-desc{% else %}badge-prac{% endif %}">
+        문제 {{ loop.index }} ({% if item.type == 'short' %}단답형{% elif item.type == 'descriptive' %}서술형{% else %}실무형{% endif %})
+      </span>
+      <span class="q-category">{{ item.category }}</span>
+      {% if item.type == 'practical' and not item.is_selected %}
+        <span style="font-size: 12px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px;">미선택 (채점 제외)</span>
+      {% endif %}
+    </div>
+    <div class="q-score" style="font-size: 18px;">
+      획득: {{ item.earned_score }} / {{ item.max_score }}점
+    </div>
+  </div>
+
+  <div class="question-text">{{ item.question_text }}</div>
+
+  <!-- Detailed Answers / Sub-questions -->
+  <div style="margin: 16px 0; background: var(--gray-50); padding: 16px; border-radius: 6px; border: 1px solid var(--gray-200);">
+    {% if item.type == 'short' %}
+      {% for sub in item.sub_results %}
+      <div style="margin-bottom: 10px; font-size: 14px;">
+        <span style="font-weight: 700;">({{ sub.label }})</span>
+        <span style="margin-left: 8px;">제출 답안: <strong style="color: {% if sub.is_correct %}var(--success-color){% else %}var(--danger-color){% endif %};">{{ sub.user_answer or '(미입력)' }}</strong></span>
+        <span style="margin-left: 16px; color: var(--gray-600);">정답: <strong>{{ sub.expected_answer }}</strong></span>
+        <span style="margin-left: 12px; font-weight: 600; color: {% if sub.is_correct %}var(--success-color){% else %}var(--danger-color){% endif %};">
+          [{{ sub.score }} / {{ sub.max_score }}점]
+        </span>
+      </div>
+      {% endfor %}
+
+    {% elif item.type in ('descriptive', 'practical') %}
+      {% if item.type == 'practical' and not item.is_selected %}
+        <div style="color: var(--gray-600); font-style: italic; margin-bottom: 12px;">
+          * 이 문항은 응시하지 않은 실무형 선택 문항입니다. 아래 모범답안을 학습에 참고하십시오.
+        </div>
+      {% endif %}
+
+      {% for sub in item.sub_results %}
+      <div style="margin-bottom: 16px; border-bottom: 1px dashed var(--gray-300); padding-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 14px; color: var(--gray-800); margin-bottom: 6px;">
+          소문항 {{ sub.sub_id }}) {{ sub.prompt }}
+          <span style="color: var(--primary-color); float: right;">{{ sub.earned_score }} / {{ sub.max_score }}점</span>
+        </div>
+        <div style="font-size: 14px; margin-bottom: 4px;">
+          <strong>나의 답안:</strong>
+          <span style="color: var(--gray-900); white-space: pre-wrap;">{{ sub.user_text or '(미작성)' }}</span>
+        </div>
+        <div style="font-size: 13px; margin-top: 6px;">
+          <span>매칭 키워드: </span>
+          {% if sub.matched_keywords %}
+            <span class="matched-keywords">{{ sub.matched_keywords | join(', ') }}</span>
+          {% else %}
+            <span style="color: var(--gray-500);">없음</span>
+          {% endif %}
+          <span style="margin-left: 16px;">누락 키워드: </span>
+          {% if sub.missing_keywords %}
+            <span class="missing-keywords">{{ sub.missing_keywords | join(', ') }}</span>
+          {% else %}
+            <span style="color: var(--success-color);">없음 (만점)</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+
+      <div style="margin-top: 12px; font-size: 14px; background: white; padding: 12px; border-radius: 4px; border: 1px solid var(--gray-200);">
+        <strong style="color: var(--primary-color);">모범 답안:</strong>
+        <div style="white-space: pre-wrap; margin-top: 4px; color: var(--gray-800);">{{ item.model_answer }}</div>
+      </div>
+    {% endif %}
+
+    <!-- Explanation -->
+    <div style="margin-top: 12px; font-size: 14px; color: var(--gray-700); line-height: 1.6;">
+      <strong style="color: var(--gray-900);">💡 해설:</strong> {{ item.explanation }}
+    </div>
+
+    <!-- Source and Page Badge -->
+    <div class="source-badge">
+      <span>📖 출처: <strong>{{ item.source_info.filename }}</strong> ({{ item.source_info.title }})</span>
+      <span style="background: white; border: 1px solid #94a3b8; padding: 1px 6px; border-radius: 3px; font-size: 12px; margin-left: 6px; color: #0f172a;">
+        Page {{ item.source_page }}
+      </span>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

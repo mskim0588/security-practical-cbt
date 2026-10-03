@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables & Local configs
+.env
+.env.*
+!.env.example
+
+# Flask / Database
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary scratch & dump text files
+scratch_*.txt
+*_dump.txt
+
+# Backup files in app/data
+app/data/*.bak
+app/data/*_bak
+app/data/*_pre_bak
+*.bak
+
+# Ensure production data files are tracked
+!app/data/questions.json
+!app/data/concepts.json
+!app/data/sources.json
+
+# IDE / Editor / OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
