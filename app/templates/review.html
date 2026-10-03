@@ -43,8 +43,7 @@
   </div>
   {% endif %}
 
-  <!-- Submit / Back Actions -->
-  <form id="submit-form" method="POST" action="/submit">
+  <form id="submit-form" method="POST" action="/submit" onsubmit="var btn=document.getElementById('btn-final-submit'); if(btn.dataset.submitted){return false;} btn.dataset.submitted='true'; btn.disabled=true; btn.innerText='채점 및 저장 중...';">
     <!-- Pass through all form inputs -->
     {% for key, val in raw_form_data.items() %}
     <input type="hidden" name="{{ key }}" value="{{ val }}">
@@ -52,7 +51,7 @@
 
     <div style="display: flex; gap: 12px; margin-top: 20px;">
       <a href="javascript:history.back()" class="btn btn-secondary btn-lg">&larr; 수정하러 가기</a>
-      <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('정말 답안을 제출하고 채점을 진행하시겠습니까?');">
+      <button id="btn-final-submit" type="submit" class="btn btn-primary btn-lg" onclick="if(!confirm('정말 답안을 제출하고 채점을 진행하시겠습니까?')){return false;}">
         최종 답안 제출 및 채점하기 &rarr;
       </button>
     </div>

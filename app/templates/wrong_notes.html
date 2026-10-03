@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}오답노트 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block header_actions %}
+<a href="/exam" class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;">
+  + 새 모의고사 응시
+</a>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h1 style="font-size: 24px; font-weight: 800; color: var(--gray-900);">
+        📝 오답노트 & 취약 문항 복습
+      </h1>
+      <p style="font-size: 14px; color: var(--gray-600); margin-top: 4px;">
+        모의고사에서 틀렸거나 부분 감점된 문항들을 체계적으로 점검하고 약점을 보완합니다.
+      </p>
+    </div>
+    
+    <!-- Quick Stats Badges -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <span style="background: #fee2e2; color: #b91c1c; font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 6px; border: 1px solid #fecaca;">
+        미해결 오답: {{ stats.total }}문항
+      </span>
+      <span style="background: #eff6ff; color: #1e40af; font-weight: 600; font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid #bfdbfe;">
+        단답: {{ stats.short }}
+      </span>
+      <span style="background: #fef3c7; color: #92400e; font-weight: 600; font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid #fde68a;">
+        서술: {{ stats.descriptive }}
+      </span>
+      <span style="background: #f0fdf4; color: #166534; font-weight: 600; font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid #bbf7d0;">
+        실무: {{ stats.practical }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Filter & Sort Bar -->
+  <div class="card" style="padding: 16px; margin-bottom: 20px; background: white;">
+    <form method="GET" action="/wrong-notes" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+      
+      <!-- Type Filter Buttons -->
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <span style="font-size: 13px; font-weight: 700; color: var(--gray-700); margin-right: 4px;">유형:</span>
+        <a href="/wrong-notes?type=all&status={{ current_status }}&category={{ current_category }}&sort={{ current_sort }}" class="btn {% if current_type == 'all' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 4px 10px; font-size: 13px;">전체</a>
+        <a href="/wrong-notes?type=short&status={{ current_status }}&category={{ current_category }}&sort={{ current_sort }}" class="btn {% if current_type == 'short' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 4px 10px; font-size: 13px;">단답형</a>
+        <a href="/wrong-notes?type=descriptive&status={{ current_status }}&category={{ current_category }}&sort={{ current_sort }}" class="btn {% if current_type == 'descriptive' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 4px 10px; font-size: 13px;">서술형</a>
+        <a href="/wrong-notes?type=practical&status={{ current_status }}&category={{ current_category }}&sort={{ current_sort }}" class="btn {% if current_type == 'practical' %}btn-primary{% else %}btn-secondary{% endif %}" style="padding: 4px 10px; font-size: 13px;">실무형</a>
+      </div>
+
+      <!-- Dropdown Filters -->
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- Status Filter -->
+        <select name="status" onchange="this.form.submit()" style="padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid var(--gray-300); background: white;">
+          <option value="all" {% if current_status == 'all' %}selected{% endif %}>상태: 전체</option>
+          <option value="incorrect" {% if current_status == 'incorrect' %}selected{% endif %}>✕ 완전 오답 (0점)</option>
+          <option value="partial" {% if current_status == 'partial' %}selected{% endif %}>⚠ 부분 감점</option>
+        </select>
+
+        <!-- Category Filter -->
+        <select name="category" onchange="this.form.submit()" style="padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid var(--gray-300); background: white;">
+          <option value="all" {% if current_category == 'all' %}selected{% endif %}>카테고리: 전체</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+
+        <!-- Sort Filter -->
+        <select name="sort" onchange="this.form.submit()" style="padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid var(--gray-300); background: white;">
+          <option value="latest" {% if current_sort == 'latest' %}selected{% endif %}>정렬: 최근 오답순</option>
+          <option value="frequency" {% if current_sort == 'frequency' %}selected{% endif %}>정렬: 오답 횟수 많은 순</option>
+        </select>
+
+        <input type="hidden" name="type" value="{{ current_type }}">
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if not questions %}
+<div class="card" style="text-align: center; padding: 60px 20px;">
+  <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+  <h3 style="font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px;">
+    현재 조건에 일치하는 미해결 오답 문항이 없습니다!
+  </h3>
+  <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 20px;">
+    {% if stats.total == 0 %}
+      아직 오답이 없거나, 모든 문제를 정답으로 복습 완료하였습니다.
+    {% else %}
+      선택한 필터 조건에 부합하는 오답 문항이 없습니다. 필터를 초기화해 보세요.
+    {% endif %}
+  </p>
+  <a href="/exam" class="btn btn-primary btn-lg">새 모의고사 응시하기 &rarr;</a>
+</div>
+{% else %}
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  {% for q in questions %}
+  <div class="card" style="border-left: 5px solid {% if q.latest_status == 'incorrect' %}var(--danger-color){% else %}var(--warning-color){% endif %}; padding: 20px;">
+    
+    <!-- Top Meta -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-family: monospace; font-weight: 800; font-size: 14px; color: var(--gray-800); background: var(--gray-100); padding: 3px 8px; border-radius: 4px;">
+          {{ q.question_id }}
+        </span>
+        {% if q.type == 'short' %}
+          <span class="q-badge badge-short">단답형</span>
+        {% elif q.type == 'descriptive' %}
+          <span class="q-badge badge-desc">서술형</span>
+        {% else %}
+          <span class="q-badge badge-prac">실무형</span>
+        {% endif %}
+        
+        <span class="q-category">{{ q.category }}</span>
+
+        {% if q.concept_name %}
+        <span style="background: #ede9fe; color: #6d28d9; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+          {{ q.concept_name }}
+        </span>
+        {% endif %}
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        {% if q.latest_status == 'incorrect' %}
+          <span style="background: #fee2e2; color: #b91c1c; font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fecaca;">
+            ✕ 오답 (0 / {{ q.max_score }}점)
+          </span>
+        {% else %}
+          <span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fde68a;">
+            ⚠ 부분 감점 ({{ q.latest_earned }} / {{ q.max_score }}점)
+          </span>
+        {% endif %}
+        
+        <span style="font-size: 12px; font-weight: 600; color: var(--gray-600);">
+          총 {{ q.total_attempts }}회 중 {{ q.fail_count }}회 오답 (오답률 {{ q.fail_rate }}%)
+        </span>
+      </div>
+    </div>
+
+    <!-- Question Body -->
+    <div style="font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 14px; line-height: 1.6; white-space: pre-line;">
+      {{ q.question_text }}
+    </div>
+
+    <!-- Latest Answer & Model Answer comparison -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 6px; padding: 10px 14px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--gray-600); margin-bottom: 4px;">
+          최근 작성한 답안:
+        </div>
+        <div style="font-size: 13px; color: var(--gray-800); word-break: break-all;">
+          {% if q.latest_user_answer %}
+            {% if q.latest_user_answer is mapping %}
+              {% for k, v in q.latest_user_answer.items() %}
+                <div>[{{ k }}] {{ v if v else '<미작성>' }}</div>
+              {% endfor %}
+            {% else %}
+              {{ q.latest_user_answer }}
+            {% endif %}
+          {% else %}
+            <span style="color: #94a3b8; font-style: italic;">&lt;미작성&gt;</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">
+          정답 / 모범 답안:
+        </div>
+        <div style="font-size: 13px; color: var(--gray-900); word-break: break-all;">
+          {% if q.sub_questions %}
+            {% for sub in q.sub_questions %}
+              <div>
+                <strong>[{{ sub.label or sub.sub_id }}]</strong>
+                {{ sub.expected or sub.model_answer }}
+              </div>
+            {% endfor %}
+          {% elif q.model_answer %}
+            {{ q.model_answer }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer: Source and Action -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gray-100); padding-top: 10px;">
+      <div style="font-size: 12px; color: var(--gray-600); font-family: monospace;">
+        {% if q.source_info %}출처: {{ q.source_info.title if q.source_info is mapping else q.source_info }}{% if q.source_page %} p.{{ q.source_page }}{% endif %}{% endif %}
+      </div>
+      <div>
+        <a href="/wrong-notes/{{ q.question_id }}" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px; text-decoration: none;">
+          상세 복기 & 이력 타임라인 &rarr;
+        </a>
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

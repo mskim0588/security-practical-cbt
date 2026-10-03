@@ -7,16 +7,20 @@ class ExamGenerator:
     STANDARD_PRAC_IDS = [f"Q-PRAC-{i:03d}" for i in range(1, 3)]
     STANDARD_QUESTION_IDS = STANDARD_SHORT_IDS + STANDARD_DESC_IDS + STANDARD_PRAC_IDS
 
-    @staticmethod
+    @classmethod
     def generate_exam_set(
+        cls,
         all_questions: List[Dict[str, Any]],
         mode: str = "standard",
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        **kwargs
     ) -> List[Dict[str, Any]]:
         """
         시험 세트 생성기
         - mode == "standard": 제1회 표준 기출 모의고사 (고정 18문항)
         - mode == "random": 카테고리 분산 및 중복 방지 지능형 랜덤 시험 세트 생성
+        - mode == "wrong_review": 오답노트 등록 문항 우선 출제 모의고사
+        - mode == "adaptive": 취약 Concept 집중 출제 모의고사
         """
         if mode == "standard":
             # 표준 모드: 고정 18문항 (Goal 1 보존)
@@ -29,6 +33,14 @@ class ExamGenerator:
             desc_pool = [q for q in all_questions if q["type"] == "descriptive"][:4]
             prac_pool = [q for q in all_questions if q["type"] == "practical"][:2]
             return short_pool + desc_pool + prac_pool
+
+        if mode == "wrong_review":
+            wrong_ids = kwargs.get("wrong_question_ids", [])
+            return cls.generate_wrong_review_exam(all_questions, wrong_ids, seed)
+
+        if mode == "adaptive":
+            vuln_concepts = kwargs.get("vulnerable_concept_ids", [])
+            return cls.generate_adaptive_exam(all_questions, vuln_concepts, seed)
 
         # 랜덤 모드: 카테고리 분산 및 지능형 선별
         rng = random.Random(seed)
@@ -51,6 +63,105 @@ class ExamGenerator:
         exam_set = selected_shorts + selected_descs + selected_pracs
 
         # 5. 유효성 검증 (12 + 4 + 2 = 18)
+        assert len(exam_set) == 18, f"시험 문항 수는 18개여야 하나 {len(exam_set)}개가 생성되었습니다."
+        return exam_set
+
+    @classmethod
+    def generate_wrong_review_exam(
+        cls,
+        all_questions: List[Dict[str, Any]],
+        wrong_question_ids: List[str],
+        seed: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        오답노트 등록 문항 우선 출제 모의고사 (100점 / 18문항: 단답 12, 서술 4, 실무 2)
+        - 오답 문항이 있으면 해당 유형 슬롯에 우선 배정
+        - 오답 문항이 부족한 경우 일반 풀에서 카테고리 균형을 맞춰 보충
+        """
+        rng = random.Random(seed)
+        wrong_set = set(wrong_question_ids)
+
+        short_pool = [q for q in all_questions if q["type"] == "short"]
+        desc_pool = [q for q in all_questions if q["type"] == "descriptive"]
+        prac_pool = [q for q in all_questions if q["type"] == "practical"]
+
+        # 1. 단답형 12문항
+        short_wrong = [q for q in short_pool if q["id"] in wrong_set]
+        rng.shuffle(short_wrong)
+        picked_shorts = short_wrong[:12]
+        if len(picked_shorts) < 12:
+            remaining_shorts = [q for q in short_pool if q["id"] not in {q["id"] for q in picked_shorts}]
+            needed = 12 - len(picked_shorts)
+            picked_shorts.extend(cls._pick_balanced_questions(remaining_shorts, needed, rng))
+
+        # 2. 서술형 4문항
+        desc_wrong = [q for q in desc_pool if q["id"] in wrong_set]
+        rng.shuffle(desc_wrong)
+        picked_descs = desc_wrong[:4]
+        if len(picked_descs) < 4:
+            used_concepts = set(q.get("concept_id") for q in picked_shorts + picked_descs if q.get("concept_id"))
+            remaining_descs = [q for q in desc_pool if q["id"] not in {q["id"] for q in picked_descs}]
+            needed = 4 - len(picked_descs)
+            picked_descs.extend(cls._pick_balanced_descriptive(remaining_descs, needed, used_concepts, rng))
+
+        # 3. 실무형 2문항
+        prac_wrong = [q for q in prac_pool if q["id"] in wrong_set]
+        rng.shuffle(prac_wrong)
+        picked_pracs = prac_wrong[:2]
+        if len(picked_pracs) < 2:
+            remaining_pracs = [q for q in prac_pool if q["id"] not in {q["id"] for q in picked_pracs}]
+            needed = 2 - len(picked_pracs)
+            picked_pracs.extend(cls._pick_balanced_practical(remaining_pracs, needed, rng))
+
+        exam_set = picked_shorts + picked_descs + picked_pracs
+        assert len(exam_set) == 18, f"시험 문항 수는 18개여야 하나 {len(exam_set)}개가 생성되었습니다."
+        return exam_set
+
+    @classmethod
+    def generate_adaptive_exam(
+        cls,
+        all_questions: List[Dict[str, Any]],
+        vulnerable_concept_ids: List[str],
+        seed: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        취약 Concept 집중 모의고사 (100점 / 18문항: 단답 12, 서술 4, 실무 2)
+        - 취약도 상위 Concept에 속한 문항을 60~70% 이상 우선 선발
+        - 나머지 슬롯은 카테고리 균형을 위해 일반 문제로 보충
+        """
+        rng = random.Random(seed)
+        vuln_set = set(vulnerable_concept_ids)
+
+        short_pool = [q for q in all_questions if q["type"] == "short"]
+        desc_pool = [q for q in all_questions if q["type"] == "descriptive"]
+        prac_pool = [q for q in all_questions if q["type"] == "practical"]
+
+        # 1. 단답형 12문항 (취약 Concept 문항 최대 8개 우선)
+        short_vuln = [q for q in short_pool if q.get("concept_id") in vuln_set]
+        rng.shuffle(short_vuln)
+        picked_shorts = short_vuln[:8]
+        remaining_shorts = [q for q in short_pool if q["id"] not in {q["id"] for q in picked_shorts}]
+        needed_shorts = 12 - len(picked_shorts)
+        picked_shorts.extend(cls._pick_balanced_questions(remaining_shorts, needed_shorts, rng))
+
+        # 2. 서술형 4문항 (취약 Concept 문항 최대 3개 우선)
+        desc_vuln = [q for q in desc_pool if q.get("concept_id") in vuln_set]
+        rng.shuffle(desc_vuln)
+        picked_descs = desc_vuln[:3]
+        used_concepts = set(q.get("concept_id") for q in picked_shorts + picked_descs if q.get("concept_id"))
+        remaining_descs = [q for q in desc_pool if q["id"] not in {q["id"] for q in picked_descs}]
+        needed_descs = 4 - len(picked_descs)
+        picked_descs.extend(cls._pick_balanced_descriptive(remaining_descs, needed_descs, used_concepts, rng))
+
+        # 3. 실무형 2문항 (취약 Concept 문항 최대 1개 우선)
+        prac_vuln = [q for q in prac_pool if q.get("concept_id") in vuln_set]
+        rng.shuffle(prac_vuln)
+        picked_pracs = prac_vuln[:1]
+        remaining_pracs = [q for q in prac_pool if q["id"] not in {q["id"] for q in picked_pracs}]
+        needed_pracs = 2 - len(picked_pracs)
+        picked_pracs.extend(cls._pick_balanced_practical(remaining_pracs, needed_pracs, rng))
+
+        exam_set = picked_shorts + picked_descs + picked_pracs
         assert len(exam_set) == 18, f"시험 문항 수는 18개여야 하나 {len(exam_set)}개가 생성되었습니다."
         return exam_set
 

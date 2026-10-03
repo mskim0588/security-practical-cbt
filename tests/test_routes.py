@@ -48,7 +48,7 @@ class TestExamRoutes(unittest.TestCase):
             "ans_Q-SHORT-008": "/proc",
             "ans_Q-SHORT-010": "Log4j"
         }
-        response = self.client.post("/submit", data=form_data)
+        response = self.client.post("/submit", data=form_data, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("정보보안기사 실기 모의고사 채점 결과".encode("utf-8"), response.data)
         self.assertIn("/ 100점".encode("utf-8"), response.data)

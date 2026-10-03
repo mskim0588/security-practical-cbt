@@ -8,9 +8,22 @@ class ExamService:
         self.data_loader = data_loader or DataLoader()
 
     def get_exam_questions(self, mode: str = "standard", seed: Optional[int] = None) -> List[Dict[str, Any]]:
-        """시험 응시용 문항 목록 (mode: 'standard' | 'random', seed: Optional[int])"""
+        """시험 응시용 문항 목록 (mode: 'standard' | 'random' | 'wrong_review' | 'adaptive', seed: Optional[int])"""
         all_qs = self.data_loader.get_enriched_questions()
-        return ExamGenerator.generate_exam_set(all_qs, mode=mode, seed=seed)
+        
+        extra_kwargs = {}
+        if mode == "wrong_review":
+            from app.services.wrong_answer_service import WrongAnswerService
+            wrong_service = WrongAnswerService(self.data_loader)
+            wrong_qs = wrong_service.get_wrong_questions()
+            extra_kwargs["wrong_question_ids"] = [q["question_id"] for q in wrong_qs]
+        elif mode == "adaptive":
+            from app.services.analytics_service import AnalyticsService
+            analytics_service = AnalyticsService(self.data_loader)
+            top_vuln = analytics_service.get_top_vulnerable_concepts(limit=5)
+            extra_kwargs["vulnerable_concept_ids"] = [c["concept_id"] for c in top_vuln]
+
+        return ExamGenerator.generate_exam_set(all_qs, mode=mode, seed=seed, **extra_kwargs)
 
     def parse_submission(self, form_data: Dict[str, Any], questions: List[Dict[str, Any]]) -> Dict[str, Any]:
         """

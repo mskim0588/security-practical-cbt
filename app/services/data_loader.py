@@ -55,6 +55,12 @@ class DataLoader:
             enriched.append(q_copy)
         return enriched
 
+    def get_question_by_id(self, question_id: str) -> Optional[Dict[str, Any]]:
+        """문항 ID로 단건 조회 (출처 및 개념 메타데이터 결합)"""
+        if not hasattr(self, "_q_map") or self._q_map is None:
+            self._q_map = {q["id"]: q for q in self.get_enriched_questions()}
+        return self._q_map.get(question_id)
+
     def validate_dataset(self, scope: str = "standard") -> Dict[str, Any]:
         """
         데이터셋 정합성 검증

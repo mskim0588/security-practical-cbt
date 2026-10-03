@@ -53,8 +53,30 @@
   </div>
 
   <div style="margin-top: 24px;">
-    <a href="/exam" class="btn btn-primary btn-lg">모의고사 다시 응시하기</a>
-    <a href="/" class="btn btn-secondary btn-lg" style="margin-left: 10px;">홈으로</a>
+    {% if attempt_id %}
+    <div style="margin-bottom: 16px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 10px 16px; display: inline-flex; align-items: center; gap: 8px; color: #065f46; font-size: 14px; font-weight: 600;">
+      <span>✓</span>
+      <span>이번 모의고사 응시 기록이 성공적으로 저장되었습니다 (회차 #{{ attempt_id }})</span>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="/history/{{ attempt_id }}" class="btn btn-primary btn-lg">
+        📋 상세 복기 리포트 &rarr;
+      </a>
+      <a href="/history" class="btn btn-secondary btn-lg">
+        📜 응시 이력 목록
+      </a>
+      <a href="/exam" class="btn btn-secondary btn-lg">
+        모의고사 다시 응시
+      </a>
+      <a href="/" class="btn btn-secondary btn-lg">홈으로</a>
+    </div>
+    {% else %}
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="/exam" class="btn btn-primary btn-lg">모의고사 다시 응시하기</a>
+      <a href="/history" class="btn btn-secondary btn-lg">응시 이력 목록</a>
+      <a href="/" class="btn btn-secondary btn-lg">홈으로</a>
+    </div>
+    {% endif %}
   </div>
 </div>
 

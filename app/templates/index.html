@@ -33,12 +33,18 @@
     </div>
   </div>
 
-  <div style="margin-top: 15px; display: flex; gap: 12px; flex-wrap: wrap;">
-    <a href="/exam?mode=standard" class="btn btn-primary btn-lg">
-      📘 제1회 표준 기출 모의고사 응시 &rarr;
+  <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+    <a href="/exam?mode=standard" class="btn btn-primary btn-lg" style="text-align: center; text-decoration: none;">
+      📘 제1회 표준 기출 모의고사 &rarr;
     </a>
-    <a href="/exam?mode=random" class="btn btn-secondary btn-lg" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
-      🎲 랜덤 실전 모의고사 생성 및 응시 &rarr;
+    <a href="/exam?mode=random" class="btn btn-secondary btn-lg" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; text-align: center; text-decoration: none;">
+      🎲 랜덤 실전 모의고사 &rarr;
+    </a>
+    <a href="/exam?mode=adaptive" class="btn btn-secondary btn-lg" style="background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; text-align: center; text-decoration: none;">
+      🎯 취약 Concept 집중 모의고사 &rarr;
+    </a>
+    <a href="/exam?mode=wrong_review" class="btn btn-secondary btn-lg" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; text-align: center; text-decoration: none;">
+      📝 오답 다시 풀기 모의고사 &rarr;
     </a>
   </div>
 </div>

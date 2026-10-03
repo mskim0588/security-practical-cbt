@@ -9,9 +9,16 @@
 <body>
   <header class="app-header">
     <div class="header-content">
-      <div class="logo-area">
+      <div class="logo-area" style="display: flex; align-items: center;">
         <span class="logo-badge">실기 CBT</span>
         <a href="/" class="logo-title">정보보안기사 실기시험 CBT</a>
+        <nav style="margin-left: 24px; display: inline-flex; gap: 16px; font-size: 14px; font-weight: 600;">
+          <a href="/" style="color: var(--gray-700); text-decoration: none;">홈</a>
+          <a href="/dashboard" style="color: var(--gray-700); text-decoration: none;">대시보드</a>
+          <a href="/exam" style="color: var(--gray-700); text-decoration: none;">모의고사</a>
+          <a href="/history" style="color: var(--gray-700); text-decoration: none;">응시이력</a>
+          <a href="/wrong-notes" style="color: var(--gray-700); text-decoration: none;">오답노트</a>
+        </nav>
       </div>
       <div class="header-actions">
         {% block header_actions %}
