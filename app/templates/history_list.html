@@ -37,7 +37,8 @@
   <a href="/exam" class="btn btn-primary btn-lg">모의고사 응시하러 가기 &rarr;</a>
 </div>
 {% else %}
-<div class="card" style="padding: 0; overflow-x: auto;">
+<!-- Desktop Multi-column Table (MOB-005: Preserved for >= 768px) -->
+<div class="history-table-wrapper card" style="padding: 0; overflow-x: auto;">
   <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
     <thead>
       <tr style="background: var(--neutral-100); border-bottom: 2px solid var(--neutral-200); color: var(--neutral-700);">
@@ -126,6 +127,82 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+
+<!-- Mobile Stacked Card Presentation (MOB-005: Displayed for < 768px) -->
+<div class="history-cards-list">
+  {% for att in attempts %}
+  {% set wrong_count = att.answers | selectattr('achievement_status', 'equalto', 'incorrect') | list | length %}
+  {% set partial_count = att.answers | selectattr('achievement_status', 'equalto', 'partial') | list | length %}
+  <div class="card history-mobile-card" style="padding: 16px; margin-bottom: 0;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-weight: 800; font-size: 16px; color: var(--neutral-800);">#{{ att.id }}</span>
+        {% if att.exam_mode == 'standard' %}
+          <span class="badge-mode badge-mode-standard" style="font-size: 11px;">📘 표준</span>
+        {% elif att.exam_mode == 'random' %}
+          <span class="badge-mode badge-mode-random" style="font-size: 11px;">🎲 랜덤</span>
+        {% elif att.exam_mode == 'wrong_review' %}
+          <span class="badge-mode badge-mode-wrong_review" style="font-size: 11px;">🔥 오답집중</span>
+        {% elif att.exam_mode == 'adaptive' %}
+          <span class="badge-mode badge-mode-adaptive" style="font-size: 11px;">🎯 취약점</span>
+        {% else %}
+          <span class="badge-mode" style="font-size: 11px;">{{ att.exam_mode }}</span>
+        {% endif %}
+      </div>
+      <div style="text-align: right;">
+        {% if att.is_passed %}
+          <span class="status-pill status-pill-sufficient" style="font-size: 12px; padding: 3px 8px;">✓ 합격</span>
+        {% else %}
+          <span class="status-pill status-pill-incorrect" style="font-size: 12px; padding: 3px 8px;">✕ 불합격</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+      <div>
+        <span style="font-size: 22px; font-weight: 800; color: var(--neutral-900);">
+          {{ "%.1f"|format(att.total_score)|replace('.0', '') }}
+        </span>
+        <span style="font-size: 13px; color: var(--neutral-500); font-weight: normal;"> / 100점</span>
+      </div>
+      <div style="font-size: 12px; color: var(--neutral-500);">
+        {{ att.created_at.strftime('%Y-%m-%d %H:%M') if att.created_at else '-' }}
+      </div>
+    </div>
+
+    <div style="font-size: 12px; color: var(--neutral-600); margin-bottom: 10px; background: var(--neutral-50); padding: 6px 10px; border-radius: var(--radius-sm);">
+      <span>단답: <strong>{{ "%.1f"|format(att.short_score)|replace('.0', '') }}</strong>점</span> ·
+      <span>서술: <strong>{{ "%.1f"|format(att.descriptive_score)|replace('.0', '') }}</strong>점</span> ·
+      <span>실무: <strong>{{ "%.1f"|format(att.practical_score)|replace('.0', '') }}</strong>점</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; pt-2; border-top: 1px solid var(--neutral-100); padding-top: 10px;">
+      <div style="display: flex; gap: 4px; align-items: center;">
+        {% if wrong_count > 0 %}
+          <span class="status-pill status-pill-incorrect" style="font-size: 11px; padding: 2px 6px;">✕ 오답 {{ wrong_count }}</span>
+        {% endif %}
+        {% if partial_count > 0 %}
+          <span class="status-pill status-pill-partial" style="font-size: 11px; padding: 2px 6px;">△ 부분 {{ partial_count }}</span>
+        {% endif %}
+        {% if wrong_count == 0 and partial_count == 0 and att.answers %}
+          <span class="status-pill status-pill-sufficient" style="font-size: 11px; padding: 2px 6px;">✓ 완전 정복</span>
+        {% endif %}
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <a href="/history/{{ att.id }}" class="btn btn-secondary" style="min-height: 40px; display: inline-flex; align-items: center; padding: 6px 14px; font-size: 13px; font-weight: 600;">
+          상세 복기 &rarr;
+        </a>
+        <form method="POST" action="/history/{{ att.id }}/delete" onsubmit="return confirm('이 회차의 응시 기록을 삭제하시겠습니까?');" style="margin: 0; display: inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-delete" style="background: transparent; border: 1px solid var(--neutral-300); border-radius: var(--radius-md); color: var(--danger-color); cursor: pointer; min-width: 40px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;" title="기록 삭제" aria-label="기록 삭제">
+            ✕
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>
 
 {% if total_pages > 1 %}

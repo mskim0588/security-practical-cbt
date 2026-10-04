@@ -395,7 +395,7 @@ header.app-header {
 
   .nav-mobile-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     height: 100%;
     max-width: var(--container-max);
     margin: 0 auto;
@@ -409,15 +409,24 @@ header.app-header {
     height: 100%;
     min-height: var(--touch-target-min);
     min-width: var(--touch-target-min);
-    padding: var(--space-1) 2px;
+    padding: var(--space-1) 1px;
     color: var(--neutral-600);
     text-decoration: none;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: var(--font-medium);
     gap: 2px;
     position: relative;
     transition: color 0.15s ease, background-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-mobile-label {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
   }
 
   .nav-mobile-item:hover {
@@ -645,7 +654,7 @@ header.app-header {
 
 .exam-container {
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: minmax(0, 1fr) 280px;
   gap: var(--space-6);
   position: relative;
 }
@@ -940,7 +949,10 @@ header.app-header {
 /* Tablet & Mobile Layout (< 900px) */
 @media (max-width: 900px) {
   .exam-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .exam-main {
+    min-width: 0;
   }
   .exam-sidebar {
     display: none;
@@ -1519,9 +1531,15 @@ header.app-header {
 
 /* Small Screen (< 480px) */
 @media (max-width: 480px) {
+  .app-header {
+    height: auto;
+    min-height: var(--header-height);
+    padding: var(--space-1) 0;
+  }
   .header-content {
     padding: 0 var(--space-2);
     gap: var(--space-2);
+    flex-wrap: wrap;
   }
   .logo-area {
     gap: var(--space-2);
@@ -1531,15 +1549,25 @@ header.app-header {
     padding: 2px 6px;
   }
   .logo-title {
-    font-size: 15px;
+    font-size: 14px;
+    max-width: 160px;
   }
   .header-status-text {
     display: none;
   }
+  .header-actions {
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-end;
+  }
   .header-actions .btn {
-    padding: 6px 10px;
-    font-size: var(--text-xs);
+    padding: 4px 8px;
+    font-size: 11px;
     min-height: 32px;
+  }
+  .header-btn-full {
+    display: none;
   }
   .input-row {
     flex-direction: column;
@@ -2635,7 +2663,8 @@ header.app-header {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: var(--space-4);
+  padding: 16px;
+  box-sizing: border-box;
   animation: aiModalFadeIn 0.2s ease-out;
 }
 
@@ -2649,8 +2678,8 @@ header.app-header {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 680px;
-  max-height: 90vh;
+  max-width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -3258,7 +3287,173 @@ header.app-header {
   font-size: 14px;
 }
 
+/* ==========================================================================
+   Goal 6B: Mobile UI Polish & Layout Enhancements
+   ========================================================================== */
 
+/* MOB-003: Dashboard Analysis Grid Responsive Stacking */
+.dashboard-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
 
+.clinic-item {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 
+/* MOB-005: Table vs Mobile Card Presentations */
+.history-table-wrapper {
+  display: block;
+}
 
+.history-cards-list {
+  display: none;
+}
+
+.review-table-wrapper {
+  display: block;
+}
+
+.review-cards-list {
+  display: none;
+}
+
+/* MOB-006: Header Actions Compact Presentation */
+.header-action-btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .header-btn-full {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Goal 6B: Global Mobile Rules (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  /* MOB-001: Exam Main Track Safety */
+  .exam-main {
+    min-width: 0;
+  }
+
+  /* MOB-003: Dashboard Stacks to 1-Column */
+  .dashboard-analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* MOB-004: iOS Input Auto-Zoom Prevention (>= 16px) */
+  input[type="text"],
+  input[type="password"],
+  input[type="search"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* MOB-005: Switch from Wide Table to Card View */
+  .history-table-wrapper {
+    display: none !important;
+  }
+
+  .history-cards-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .review-table-wrapper {
+    display: none !important;
+  }
+
+  .review-cards-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* MOB-006: Header Action Toolbar Wrapping */
+  .app-header {
+    height: auto;
+    min-height: var(--header-height);
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .header-actions {
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  /* MOB-007: Mobile Touch Target Standards (>= 44px) */
+  .practical-radio-label {
+    min-height: 44px;
+    padding: 8px 0;
+  }
+
+  .practical-radio-label input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+    cursor: pointer;
+  }
+
+  .filter-type-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+  }
+
+  .btn-delete,
+  .ai-modal-close-btn,
+  #btn-mobile-sheet-close {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #btn-mobile-sheet-open {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+
+  /* MOB-008: AI Modal Mobile Optimization */
+  .ai-modal-body {
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .ai-modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ai-modal-actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Safe Area Inset Support for Fixed Bottom Bars */
+  .mobile-exam-action-bar,
+  .nav-mobile-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
