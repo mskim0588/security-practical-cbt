@@ -1,3 +1,4 @@
+import os
 # -*- coding: utf-8 -*-
 import sys
 import pypdf
@@ -5,7 +6,7 @@ import re
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-reader = pypdf.PdfReader(r'G:\내 드라이브\보안기사\보안기사 실기 관련자료\3과목.pdf')
+reader = pypdf.PdfReader(os.path.join(os.environ.get("PRIVATE_SOURCE_DIR", ""), "3과목.pdf"))
 
 def search(term, start=1, end=len(reader.pages)):
     found = []

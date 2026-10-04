@@ -28,10 +28,14 @@ def init_db(app: Optional[Flask] = None, uri: Optional[str] = None):
         os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
 
     connect_args = {}
+    engine_kwargs = {}
     if uri.startswith("sqlite:"):
         connect_args["check_same_thread"] = False
+    else:
+        engine_kwargs["pool_pre_ping"] = True
+        engine_kwargs["pool_recycle"] = 300
 
-    engine = create_engine(uri, connect_args=connect_args)
+    engine = create_engine(uri, connect_args=connect_args, **engine_kwargs)
     db_session.configure(bind=engine)
 
     # 모델 클래스 임포트하여 Base.metadata에 등록
@@ -61,6 +65,10 @@ def _migrate_schema(bind_engine):
                 if "submission_token" not in columns:
                     conn.execute(text("ALTER TABLE exam_attempts ADD COLUMN submission_token VARCHAR(64)"))
                     conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_exam_attempts_submission_token ON exam_attempts (submission_token)"))
+                    conn.commit()
+                if "is_owner" not in columns:
+                    conn.execute(text("ALTER TABLE exam_attempts ADD COLUMN is_owner BOOLEAN DEFAULT 1 NOT NULL"))
+                    conn.execute(text("CREATE INDEX IF NOT EXISTS ix_exam_attempts_is_owner ON exam_attempts (is_owner)"))
                     conn.commit()
     except Exception:
         # 인메모리 DB나 특수 환경에서 예외 발생 시 안전하게 통과

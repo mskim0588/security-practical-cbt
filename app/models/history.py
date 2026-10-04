@@ -23,6 +23,7 @@ class ExamAttempt(Base):
     
     selected_practical_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     is_passed: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_owner: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, index=True)
 
     # 관계 정의 (Attempt 삭제 시 종속 AnswerRecord 연쇄 삭제)
@@ -48,6 +49,7 @@ class ExamAttempt(Base):
             "practical_score": self.practical_score,
             "selected_practical_id": self.selected_practical_id,
             "is_passed": self.is_passed,
+            "is_owner": self.is_owner,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "answers_count": len(self.answers) if self.answers else 0
         }

@@ -1,7 +1,7 @@
 from typing import Dict, List, Any, Optional
 from sqlalchemy import select, desc
 from app.models.database import db_session
-from app.models.history import AnswerRecord
+from app.models.history import ExamAttempt, AnswerRecord
 from app.services.data_loader import DataLoader
 
 class WrongAnswerService:
@@ -13,16 +13,21 @@ class WrongAnswerService:
         type_filter: Optional[str] = None,
         status_filter: Optional[str] = None,
         category_filter: Optional[str] = None,
-        sort_by: str = "latest"
+        sort_by: str = "latest",
+        is_owner: bool = True
     ) -> List[Dict[str, Any]]:
         """
-        오답노트 대상 문항 목록을 동적으로 집계하여 반환합니다.
+        오답노트 대상 문항 목록을 동적으로 집계하여 반환합니다 (기본적으로 Owner 전용).
         - 실무형 미선택 문항('unselected')은 모수에서 제외
         - 최신 응시 상태가 'incorrect' 또는 'partial'인 문항만 추출
         """
         stmt = (
             select(AnswerRecord)
-            .where(AnswerRecord.achievement_status != "unselected")
+            .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
+            .where(
+                ExamAttempt.is_owner == is_owner,
+                AnswerRecord.achievement_status != "unselected"
+            )
             .order_by(desc(AnswerRecord.created_at), desc(AnswerRecord.id))
         )
         all_records = list(db_session.scalars(stmt).all())
@@ -96,14 +101,14 @@ class WrongAnswerService:
 
         return results
 
-    def get_wrong_question_count(self) -> int:
-        """현재 미해결 오답 문항 수 반환"""
-        wrong_list = self.get_wrong_questions()
+    def get_wrong_question_count(self, is_owner: bool = True) -> int:
+        """현재 미해결 오답 문항 수 반환 (기본적으로 Owner 전용)"""
+        wrong_list = self.get_wrong_questions(is_owner=is_owner)
         return len(wrong_list)
 
-    def get_wrong_question_detail(self, question_id: str) -> Optional[Dict[str, Any]]:
+    def get_wrong_question_detail(self, question_id: str, is_owner: bool = True) -> Optional[Dict[str, Any]]:
         """
-        특정 문항의 상세 정보와 과거 모든 응시 이력(타임라인)을 반환합니다.
+        특정 문항의 상세 정보와 과거 모든 응시 이력(타임라인)을 반환합니다 (기본적으로 Owner 전용).
         """
         q_meta = self.loader.get_question_by_id(question_id)
         if not q_meta:
@@ -111,6 +116,8 @@ class WrongAnswerService:
 
         stmt = (
             select(AnswerRecord)
+            .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
+            .where(ExamAttempt.is_owner == is_owner)
             .where(AnswerRecord.question_id == question_id)
             .where(AnswerRecord.achievement_status != "unselected")
             .order_by(desc(AnswerRecord.created_at))

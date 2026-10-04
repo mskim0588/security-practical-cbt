@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, abort, current_app
 from app.services.data_loader import DataLoader
 from app.services.wrong_answer_service import WrongAnswerService
+from app.services.auth_service import admin_required
 
 wrong_bp = Blueprint("wrong", __name__)
 
@@ -9,6 +10,7 @@ def get_wrong_service():
     return WrongAnswerService(loader)
 
 @wrong_bp.route("/wrong-notes")
+@admin_required
 def list_wrong_notes():
     service = get_wrong_service()
     
@@ -57,6 +59,7 @@ def list_wrong_notes():
     )
 
 @wrong_bp.route("/wrong-notes/<question_id>")
+@admin_required
 def view_wrong_detail(question_id: str):
     service = get_wrong_service()
     detail = service.get_wrong_question_detail(question_id)

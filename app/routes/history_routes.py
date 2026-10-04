@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort, current_app
 from app.services.data_loader import DataLoader
 from app.services.history_service import HistoryService
+from app.services.auth_service import admin_required
 
 history_bp = Blueprint("history", __name__)
 
@@ -9,6 +10,7 @@ def get_history_service():
     return HistoryService(loader)
 
 @history_bp.route("/history")
+@admin_required
 def list_history():
     service = get_history_service()
     
@@ -29,12 +31,14 @@ def list_history():
     )
 
 @history_bp.route("/history/<int:attempt_id>")
+@admin_required
 def view_history_detail(attempt_id: int):
     service = get_history_service()
+    attempt = service.get_attempt_by_id(attempt_id)
+    if not attempt or not attempt.is_owner:
+        abort(404, description="요청하신 관리자 응시 기록을 찾을 수 없습니다.")
+
     detail = service.get_attempt_detail(attempt_id)
-    if not detail:
-        abort(404)
-        
     return render_template(
         "history_detail.html",
         attempt=detail
@@ -43,11 +47,12 @@ def view_history_detail(attempt_id: int):
 from app.services.csrf_service import csrf_protect
 
 @history_bp.route("/history/<int:attempt_id>/delete", methods=["POST"])
+@admin_required
 @csrf_protect
 def delete_history_item(attempt_id: int):
     service = get_history_service()
     attempt = service.get_attempt_by_id(attempt_id)
-    if not attempt:
-        abort(404, description="삭제할 응시 기록을 찾을 수 없습니다.")
+    if not attempt or not attempt.is_owner:
+        abort(404, description="삭제할 관리자 응시 기록을 찾을 수 없습니다.")
     service.delete_attempt(attempt_id)
     return redirect(url_for("history.list_history"))

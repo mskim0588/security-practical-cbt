@@ -1,9 +1,10 @@
 import secrets
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, session, abort, make_response
 from app.services.data_loader import DataLoader
 from app.services.exam_service import ExamService
 from app.services.grader import Grader
 from app.services.csrf_service import csrf_protect
+from app.services.auth_service import is_admin_authenticated
 
 exam_bp = Blueprint("exam", __name__)
 
@@ -18,6 +19,14 @@ def take_exam():
     if mode not in ("standard", "random", "wrong_review", "adaptive"):
         mode = "standard"
 
+    is_owner = is_admin_authenticated()
+    # Guest 격리: 비인증 사용자는 개인 오답노트/취약개념이 없으므로 표준/랜덤으로 안전하게 fallback
+    if not is_owner:
+        if mode == "wrong_review":
+            mode = "standard"
+        elif mode == "adaptive":
+            mode = "random"
+
     seed_param = request.args.get("seed")
     seed_val = None
     if seed_param is not None and seed_param.strip() != "":
@@ -27,7 +36,7 @@ def take_exam():
             # 잘못된 seed 값 입력 시 서버 오류(500) 없이 안전하게 일반 랜덤으로 fallback
             seed_val = None
 
-    questions = service.get_exam_questions(mode=mode, seed=seed_val)
+    questions = service.get_exam_questions(mode=mode, seed=seed_val, is_owner=is_owner)
 
     short_qs = [q for q in questions if q["type"] == "short"]
     desc_qs = [q for q in questions if q["type"] == "descriptive"]
@@ -133,15 +142,24 @@ def submit_exam():
             except (ValueError, TypeError):
                 seed_val = None
 
+        is_owner = is_admin_authenticated()
         attempt = history_service.save_exam_attempt(
             exam_mode=exam_mode,
             seed=seed_val,
             selected_practical_id=submission.get("selected_practical_id"),
             grading_result=result,
             answers=submission.get("answers", {}),
-            submission_token=submission_token
+            submission_token=submission_token,
+            is_owner=is_owner
         )
         attempt_id = attempt.id
+
+        # 세션에 제출한 attempt_id 등록 (Guest Result 소유권 보장)
+        submitted_attempts = session.get("submitted_attempts", [])
+        if attempt_id not in submitted_attempts:
+            submitted_attempts.append(attempt_id)
+            session["submitted_attempts"] = submitted_attempts
+            session.modified = True
     except Exception as e:
         current_app.logger.error(f"Failed to save exam attempt: {e}")
 
@@ -163,13 +181,26 @@ def view_result(attempt_id: int):
     """
     PRG 패턴에 따라 제출 완료 후 시험 채점 결과를 안전하게 조회하는 GET 라우트.
     새로고침(F5) 시 중복 제출이나 데이터 왜곡 없이 안전하게 채점 결과를 재표시합니다.
+    - IDOR 방어: 관리자이거나 현재 세션에서 직접 제출한 Attempt만 접근 허용
+    - 검색엔진 색인 방지: X-Robots-Tag: noindex, nofollow 헤더 주입
     """
+    is_admin = is_admin_authenticated()
+    user_attempts = session.get("submitted_attempts", [])
+    is_session_owner = attempt_id in user_attempts
+
+    if not is_admin and not is_session_owner:
+        abort(403, description="접근 권한이 없습니다: 본인이 직접 응시한 시험 결과만 열람할 수 있습니다.")
+
     from app.services.history_service import HistoryService
     loader = DataLoader(current_app.config["DATA_DIR"])
     history_service = HistoryService(loader)
     detail = history_service.get_attempt_detail(attempt_id)
     if not detail:
-        return redirect(url_for("history.list_history"))
+        abort(404, description="요청하신 시험 결과를 찾을 수 없습니다.")
+
+    # 관리자라도 세션 소유권이 없는 다른 게스트의 Attempt는 열람 차단
+    if is_admin and not is_session_owner and not detail.get("is_owner", False):
+        abort(403, description="접근 권한이 없습니다: 관리자는 본인의 학습 기록 또는 현재 세션 응시 결과만 열람할 수 있습니다.")
 
     short_earned = detail.get("short_score", 0.0)
     desc_earned = detail.get("descriptive_score", 0.0)
@@ -225,5 +256,7 @@ def view_result(attempt_id: int):
         "details": details
     }
 
-    return render_template("result.html", result=result_dict, attempt_id=attempt_id)
+    response = make_response(render_template("result.html", result=result_dict, attempt_id=attempt_id))
+    response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    return response
 

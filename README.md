@@ -76,9 +76,14 @@ security-practical-cbt/
 
 ---
 
-## 📖 탑재된 PDF 출처 (추적 가능)
-모든 문제는 Google Drive의 실제 기출 및 교안 PDF에서 정확한 페이지 번호와 함께 추출되었습니다:
-1. `보안기사 실기 단답형.pdf` (기출 복원 1~28회 단답형)
-2. `보안기사 실기 서술형.pdf` (기출 복원 1~28회 서술/실무형)
-3. `정보보안기사 실기 서술형 TOP 20.pdf` (고빈출 1위~20위 심층 분석)
-4. `4과목.pdf` (보안 운영 도구 - IPTables, Snort 교안)
+## 📖 출처 인용 및 원천 자산 격리 정책 (Source Asset Policy)
+
+본 프로젝트는 원본 자료의 저장소/배포 격리 및 기술적 위생 기준을 엄격히 준수합니다.
+
+- **외부 원본 문서 격리**: 원본 PDF, 상용 교재, 수험 요약본 등 원문 바이너리 문서는 본 저장소 및 프로덕션 환경에 절대 포함되지 않습니다 (Zero Raw Asset Tracking).
+- **서지 인용 메타데이터**: 애플리케이션 내의 출처 표기(`sources.json`)는 검증을 위한 서지 정보(파일명, 인용 페이지 번호)만을 포함하며, 원문 텍스트나 바이너리를 내포하지 않습니다.
+- **콘텐츠 분류 (Provenance)**: 180문항에 대한 해설(`explanations.json`)과 20개 개념서(`concept_contents.json`)는 공개 기술 표준(RFC, NIST, OWASP, KISA 가이드라인)을 바탕으로 프로젝트 전용으로 작성되었습니다.
+
+> **[참고]** 본 검증은 원본 Source Asset의 Repository/Production 격리 여부와 콘텐츠 provenance를 기술적으로 검증한 것이며, 개별 콘텐츠의 법적 이용 허가 또는 공정이용 해당 여부를 확정하는 법률 검토를 의미하지 않습니다.
+
+상세 격리 정책 및 기술 감사 결과는 [docs/SOURCE_ASSET_POLICY.md](docs/SOURCE_ASSET_POLICY.md)를 참조하십시오.

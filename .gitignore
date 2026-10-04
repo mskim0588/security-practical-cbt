@@ -34,6 +34,27 @@ app/data/*_pre_bak
 !app/data/questions.json
 !app/data/concepts.json
 !app/data/sources.json
+!app/data/concept_contents.json
+!app/data/explanations.json
+
+# Source Asset & Copyright Isolation (Goal 5B)
+# Raw source documents, PDFs, OCR dumps, and private materials must never be committed
+*.pdf
+*.hwp
+*.hwpx
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.epub
+*.ocr
+*.dump
+private_sources/
+source_materials/
+local_references/
+raw_sources/
+ocr_output/
+pdf_sources/
 
 # IDE / Editor / OS files
 .vscode/

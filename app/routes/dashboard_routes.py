@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from app.services.data_loader import DataLoader
 from app.services.analytics_service import AnalyticsService
 from app.services.wrong_answer_service import WrongAnswerService
+from app.services.auth_service import admin_required
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -72,6 +73,7 @@ def get_learning_recommendation(summary: Dict[str, Any], wrong_count: int, top_v
     }
 
 @dashboard_bp.route("/dashboard")
+@admin_required
 def view_dashboard():
     analytics_service, wrong_service = get_services()
 

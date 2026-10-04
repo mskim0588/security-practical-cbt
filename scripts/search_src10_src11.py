@@ -8,7 +8,7 @@ import pypdf
 sys.stdout.reconfigure(encoding='utf-8')
 sources = json.load(open('app/data/sources.json', encoding='utf-8'))
 source_map = {s['id']: s for s in sources}
-PDF_DIR = r'G:\내 드라이브\보안기사\보안기사 실기 관련자료'
+PDF_DIR = os.environ.get("PRIVATE_SOURCE_DIR", "")
 r11 = pypdf.PdfReader(os.path.join(PDF_DIR, source_map['SRC-11']['filename']))
 
 print("=== 고유식별정보 in SRC-11 ===")

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}관리자 인증 - 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 560px; margin: 3rem auto; padding: 0 1rem;">
+  <div class="card" style="padding: 2.25rem; border-radius: var(--radius-lg, 12px); box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+    
+    <div style="text-align: center; margin-bottom: 1.75rem;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #e0e7ff; color: #4338ca; margin-bottom: 1rem;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h1 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">관리자 / 개인 학습 데이터 인증</h1>
+      <p style="font-size: 0.95rem; color: #64748b; line-height: 1.5;">
+        응시 이력, 취약점 오답노트 및 대시보드 통계의 무결성을 보호하기 위한 관리자 전용 인증 영역입니다.
+      </p>
+    </div>
+
+    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; font-size: 0.875rem; color: #475569; line-height: 1.5;">
+      <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #334155;">💡 공개 모의고사 안내</p>
+      <p style="margin: 0;">
+        180문항 모의고사 풀이, 즉시 자동 채점, 결과 리포트 및 20개 개념 사전은 <strong>인증 없이 자유롭게 체험</strong>하실 수 있습니다.
+      </p>
+    </div>
+
+    {% if error %}
+    <div role="alert" style="background-color: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.875rem 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('auth.admin_login') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next_url }}">
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="access_key" style="display: block; font-size: 0.9rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem;">
+          관리자 마스터 패스프레이즈
+        </label>
+        <input type="password" id="access_key" name="access_key" required autofocus placeholder="패스프레이즈를 입력하세요"
+               style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" />
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.875rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer;">
+        인증 완료 및 입장
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <a href="/" style="font-size: 0.9rem; color: #64748b; text-decoration: none;">← 메인 홈으로 돌아가기</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

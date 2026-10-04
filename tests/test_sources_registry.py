@@ -2,7 +2,7 @@ import unittest
 import os
 from app.services.data_loader import DataLoader
 
-PDF_DIR = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료"
+PRIVATE_SOURCE_DIR = os.environ.get("PRIVATE_SOURCE_DIR")
 
 class TestSourcesRegistry(unittest.TestCase):
     def setUp(self):
@@ -19,12 +19,13 @@ class TestSourcesRegistry(unittest.TestCase):
             self.assertIsInstance(s["total_pages"], int)
             self.assertGreater(s["total_pages"], 0)
 
-    def test_sources_match_google_drive_files(self):
-        """Google Drive의 12개 실제 파일명과 sources.json의 파일명이 1:1 일치하는지 검증"""
-        if os.path.exists(PDF_DIR):
-            drive_files = set(f for f in os.listdir(PDF_DIR) if f.endswith(".pdf"))
-            registered_files = set(s["filename"] for s in self.loader.load_sources())
-            self.assertEqual(drive_files, registered_files, "Google Drive의 12개 파일과 sources.json 등록 파일명이 완벽히 일치해야 합니다.")
+    def test_sources_match_external_files(self):
+        """PRIVATE_SOURCE_DIR가 설정된 경우 12개 실제 파일명과 sources.json의 파일명이 1:1 일치하는지 검증"""
+        if not PRIVATE_SOURCE_DIR or not os.path.exists(PRIVATE_SOURCE_DIR):
+            self.skipTest("PRIVATE_SOURCE_DIR 환경변수가 설정되지 않아 로컬 원본 파일 비교를 건너뜁니다.")
+        drive_files = set(f for f in os.listdir(PRIVATE_SOURCE_DIR) if f.endswith(".pdf"))
+        registered_files = set(s["filename"] for s in self.loader.load_sources())
+        self.assertEqual(drive_files, registered_files, "외부 소스 디렉토리의 파일과 sources.json 등록 파일명이 완벽히 일치해야 합니다.")
 
     def test_concepts_integrity(self):
         """concepts.json의 15개 핵심 개념 및 Source ID 유효성 검증"""

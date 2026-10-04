@@ -19,7 +19,8 @@ class HistoryService:
         answers: Dict[str, Any],
         started_at: Optional[datetime] = None,
         duration_seconds: Optional[int] = None,
-        submission_token: Optional[str] = None
+        submission_token: Optional[str] = None,
+        is_owner: bool = True
     ) -> ExamAttempt:
         """
         시험 채점 결과와 수험자 답안을 원자적으로 DB에 저장합니다.
@@ -57,6 +58,7 @@ class HistoryService:
             practical_score=prac_score,
             selected_practical_id=selected_practical_id,
             is_passed=is_passed,
+            is_owner=is_owner,
             created_at=datetime.now()
         )
 
@@ -127,19 +129,20 @@ class HistoryService:
                     return existing
             raise
 
-    def get_attempts(self, limit: int = 20, offset: int = 0) -> List[ExamAttempt]:
-        """응시 이력 목록을 최신순으로 조회합니다."""
+    def get_attempts(self, limit: int = 20, offset: int = 0, is_owner: bool = True) -> List[ExamAttempt]:
+        """응시 이력 목록을 최신순으로 조회합니다 (기본적으로 Owner 전용)."""
         stmt = (
             select(ExamAttempt)
+            .where(ExamAttempt.is_owner == is_owner)
             .order_by(desc(ExamAttempt.created_at))
             .limit(limit)
             .offset(offset)
         )
         return list(db_session.scalars(stmt).all())
 
-    def get_attempt_count(self) -> int:
-        """총 응시 횟수 반환"""
-        stmt = select(func.count(ExamAttempt.id))
+    def get_attempt_count(self, is_owner: bool = True) -> int:
+        """총 응시 횟수 반환 (기본적으로 Owner 전용)"""
+        stmt = select(func.count(ExamAttempt.id)).where(ExamAttempt.is_owner == is_owner)
         return db_session.scalar(stmt) or 0
 
     def get_attempt_by_id(self, attempt_id: int) -> Optional[ExamAttempt]:

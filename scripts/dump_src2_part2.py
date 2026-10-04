@@ -3,7 +3,7 @@ import sys
 import pypdf
 
 sys.stdout.reconfigure(encoding='utf-8')
-pdf_path = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료\보안기사 실기 서술형.pdf"
+pdf_path = os.path.join(os.environ.get("PRIVATE_SOURCE_DIR", ""), "보안기사 실기 서술형.pdf")
 reader = pypdf.PdfReader(pdf_path)
 
 with open("candidate_details_2.txt", "w", encoding="utf-8") as out:

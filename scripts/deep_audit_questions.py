@@ -3,7 +3,7 @@ import os
 import pypdf
 from typing import Dict, List, Any
 
-PDF_DIR = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료"
+PDF_DIR = os.environ.get("PRIVATE_SOURCE_DIR", "")
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "data")
 
 with open(os.path.join(DATA_DIR, "sources.json"), "r", encoding="utf-8") as f:

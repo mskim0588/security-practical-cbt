@@ -1,7 +1,7 @@
 import os
 import pypdf
 
-pdf_dir = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료"
+pdf_dir = os.environ.get("PRIVATE_SOURCE_DIR", "")
 
 def verify_item(pdf_name, page_num, expected_tokens):
     fp = os.path.join(pdf_dir, pdf_name)

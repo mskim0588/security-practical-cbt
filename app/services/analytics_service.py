@@ -21,11 +21,15 @@ class AnalyticsService:
         self.all_questions = self.loader.get_enriched_questions()
         self.question_map = {q["id"]: q for q in self.all_questions}
 
-    def get_summary_stats(self) -> Dict[str, Any]:
+    def get_summary_stats(self, is_owner: bool = True) -> Dict[str, Any]:
         """
-        학습자의 전체 응시 요약 지표
+        학습자의 전체 응시 요약 지표 (기본적으로 Owner 전용)
         """
-        attempts_stmt = select(ExamAttempt).order_by(desc(ExamAttempt.created_at))
+        attempts_stmt = (
+            select(ExamAttempt)
+            .where(ExamAttempt.is_owner == is_owner)
+            .order_by(desc(ExamAttempt.created_at))
+        )
         attempts = list(db_session.scalars(attempts_stmt).all())
 
         total_attempts = len(attempts)
@@ -57,16 +61,23 @@ class AnalyticsService:
             "latest_attempt": latest_attempt.to_dict()
         }
 
-    def get_all_valid_answer_records(self) -> List[AnswerRecord]:
-        """미선택 실무형(unselected)을 제외한 모든 유효 답안 레코드 조회"""
-        stmt = select(AnswerRecord).where(AnswerRecord.achievement_status != "unselected")
+    def get_all_valid_answer_records(self, is_owner: bool = True) -> List[AnswerRecord]:
+        """미선택 실무형(unselected)을 제외한 모든 유효 답안 레코드 조회 (기본적으로 Owner 전용)"""
+        stmt = (
+            select(AnswerRecord)
+            .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
+            .where(
+                ExamAttempt.is_owner == is_owner,
+                AnswerRecord.achievement_status != "unselected"
+            )
+        )
         return list(db_session.scalars(stmt).all())
 
-    def get_category_analytics(self) -> List[Dict[str, Any]]:
+    def get_category_analytics(self, is_owner: bool = True) -> List[Dict[str, Any]]:
         """
-        5대 카테고리별 누적 성취도 분석
+        5대 카테고리별 누적 성취도 분석 (기본적으로 Owner 전용)
         """
-        records = self.get_all_valid_answer_records()
+        records = self.get_all_valid_answer_records(is_owner=is_owner)
 
         # 카테고리별 문항 수 (전체 문제은행 기준)
         category_bank_counts = {cat: 0 for cat in self.CATEGORIES}
@@ -155,11 +166,11 @@ class AnalyticsService:
 
         return results
 
-    def get_concept_analytics(self) -> List[Dict[str, Any]]:
+    def get_concept_analytics(self, is_owner: bool = True) -> List[Dict[str, Any]]:
         """
-        20개 Concept별 누적 성취도 및 취약도 지수(VI) 산출
+        20개 Concept별 누적 성취도 및 취약도 지수(VI) 산출 (기본적으로 Owner 전용)
         """
-        records = self.get_all_valid_answer_records()
+        records = self.get_all_valid_answer_records(is_owner=is_owner)
 
         # 개념별 문제은행 문항 수
         concept_bank_counts = {cid: 0 for cid in self.concept_map}
@@ -259,11 +270,11 @@ class AnalyticsService:
         results.sort(key=lambda x: x["concept_id"])
         return results
 
-    def get_top_vulnerable_concepts(self, limit: int = 5) -> List[Dict[str, Any]]:
+    def get_top_vulnerable_concepts(self, limit: int = 5, is_owner: bool = True) -> List[Dict[str, Any]]:
         """
-        집중 보완 대상 취약 Concept Top N 산출 (취약도 지수 높은 순)
+        집중 보완 대상 취약 Concept Top N 산출 (기본적으로 Owner 전용)
         """
-        concepts = self.get_concept_analytics()
+        concepts = self.get_concept_analytics(is_owner=is_owner)
         # 응시 이력이 있고 오답/감점이 있는 개념 우선
         attempted_vulnerable = [c for c in concepts if c["attempts_count"] > 0 and c["vulnerability_index"] > 0]
         attempted_vulnerable.sort(key=lambda x: x["vulnerability_index"], reverse=True)
@@ -276,12 +287,13 @@ class AnalyticsService:
         combined = attempted_vulnerable + unattempted
         return combined[:limit]
 
-    def get_recent_performance_trend(self, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_recent_performance_trend(self, limit: int = 10, is_owner: bool = True) -> List[Dict[str, Any]]:
         """
-        최근 회차별 점수 및 합격 추이 (시간순 오름차순 정렬)
+        최근 회차별 점수 및 합격 추이 (기본적으로 Owner 전용)
         """
         stmt = (
             select(ExamAttempt)
+            .where(ExamAttempt.is_owner == is_owner)
             .order_by(desc(ExamAttempt.created_at))
             .limit(limit)
         )

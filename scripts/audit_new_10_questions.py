@@ -8,7 +8,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 from scripts.new_questions_batch import NEW_SHORT_QUESTIONS, NEW_DESC_QUESTIONS, NEW_PRAC_QUESTIONS
 
-pdf_dir = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료"
+pdf_dir = os.environ.get("PRIVATE_SOURCE_DIR", "")
 with open('app/data/sources.json', encoding='utf-8') as f:
     sources = {s['id']: s for s in json.load(f)}
 

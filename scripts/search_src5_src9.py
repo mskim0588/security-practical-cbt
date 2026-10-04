@@ -3,7 +3,7 @@ import sys
 import pypdf
 
 sys.stdout.reconfigure(encoding='utf-8')
-pdf_dir = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료"
+pdf_dir = os.environ.get("PRIVATE_SOURCE_DIR", "")
 
 def search_text(fn, keywords):
     fp = os.path.join(pdf_dir, fn)

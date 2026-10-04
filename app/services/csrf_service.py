@@ -52,10 +52,12 @@ def verify_csrf():
 
 def csrf_protect(f):
     """
-    Decorator to enforce CSRF validation on state-changing view functions.
+    Decorator to enforce CSRF validation on state-changing view functions (POST, PUT, DELETE, PATCH).
+    Safe HTTP methods (GET, HEAD, OPTIONS) are exempt per RFC 7231.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        verify_csrf()
+        if request.method in ("POST", "PUT", "DELETE", "PATCH"):
+            verify_csrf()
         return f(*args, **kwargs)
     return decorated_function

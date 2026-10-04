@@ -27,6 +27,12 @@
       <div class="header-actions">
         {% block header_actions %}
         <span class="header-status-text">총 100점 만점 / 합격 기준 60점</span>
+        {% if admin_access_key_configured and is_admin_authenticated() %}
+        <form method="POST" action="/admin-logout" style="display:inline; margin-left: 0.75rem;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-color: #cbd5e1; color: #64748b; cursor: pointer;" title="관리자 세션 로그아웃">로그아웃</button>
+        </form>
+        {% endif %}
         {% endblock %}
       </div>
     </div>

@@ -3,7 +3,7 @@ import sys
 import pypdf
 
 sys.stdout.reconfigure(encoding='utf-8')
-pdf_path = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료\00. 정보보안기사_실기_요약_v1.0.pdf"
+pdf_path = os.path.join(os.environ.get("PRIVATE_SOURCE_DIR", ""), "00. 정보보안기사_실기_요약_v1.0.pdf")
 reader = pypdf.PdfReader(pdf_path)
 
 with open("batch1_src5_dump.txt", "w", encoding="utf-8") as out:

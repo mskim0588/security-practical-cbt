@@ -1,3 +1,4 @@
+import os
 import pypdf
 
 def dump_pages(pdf_path, name):
@@ -11,6 +12,6 @@ def dump_pages(pdf_path, name):
         print(f"Page {i+1}: {preview}")
 
 if __name__ == "__main__":
-    dump_pages("G:/내 드라이브/보안기사/보안기사 실기 관련자료/보안기사 실기 단답형.pdf", "SRC-01")
-    dump_pages("G:/내 드라이브/보안기사/보안기사 실기 관련자료/보안기사 실기 서술형.pdf", "SRC-02")
-    dump_pages("G:/내 드라이브/보안기사/보안기사 실기 관련자료/정보보안기사 실기 서술형 TOP 20.pdf", "SRC-03")
+    dump_pages(os.path.join(os.environ.get("PRIVATE_SOURCE_DIR", ""), "보안기사 실기 단답형.pdf"), "SRC-01")
+    dump_pages(os.path.join(os.environ.get("PRIVATE_SOURCE_DIR", ""), "보안기사 실기 서술형.pdf"), "SRC-02")
+    dump_pages(os.path.join(os.environ.get("PRIVATE_SOURCE_DIR", ""), "정보보안기사 실기 서술형 TOP 20.pdf"), "SRC-03")

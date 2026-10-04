@@ -12,7 +12,7 @@ with open('app/data/sources.json', encoding='utf-8') as f:
     sources = json.load(f)
 source_map = {s['id']: s for s in sources}
 
-pdf_dir = r"G:\내 드라이브\보안기사\보안기사 실기 관련자료"
+pdf_dir = os.environ.get("PRIVATE_SOURCE_DIR", "")
 
 # Load all PDF readers
 readers = {}
