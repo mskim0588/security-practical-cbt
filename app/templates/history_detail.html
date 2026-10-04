@@ -13,17 +13,30 @@
 
 {% block content %}
 <div class="score-summary-card" style="margin-bottom: 28px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-    <div style="font-size: 14px; font-weight: 700; color: var(--gray-600); text-transform: uppercase;">
-      제{{ attempt.id }}회차 모의고사 복기 리포트
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 16px; font-weight: 800; color: var(--neutral-800);">
+        제{{ attempt.id }}회차 모의고사 복기 리포트
+      </span>
+      {% if attempt.exam_mode == 'standard' %}
+        <span class="badge-mode badge-mode-standard">📘 표준 모의고사</span>
+      {% elif attempt.exam_mode == 'random' %}
+        <span class="badge-mode badge-mode-random">🎲 랜덤 모의고사</span>
+      {% elif attempt.exam_mode == 'wrong_review' %}
+        <span class="badge-mode badge-mode-wrong_review">🔥 오답 집중 모의고사</span>
+      {% elif attempt.exam_mode == 'adaptive' %}
+        <span class="badge-mode badge-mode-adaptive">🎯 취약점 맞춤 모의고사</span>
+      {% else %}
+        <span class="badge-mode">{{ attempt.exam_mode }}</span>
+      {% endif %}
     </div>
-    <div style="font-size: 13px; color: var(--gray-600);">
+    <div style="font-size: 13px; color: var(--neutral-600);">
       응시 일시: {{ attempt.created_at[:16].replace('T', ' ') if attempt.created_at else '-' }}
     </div>
   </div>
 
   <div class="score-main">
-    {{ attempt.total_score }} <span class="unit">/ 100점</span>
+    {{ "%.1f"|format(attempt.total_score)|replace('.0', '') }} <span class="unit">/ 100점</span>
   </div>
 
   <div>
@@ -36,49 +49,66 @@
 
   <div class="section-score-grid">
     <div class="section-score-box">
-      <div style="font-size: 13px; color: var(--primary-color); font-weight: 700;">1. 단답형</div>
-      <div style="font-size: 22px; font-weight: 800; color: var(--gray-900); margin: 4px 0;">
-        {{ attempt.short_score }} <span style="font-size: 13px; color: var(--gray-600);">/ 36점</span>
+      <div style="font-size: 13px; color: var(--primary-700); font-weight: 700;">1. 단답형</div>
+      <div style="font-size: 22px; font-weight: 800; color: var(--neutral-900); margin: 4px 0;">
+        {{ "%.1f"|format(attempt.short_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 36점</span>
       </div>
-      <div style="font-size: 12px; color: var(--gray-600);">12문항 (문항당 3점)</div>
+      <div style="font-size: 12px; color: var(--neutral-600);">12문항 (문항당 3점)</div>
     </div>
 
     <div class="section-score-box">
       <div style="font-size: 13px; color: #b45309; font-weight: 700;">2. 서술형</div>
-      <div style="font-size: 22px; font-weight: 800; color: var(--gray-900); margin: 4px 0;">
-        {{ attempt.descriptive_score }} <span style="font-size: 13px; color: var(--gray-600);">/ 48점</span>
+      <div style="font-size: 22px; font-weight: 800; color: var(--neutral-900); margin: 4px 0;">
+        {{ "%.1f"|format(attempt.descriptive_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 48점</span>
       </div>
-      <div style="font-size: 12px; color: var(--gray-600);">4문항 (문항당 12점)</div>
+      <div style="font-size: 12px; color: var(--neutral-600);">4문항 (문항당 12점)</div>
     </div>
 
     <div class="section-score-box">
       <div style="font-size: 13px; color: #15803d; font-weight: 700;">3. 실무형</div>
-      <div style="font-size: 22px; font-weight: 800; color: var(--gray-900); margin: 4px 0;">
-        {{ attempt.practical_score }} <span style="font-size: 13px; color: var(--gray-600);">/ 16점</span>
+      <div style="font-size: 22px; font-weight: 800; color: var(--neutral-900); margin: 4px 0;">
+        {{ "%.1f"|format(attempt.practical_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 16점</span>
       </div>
-      <div style="font-size: 12px; color: var(--gray-600);">
+      <div style="font-size: 12px; color: var(--neutral-600);">
         선택: {{ attempt.selected_practical_id if attempt.selected_practical_id else '선택 안 함' }}
       </div>
     </div>
   </div>
+
+  {% set wrong_items = attempt.answers | selectattr('achievement_status', 'in', ['incorrect', 'partial']) | list %}
+  {% if wrong_items | length > 0 %}
+  <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--neutral-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div style="font-size: 14px; color: var(--neutral-700);">
+      💡 이번 시험에서 복습이 필요한 오답/감점 문항이 <strong>{{ wrong_items | length }}개</strong> 있습니다.
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="/wrong-notes" class="btn btn-secondary" style="font-size: 13px;">
+        📝 오답노트에서 확인
+      </a>
+      <a href="/exam?mode=wrong_review" class="btn btn-warning" style="font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+        🔥 오답 집중 모의고사 풀기 &rarr;
+      </a>
+    </div>
+  </div>
+  {% endif %}
 </div>
 
-<h2 style="font-size: 20px; font-weight: 800; color: var(--gray-900); margin-bottom: 16px;">
+<h2 style="font-size: 20px; font-weight: 800; color: var(--neutral-900); margin-bottom: 16px;">
   📋 문항별 답안 및 채점 상세 복기
 </h2>
 
 <div style="display: flex; flex-direction: column; gap: 20px;">
   {% for ans in attempt.answers %}
   {% set idx = loop.index %}
-  <div class="card" style="border-left: 5px solid {% if ans.achievement_status == 'sufficient' %}var(--success-color){% elif ans.achievement_status == 'partial' %}var(--warning-color){% elif ans.achievement_status == 'unselected' %}var(--gray-300){% else %}var(--danger-color){% endif %}; padding: 20px;">
+  <div class="card" style="border-left: 5px solid {% if ans.achievement_status == 'sufficient' %}var(--success-color){% elif ans.achievement_status == 'partial' %}var(--warning-color){% elif ans.achievement_status == 'unselected' %}var(--neutral-300){% else %}var(--danger-color){% endif %}; padding: 20px;">
     
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-weight: 800; font-size: 16px; color: var(--gray-900);">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-weight: 800; font-size: 16px; color: var(--neutral-900);">
           {{ idx }}번 문항
         </span>
-        <span style="font-family: monospace; font-size: 13px; color: var(--gray-600); background: var(--gray-100); padding: 2px 6px; border-radius: 4px;">
+        <span style="font-family: var(--font-mono); font-size: 13px; color: var(--neutral-600); background: var(--neutral-100); padding: 2px 6px; border-radius: 4px;">
           {{ ans.question_id }}
         </span>
         {% if ans.question_type == 'short' %}
@@ -92,48 +122,58 @@
         {% if ans.category %}
         <span class="q-category">{{ ans.category }}</span>
         {% endif %}
+
+        {% if ans.concept_id %}
+        <a href="{{ url_for('concepts.view_concept_detail', concept_id=ans.concept_id) }}" class="btn-concept-link" title="소속 개념 심층 학습서 보기">
+          📖 {{ ans.concept_id }} {% if ans.concept_name %}{{ ans.concept_name }}{% endif %} &rarr;
+        </a>
+        {% elif ans.concept_name %}
+        <span style="background: #ede9fe; color: #6d28d9; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+          {{ ans.concept_name }}
+        </span>
+        {% endif %}
       </div>
 
       <div style="display: flex; align-items: center; gap: 10px;">
         {% if ans.achievement_status == 'sufficient' %}
-          <span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 4px; border: 1px solid #bbf7d0;">
+          <span class="status-pill status-pill-sufficient">
             ✓ 정답 (완전 이해)
           </span>
         {% elif ans.achievement_status == 'partial' %}
-          <span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 4px; border: 1px solid #fde68a;">
-            ⚠ 부분 정답 (감점)
+          <span class="status-pill status-pill-partial">
+            △ 부분 정답 (감점)
           </span>
         {% elif ans.achievement_status == 'unselected' %}
-          <span style="background: #f1f5f9; color: #64748b; font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1;">
-            미선택 (채점 제외)
+          <span class="status-pill status-pill-unselected">
+            - 미선택 (채점 제외)
           </span>
         {% else %}
-          <span style="background: #fee2e2; color: #b91c1c; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 4px; border: 1px solid #fecaca;">
+          <span class="status-pill status-pill-incorrect">
             ✕ 오답
           </span>
         {% endif %}
         
-        <span style="font-weight: 800; font-size: 16px; color: var(--gray-900);">
-          {{ ans.earned_score }} / {{ ans.max_score }}점
+        <span style="font-weight: 800; font-size: 16px; color: var(--neutral-900);">
+          {{ "%.1f"|format(ans.earned_score)|replace('.0', '') }} / {{ "%.1f"|format(ans.max_score)|replace('.0', '') }}점
         </span>
       </div>
     </div>
 
     <!-- Question Text -->
-    <div style="font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 16px; line-height: 1.6; white-space: pre-line; background: var(--gray-50); padding: 12px; border-radius: 6px;">
+    <div style="font-size: 15px; font-weight: 600; color: var(--neutral-800); margin-bottom: 16px; line-height: 1.6; white-space: pre-line; background: var(--neutral-50); padding: 12px; border-radius: 6px;">
       {{ ans.question_text }}
     </div>
 
     <!-- User Answer vs Model Answer -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
       <!-- Submitted Answer -->
-      <div style="background: white; border: 1px solid var(--gray-200); border-radius: 6px; padding: 12px;">
-        <div style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px;">
+      <div style="background: white; border: 1px solid var(--neutral-200); border-radius: 6px; padding: 12px;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--neutral-600); margin-bottom: 6px;">
           ✍️ 제출한 수험자 답안:
         </div>
-        <div style="font-size: 14px; color: var(--gray-900); white-space: pre-wrap; word-break: break-all; min-height: 40px;">
+        <div style="font-size: 14px; color: var(--neutral-900); white-space: pre-wrap; word-break: break-all; min-height: 40px;">
           {% if ans.achievement_status == 'unselected' %}
-            <span style="color: var(--gray-600); font-style: italic;">(선택하지 않은 실무형 문항)</span>
+            <span style="color: var(--neutral-500); font-style: italic;">(선택하지 않은 실무형 문항)</span>
           {% elif ans.user_answer %}
             {% if ans.user_answer is mapping %}
               {% for k, v in ans.user_answer.items() %}
@@ -150,10 +190,10 @@
 
       <!-- Model Answer -->
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px;">
-        <div style="font-size: 12px; font-weight: 700; color: var(--primary-color); margin-bottom: 6px;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary-700); margin-bottom: 6px;">
           🎯 모범 답안 / 인정 정답:
         </div>
-        <div style="font-size: 14px; color: var(--gray-800); white-space: pre-wrap; word-break: break-all; min-height: 40px;">
+        <div style="font-size: 14px; color: var(--neutral-800); white-space: pre-wrap; word-break: break-all; min-height: 40px;">
           {% if ans.sub_questions %}
             {% for sub in ans.sub_questions %}
               <div style="margin-bottom: 4px;">
@@ -161,7 +201,7 @@
                 {% if sub.expected %}
                   {{ sub.expected }}
                   {% if sub.accepted_answers %}
-                    <span style="font-size: 12px; color: var(--gray-600);">(인정: {{ sub.accepted_answers | join(', ') }})</span>
+                    <span style="font-size: 12px; color: var(--neutral-600);">(인정: {{ sub.accepted_answers | join(', ') }})</span>
                   {% endif %}
                 {% elif sub.model_answer %}
                   {{ sub.model_answer }}
@@ -177,19 +217,19 @@
 
     <!-- Rubric / Sub Results (if available) -->
     {% if ans.self_eval_data and ans.question_type != 'short' %}
-    <div style="background: #f8fafc; border: 1px dashed var(--gray-300); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
-      <div style="font-size: 12px; font-weight: 700; color: var(--gray-700); margin-bottom: 8px;">
+    <div style="background: #f8fafc; border: 1px dashed var(--neutral-300); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+      <div style="font-size: 12px; font-weight: 700; color: var(--neutral-700); margin-bottom: 8px;">
         🔍 소문항 채점 기준 및 키워드 매칭 분석:
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
         {% for sub in ans.self_eval_data %}
         {% set sub_earned = sub.earned_score if sub.earned_score is defined else (sub.score if sub.score is defined else 0.0) %}
         {% set sub_max = sub.max_score if sub.max_score is defined else 0.0 %}
-        <div style="font-size: 13px; border-bottom: 1px solid var(--gray-200); padding-bottom: 6px;">
+        <div style="font-size: 13px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 6px;">
           <div style="display: flex; justify-content: space-between; font-weight: 600;">
             <span>소문항 {{ sub.sub_id or sub.label or loop.index }}{% if sub.prompt %}: {{ sub.prompt }}{% endif %}</span>
             <span style="color: {% if sub_earned == sub_max and sub_max > 0 %}var(--success-color){% elif sub_earned > 0 %}var(--warning-color){% else %}var(--danger-color){% endif %};">
-              {{ sub_earned }} / {{ sub_max }}점
+              {{ "%.1f"|format(sub_earned)|replace('.0', '') }} / {{ "%.1f"|format(sub_max)|replace('.0', '') }}점
             </span>
           </div>
           {% if sub.matched_keywords %}
@@ -209,7 +249,7 @@
     {% endif %}
 
     <!-- Explanation & Source Info -->
-    <div style="font-size: 12px; color: var(--gray-600); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gray-200); padding-top: 10px; margin-top: 6px;">
+    <div style="font-size: 12px; color: var(--neutral-600); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--neutral-200); padding-top: 10px; margin-top: 6px; flex-wrap: wrap; gap: 8px;">
       <div>
         {% if ans.concept_name %}
           <span style="background: #ede9fe; color: #6d28d9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
@@ -217,15 +257,26 @@
           </span>
         {% endif %}
         {% if ans.explanation %}
-          <span style="margin-left: 8px; color: var(--gray-700);">💡 {{ ans.explanation }}</span>
+          <span style="margin-left: 8px; color: var(--neutral-700);">💡 {{ ans.explanation }}</span>
         {% endif %}
       </div>
       {% if ans.source_info %}
-      <div style="font-family: monospace; color: var(--gray-600);">
+      <div style="font-family: var(--font-mono); color: var(--neutral-600);">
         출처: {{ ans.source_info }}{% if ans.source_page %} p.{{ ans.source_page }}{% endif %}
       </div>
       {% endif %}
     </div>
+
+    <!-- Deep Explanation Accordion (Goal 4C & 4D) -->
+    {% if ans.deep_explanation %}
+      {% set explanation = ans.deep_explanation %}
+      {% set concept_id = ans.concept_id %}
+      {% set question_id = ans.question_id %}
+      {% set question_text = ans.question_text %}
+      {% set model_answer = ans.model_answer %}
+      {% set user_answer = ans.user_answer %}
+      {% include "components/explanation_card.html" %}
+    {% endif %}
 
   </div>
   {% endfor %}
@@ -235,4 +286,6 @@
   <a href="/history" class="btn btn-secondary btn-lg">&larr; 응시 이력 목록으로 돌아가기</a>
   <a href="/exam" class="btn btn-primary btn-lg" style="margin-left: 12px;">새 모의고사 응시하기 &rarr;</a>
 </div>
+
+{% include "components/ai_prompt_modal.html" %}
 {% endblock %}

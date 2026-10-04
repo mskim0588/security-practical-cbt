@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% set hide_mobile_global_nav = true %}
 
 {% block title %}시험 응시 | 정보보안기사 실기 CBT{% endblock %}
 
@@ -14,14 +15,16 @@
   <input type="hidden" name="exam_mode" value="{{ exam_mode }}">
   <input type="hidden" name="exam_seed" value="{{ exam_seed if exam_seed is not none else '' }}">
   <input type="hidden" name="submission_token" value="{{ submission_token }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-  <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+  <!-- Exam Mode Banner -->
+  <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
     {% if exam_mode == 'random' %}
       <span style="background: #fef3c7; color: #92400e; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 4px; border: 1px solid #fde68a;">
         🎲 랜덤 실전 모의고사 (문제은행 무작위 출제)
       </span>
       {% if exam_seed is not none %}
-      <span style="background: #f3f4f6; color: #4b5563; font-weight: 600; font-size: 12px; padding: 4px 8px; border-radius: 4px; border: 1px solid #e5e7eb; font-family: monospace;">
+      <span style="background: #f3f4f6; color: #4b5563; font-weight: 600; font-size: 12px; padding: 4px 8px; border-radius: 4px; border: 1px solid #e5e7eb; font-family: var(--font-mono);">
         시험 Seed: {{ exam_seed }}
       </span>
       {% endif %}
@@ -45,20 +48,21 @@
     <div class="exam-main">
 
       <!-- SECTION 1: 단답형 (1~12) -->
-      <div style="margin-bottom: 32px;">
-        <h2 style="font-size: 20px; color: var(--primary-color); margin-bottom: 8px; border-bottom: 2px solid var(--primary-color); padding-bottom: 6px;">
+      <section style="margin-bottom: 32px;" aria-labelledby="sec-short-title">
+        <h2 id="sec-short-title" style="font-size: 20px; color: var(--primary-color); margin-bottom: 8px; border-bottom: 2px solid var(--primary-color); padding-bottom: 6px;">
           제1영역 : 단답형 (12문항 / 문항당 3점 / 총 36점)
         </h2>
-        <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 20px;">
+        <p style="font-size: 14px; color: var(--neutral-600); margin-bottom: 20px;">
           * 빈칸에 알맞은 용어, 명령어, 파일명 또는 숫자를 입력하십시오.
         </p>
 
         {% for q in short_qs %}
         {% set q_idx = loop.index %}
-        <div class="question-card" id="q-{{ q.id }}" data-qid="{{ q.id }}">
+        <article class="question-card" id="q-{{ q.id }}" data-qid="{{ q.id }}" data-qtype="short" aria-labelledby="q-heading-{{ q.id }}">
           <div class="question-header">
             <div class="q-meta">
-              <span class="q-badge badge-short">문제 {{ q_idx }} (단답형)</span>
+              <span id="q-heading-{{ q.id }}" class="q-badge badge-short">문제 {{ q_idx }} (단답형)</span>
+              <span class="q-status-badge badge-empty" id="status-badge-{{ q.id }}">○ 미작성</span>
               <span class="q-category">{{ q.category }}</span>
             </div>
             <div class="q-score">배점: {{ q.score }}점</div>
@@ -71,37 +75,44 @@
               <div class="sub-inputs">
                 {% for sub in q.sub_questions %}
                 <div class="input-row">
-                  <span class="input-label">({{ sub.label }})</span>
-                  <input type="text" name="ans_{{ q.id }}_{{ sub.label }}" class="text-input" placeholder="({{ sub.label }}) 정답 입력 (배점: {{ sub.score }}점)" autocomplete="off">
+                  <label for="ans_{{ q.id }}_{{ sub.label }}" class="input-label">
+                    <span class="sub-letter">({{ sub.label }})</span>
+                    <span class="sub-score-pill">{{ sub.score }}점</span>
+                  </label>
+                  <input type="text" id="ans_{{ q.id }}_{{ sub.label }}" name="ans_{{ q.id }}_{{ sub.label }}" class="text-input" placeholder="({{ sub.label }}) 정답 입력" autocomplete="off">
                 </div>
                 {% endfor %}
               </div>
             {% else %}
               <div class="input-row">
-                <span class="input-label">답안:</span>
-                <input type="text" name="ans_{{ q.id }}" class="text-input" placeholder="정답을 입력하십시오" autocomplete="off">
+                <label for="ans_{{ q.id }}" class="input-label">
+                  <span class="sub-letter">답안</span>
+                  <span class="sub-score-pill">{{ q.score }}점</span>
+                </label>
+                <input type="text" id="ans_{{ q.id }}" name="ans_{{ q.id }}" class="text-input" placeholder="정답을 입력하십시오" autocomplete="off">
               </div>
             {% endif %}
           </div>
-        </div>
+        </article>
         {% endfor %}
-      </div>
+      </section>
 
       <!-- SECTION 2: 서술형 (13~16) -->
-      <div style="margin-bottom: 32px;">
-        <h2 style="font-size: 20px; color: #b45309; margin-bottom: 8px; border-bottom: 2px solid #b45309; padding-bottom: 6px;">
+      <section style="margin-bottom: 32px;" aria-labelledby="sec-desc-title">
+        <h2 id="sec-desc-title" style="font-size: 20px; color: #b45309; margin-bottom: 8px; border-bottom: 2px solid #b45309; padding-bottom: 6px;">
           제2영역 : 서술형 (4문항 / 문항당 12점 / 총 48점)
         </h2>
-        <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 20px;">
+        <p style="font-size: 14px; color: var(--neutral-600); margin-bottom: 20px;">
           * 각 소문항의 요구사항에 맞추어 핵심 키워드와 원리를 구체적으로 기술하십시오.
         </p>
 
         {% for q in desc_qs %}
         {% set q_idx = loop.index + 12 %}
-        <div class="question-card" id="q-{{ q.id }}" data-qid="{{ q.id }}">
+        <article class="question-card" id="q-{{ q.id }}" data-qid="{{ q.id }}" data-qtype="descriptive" aria-labelledby="q-heading-{{ q.id }}">
           <div class="question-header">
             <div class="q-meta">
-              <span class="q-badge badge-desc">문제 {{ q_idx }} (서술형)</span>
+              <span id="q-heading-{{ q.id }}" class="q-badge badge-desc">문제 {{ q_idx }} (서술형)</span>
+              <span class="q-status-badge badge-empty" id="status-badge-{{ q.id }}">○ 미작성</span>
               <span class="q-category">{{ q.category }}</span>
             </div>
             <div class="q-score">배점: {{ q.score }}점</div>
@@ -111,49 +122,49 @@
 
           <div class="question-input-area">
             {% for sub in q.sub_questions %}
-            <div style="margin-bottom: 16px;">
-              <label style="display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--gray-800);">
-                소문항 {{ sub.sub_id }}) {{ sub.prompt }} (배점: {{ sub.score }}점)
+            <div class="desc-sub-group">
+              <label for="ans_{{ q.id }}_{{ sub.sub_id }}" class="desc-sub-label">
+                <span class="sub-badge">소문항 {{ sub.sub_id }}</span>
+                <span class="sub-prompt">{{ sub.prompt }}</span>
+                <span class="sub-score-badge">{{ sub.score }}점</span>
               </label>
-              <textarea name="ans_{{ q.id }}_{{ sub.sub_id }}" class="textarea-input" placeholder="답안을 기술하십시오..."></textarea>
+              <textarea id="ans_{{ q.id }}_{{ sub.sub_id }}" name="ans_{{ q.id }}_{{ sub.sub_id }}" class="textarea-input" placeholder="답안을 기술하십시오..." rows="4"></textarea>
             </div>
             {% endfor %}
           </div>
-        </div>
+        </article>
         {% endfor %}
-      </div>
+      </section>
 
       <!-- SECTION 3: 실무형 (17~18 중 택 1) -->
-      <div style="margin-bottom: 32px;">
-        <h2 style="font-size: 20px; color: #15803d; margin-bottom: 8px; border-bottom: 2px solid #15803d; padding-bottom: 6px;">
+      <section style="margin-bottom: 32px;" aria-labelledby="sec-prac-title">
+        <h2 id="sec-prac-title" style="font-size: 20px; color: #15803d; margin-bottom: 8px; border-bottom: 2px solid #15803d; padding-bottom: 6px;">
           제3영역 : 실무형 (2문항 중 1문항 선택 / 16점)
         </h2>
-
-        <!-- 실무형 선택 박스 -->
-        <div class="practical-selector-box">
-          <div style="font-weight: 700; color: #1e40af; font-size: 15px;">
-            ⚠️ 실무형 응시 문제 선택 (필수)
-          </div>
-          <div style="font-size: 14px; color: var(--gray-700); margin-top: 4px;">
-            제시된 2개의 실무형 문항 중 <strong>응시할 1문항을 선택</strong>하십시오. 선택된 문항만 16점 만점으로 채점됩니다.
-          </div>
-          <div class="selector-options">
-            {% for q in prac_qs %}
-            {% set prac_idx = loop.index + 16 %}
-            <label class="radio-label">
-              <input type="radio" name="selected_practical_id" value="{{ q.id }}" {% if loop.first %}checked{% endif %}>
-              <span>{{ prac_idx }}번 문제 선택 ({{ q.category }}{% if q.tags %} - {{ q.tags[0] }}{% endif %})</span>
-            </label>
-            {% endfor %}
-          </div>
-        </div>
+        <p style="font-size: 14px; color: var(--neutral-600); margin-bottom: 16px;">
+          * 아래 2개의 실무형 문항 중 <strong>응시할 1문항을 선택</strong>하십시오. 선택된 문항만 16점 만점으로 채점됩니다.
+        </p>
 
         {% for q in prac_qs %}
         {% set q_idx = loop.index + 16 %}
-        <div class="question-card practical-card" id="q-{{ q.id }}" data-qid="{{ q.id }}">
+        <article class="question-card practical-card" id="q-{{ q.id }}" data-qid="{{ q.id }}" data-qtype="practical" aria-labelledby="q-heading-{{ q.id }}">
+          <!-- 실무형 선택 헤더 바 -->
+          <div class="practical-select-header">
+            <label class="practical-radio-label" for="radio-{{ q.id }}">
+              <input type="radio" id="radio-{{ q.id }}" name="selected_practical_id" value="{{ q.id }}" {% if loop.first %}checked{% endif %}>
+              <span>{{ q_idx }}번 문제 응시 ({{ q.category }}{% if q.tags %} · {{ q.tags[0] }}{% endif %})</span>
+              <span class="practical-status-pill {% if loop.first %}selected{% else %}unselected{% endif %}" id="prac-pill-{{ q.id }}">
+                {% if loop.first %}선택 문항 · 16점 채점{% else %}미선택 · 채점 제외{% endif %}
+              </span>
+            </label>
+          </div>
+
           <div class="question-header">
             <div class="q-meta">
-              <span class="q-badge badge-prac">문제 {{ q_idx }} (실무형 선택문항)</span>
+              <span id="q-heading-{{ q.id }}" class="q-badge badge-prac">문제 {{ q_idx }} (실무형 선택)</span>
+              <span class="q-status-badge {% if loop.first %}badge-empty{% else %}badge-unselected{% endif %}" id="status-badge-{{ q.id }}">
+                {% if loop.first %}○ 미작성{% else %}- 채점 제외{% endif %}
+              </span>
               <span class="q-category">{{ q.category }}</span>
             </div>
             <div class="q-score">배점: {{ q.score }}점</div>
@@ -163,19 +174,21 @@
 
           <div class="question-input-area">
             {% for sub in q.sub_questions %}
-            <div style="margin-bottom: 16px;">
-              <label style="display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--gray-800);">
-                소문항 {{ sub.sub_id }}) {{ sub.prompt }} (배점: {{ sub.score }}점)
+            <div class="desc-sub-group">
+              <label for="ans_{{ q.id }}_{{ sub.sub_id }}" class="desc-sub-label">
+                <span class="sub-badge">소문항 {{ sub.sub_id }}</span>
+                <span class="sub-prompt">{{ sub.prompt }}</span>
+                <span class="sub-score-badge">{{ sub.score }}점</span>
               </label>
-              <textarea name="ans_{{ q.id }}_{{ sub.sub_id }}" class="textarea-input" placeholder="실무형 답안을 기술하십시오..."></textarea>
+              <textarea id="ans_{{ q.id }}_{{ sub.sub_id }}" name="ans_{{ q.id }}_{{ sub.sub_id }}" class="textarea-input" placeholder="실무형 답안을 기술하십시오..." rows="5"></textarea>
             </div>
             {% endfor %}
           </div>
-        </div>
+        </article>
         {% endfor %}
-      </div>
+      </section>
 
-      <!-- 하단 액션 바 -->
+      <!-- Desktop Bottom Submit CTA -->
       <div style="text-align: right; padding: 20px 0;">
         <button type="submit" formaction="/review" class="btn btn-primary btn-lg">
           답안 검토하기 &rarr;
@@ -184,33 +197,142 @@
 
     </div>
 
-    <!-- Right: Sticky Navigator Sidebar -->
-    <aside class="exam-sidebar">
+    <!-- Right: Sticky Navigator Sidebar (Desktop >= 900px) -->
+    <aside class="exam-sidebar" aria-label="시험 문항 내비게이터">
       <div class="card" style="padding: 16px;">
-        <h4 style="font-size: 15px; margin-bottom: 12px; color: var(--gray-900);">문항 이동 내비게이터</h4>
-        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 12px;">
-          <span style="display:inline-block; width:10px; height:10px; background:#dbeafe; border-radius:2px; margin-right:4px;"></span>작성완료
-          <span style="display:inline-block; width:10px; height:10px; background:white; border:1px solid #ccc; border-radius:2px; margin: 0 4px 0 8px;"></span>미작성
+        <h4 style="font-size: 15px; margin-bottom: 10px; color: var(--neutral-900);">문항 내비게이터</h4>
+
+        <!-- Real-time Progress -->
+        <div class="nav-progress-box">
+          <div class="progress-header">
+            <span>작성 진행률</span>
+            <span id="desktop-progress-text"><strong>0</strong> / 17 완료</span>
+          </div>
+          <div class="progress-bar-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="17">
+            <div class="progress-bar-fill" id="desktop-progress-fill" style="width: 0%;"></div>
+          </div>
         </div>
-        <div class="nav-grid">
+
+        <div class="nav-legend">
+          <span class="nav-legend-item"><span style="color: var(--success); font-weight: bold;">✓</span>완료</span>
+          <span class="nav-legend-item"><span style="color: var(--warning); font-weight: bold;">△</span>일부</span>
+          <span class="nav-legend-item"><span style="color: var(--neutral-400); font-weight: bold;">○</span>미작성</span>
+          <span class="nav-legend-item"><span style="color: var(--neutral-400);">-</span>제외</span>
+        </div>
+
+        <!-- 단답형 1~12 -->
+        <div style="font-size: 11px; font-weight: 700; color: var(--neutral-600); margin-bottom: 4px;">단답형 (1~12)</div>
+        <div class="nav-grid" style="margin-bottom: 12px;">
           {% for q in short_qs %}
-          <a href="#q-{{ q.id }}" class="nav-btn" data-target="{{ q.id }}">{{ loop.index }}</a>
-          {% endfor %}
-          {% for q in desc_qs %}
-          <a href="#q-{{ q.id }}" class="nav-btn" data-target="{{ q.id }}">{{ loop.index + 12 }}</a>
-          {% endfor %}
-          {% for q in prac_qs %}
-          <a href="#q-{{ q.id }}" class="nav-btn" data-target="{{ q.id }}">{{ loop.index + 16 }}</a>
+          <a href="#q-{{ q.id }}" class="nav-btn" data-target="{{ q.id }}" id="nav-btn-{{ q.id }}">
+            <span class="nav-num">{{ loop.index }}</span>
+            <span class="nav-icon" id="nav-icon-{{ q.id }}">○</span>
+          </a>
           {% endfor %}
         </div>
 
-        <div style="margin-top: 20px;">
+        <!-- 서술형 13~16 -->
+        <div style="font-size: 11px; font-weight: 700; color: var(--neutral-600); margin-bottom: 4px;">서술형 (13~16)</div>
+        <div class="nav-grid" style="margin-bottom: 12px;">
+          {% for q in desc_qs %}
+          <a href="#q-{{ q.id }}" class="nav-btn" data-target="{{ q.id }}" id="nav-btn-{{ q.id }}">
+            <span class="nav-num">{{ loop.index + 12 }}</span>
+            <span class="nav-icon" id="nav-icon-{{ q.id }}">○</span>
+          </a>
+          {% endfor %}
+        </div>
+
+        <!-- 실무형 17~18 -->
+        <div style="font-size: 11px; font-weight: 700; color: var(--neutral-600); margin-bottom: 4px;">실무형 (택1)</div>
+        <div class="nav-grid" style="margin-bottom: 16px;">
+          {% for q in prac_qs %}
+          <a href="#q-{{ q.id }}" class="nav-btn {% if not loop.first %}unselected{% endif %}" data-target="{{ q.id }}" id="nav-btn-{{ q.id }}">
+            <span class="nav-num">{{ loop.index + 16 }}</span>
+            <span class="nav-icon" id="nav-icon-{{ q.id }}">{% if loop.first %}○{% else %}-{% endif %}</span>
+          </a>
+          {% endfor %}
+        </div>
+
+        <div>
           <button type="submit" formaction="/review" class="btn btn-primary" style="width: 100%;">
             답안 검토 후 제출
           </button>
         </div>
       </div>
     </aside>
+  </div>
+
+  <!-- Mobile Dedicated Bottom Action Bar (< 768px) -->
+  <div class="mobile-exam-action-bar" aria-label="모바일 시험 조작 바">
+    <div class="mobile-exam-progress">
+      <span class="progress-title">진행도 (17문항)</span>
+      <span class="progress-count"><strong id="mobile-progress-count">0</strong> / 17 완료</span>
+    </div>
+    <div class="mobile-exam-actions">
+      <button type="button" id="btn-mobile-sheet-open" class="btn btn-secondary" aria-expanded="false" aria-controls="mobile-question-sheet">
+        📑 문항 (<span id="mobile-unanswered-count">17</span>)
+      </button>
+      <button type="submit" formaction="/review" class="btn btn-primary">
+        검토하기 &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Question Sheet Drawer (< 768px) -->
+  <div id="mobile-question-sheet" class="mobile-question-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+    <div class="sheet-backdrop" id="sheet-backdrop"></div>
+    <div class="sheet-drawer">
+      <div class="sheet-header">
+        <h3 id="sheet-title" class="sheet-title">문항 내비게이터</h3>
+        <button type="button" id="btn-mobile-sheet-close" class="sheet-close-btn" aria-label="닫기">&times;</button>
+      </div>
+
+      <!-- Quick summary -->
+      <div style="font-size: 13px; color: var(--neutral-600); margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="badge badge-success">완료: <span id="sheet-summary-complete">0</span></span>
+        <span class="badge badge-warning">일부: <span id="sheet-summary-partial">0</span></span>
+        <span class="badge badge-neutral">미작성: <span id="sheet-summary-empty">17</span></span>
+      </div>
+
+      <!-- 단답형 (1~12) -->
+      <div class="sheet-section-title">제1영역 : 단답형 (1~12)</div>
+      <div class="sheet-grid" style="margin-bottom: 12px;">
+        {% for q in short_qs %}
+        <button type="button" class="sheet-btn" data-target="{{ q.id }}" id="sheet-btn-{{ q.id }}">
+          <span>{{ loop.index }}</span>
+          <span class="nav-icon" id="sheet-icon-{{ q.id }}">○</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <!-- 서술형 (13~16) -->
+      <div class="sheet-section-title">제2영역 : 서술형 (13~16)</div>
+      <div class="sheet-grid" style="margin-bottom: 12px;">
+        {% for q in desc_qs %}
+        <button type="button" class="sheet-btn" data-target="{{ q.id }}" id="sheet-btn-{{ q.id }}">
+          <span>{{ loop.index + 12 }}</span>
+          <span class="nav-icon" id="sheet-icon-{{ q.id }}">○</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <!-- 실무형 (17~18) -->
+      <div class="sheet-section-title">제3영역 : 실무형 (17~18 택1)</div>
+      <div class="sheet-grid" style="margin-bottom: 20px;">
+        {% for q in prac_qs %}
+        <button type="button" class="sheet-btn {% if not loop.first %}unselected{% endif %}" data-target="{{ q.id }}" id="sheet-btn-{{ q.id }}">
+          <span>{{ loop.index + 16 }}</span>
+          <span class="nav-icon" id="sheet-icon-{{ q.id }}">{% if loop.first %}○{% else %}-{% endif %}</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <div>
+        <button type="submit" formaction="/review" class="btn btn-primary btn-lg" style="width: 100%;">
+          답안 검토 화면으로 이동 &rarr;
+        </button>
+      </div>
+    </div>
   </div>
 </form>
 {% endblock %}

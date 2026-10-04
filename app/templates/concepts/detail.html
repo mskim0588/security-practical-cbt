@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}{{ concept.concept_id }} {{ concept.name }} - 개념 심층 학습{% endblock %}
+
+{% block content %}
+<div class="concept-detail-container">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav" aria-label="경로 탐색">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="/">홈</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('concepts.list_concepts') }}">개념 도서관</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('concepts.list_concepts', category=concept.category) }}">{{ concept.category }}</a></li>
+      <li class="breadcrumb-item is-active" aria-current="page">{{ concept.concept_id }}</li>
+    </ol>
+  </nav>
+
+  <!-- Concept Header Card -->
+  <header class="concept-hero-card card">
+    <div class="concept-hero-top">
+      <div class="hero-badges">
+        <span class="badge badge-category">{{ concept.category }}</span>
+        <span class="badge badge-id">{{ concept.concept_id }}</span>
+        {% if concept.analytics %}
+          {% if concept.analytics.grade_code == 'safe' %}
+            <span class="badge badge-safe">내 성취도: 안전 ({{ concept.analytics.score_rate }}%)</span>
+          {% elif concept.analytics.grade_code == 'warning' %}
+            <span class="badge badge-warning">내 성취도: 주의 ({{ concept.analytics.score_rate }}%)</span>
+          {% elif concept.analytics.grade_code == 'danger' %}
+            <span class="badge badge-danger">내 성취도: 취약 (VI {{ concept.analytics.vi }})</span>
+          {% else %}
+            <span class="badge badge-none">내 성취도: 미응시</span>
+          {% endif %}
+        {% endif %}
+      </div>
+      <div class="hero-actions">
+        <a href="#section-questions" class="btn btn-secondary btn-sm">연계 기출 {{ concept.questions|length }}문항 보기</a>
+        <a href="{{ url_for('exam.take_exam', mode='adaptive') }}" class="btn btn-primary btn-sm">맞춤형 모의고사 풀기</a>
+      </div>
+    </div>
+
+    <h1 class="concept-hero-title">{{ concept.name }}</h1>
+
+    <div class="concept-hero-summary-box">
+      <span class="summary-label">개념 정의</span>
+      <p class="summary-text">{{ concept.content.summary or concept.meta.summary }}</p>
+    </div>
+  </header>
+
+  <!-- Legal Notice Callout if applicable -->
+  {% if concept.content.law_review_status and concept.content.law_review_status.status == 'current_law_review_required' %}
+  <div class="alert-box alert-warning">
+    <div class="alert-icon">⚖️</div>
+    <div class="alert-body">
+      <h3 class="alert-title">개정 법령 수험 체크 필요 ({{ concept.content.law_review_status.effective_year }} 시행 기준)</h3>
+      <p class="alert-desc">{{ concept.content.law_review_status.note }}</p>
+    </div>
+  </div>
+  {% elif concept.content.law_review_status and concept.content.law_review_status.status == 'source_may_be_outdated' %}
+  <div class="alert-box alert-info">
+    <div class="alert-icon">ℹ️</div>
+    <div class="alert-body">
+      <h3 class="alert-title">법령 및 기준 최신화 안내</h3>
+      <p class="alert-desc">{{ concept.content.law_review_status.note }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Section 1: Core Points & Mechanism -->
+  <section class="concept-section card">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">핵심 포인트 및 동작 메커니즘</h2>
+    </div>
+
+    {% if concept.content.core_points %}
+    <div class="core-points-wrapper">
+      <h3 class="subsection-title">실기 시험 합격 필수 포인트</h3>
+      <ul class="checklist-items">
+        {% for pt in concept.content.core_points %}
+        <li class="checklist-item">
+          <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>{{ pt }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if concept.content.mechanism %}
+    <div class="mechanism-wrapper">
+      <h3 class="subsection-title">동작 원리 및 처리 흐름</h3>
+      <div class="mechanism-text-box">
+        <p>{{ concept.content.mechanism }}</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Section 2: Exam Traps & Common Mistakes -->
+  <section class="concept-section card">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">실기 시험 공략 & 오답 함정 클리닉</h2>
+    </div>
+
+    {% if concept.content.exam_points %}
+    <div class="exam-points-wrapper">
+      <h3 class="subsection-title">기출 빈출 채점 포인트</h3>
+      <div class="exam-points-grid">
+        {% for ep in concept.content.exam_points %}
+        <div class="exam-point-pill">
+          <span class="pill-dot">●</span>
+          <span>{{ ep }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if concept.content.common_mistakes %}
+    <div class="common-mistakes-wrapper">
+      <h3 class="subsection-title">수험생이 자주 빠지는 오답 함정 (Trap Clinic)</h3>
+      <div class="traps-list">
+        {% for m in concept.content.common_mistakes %}
+        <div class="trap-card">
+          <div class="trap-box">
+            <span class="trap-tag">자주 범하는 오답/오해</span>
+            <p class="trap-content">{{ m.trap }}</p>
+          </div>
+          <div class="clarification-box">
+            <span class="clarification-tag">정확한 구별 기준 및 정답 해설</span>
+            <p class="clarification-content">{{ m.clarification }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if concept.content.compare_with %}
+    <div class="compare-wrapper">
+      <h3 class="subsection-title">유사 / 연관 개념 비교</h3>
+      <div class="compare-list">
+        {% for cp in concept.content.compare_with %}
+        <div class="compare-card">
+          <div class="compare-target">
+            <span class="badge badge-id">{{ cp.target_concept_id }}</span>
+            <a href="{{ url_for('concepts.view_concept_detail', concept_id=cp.target_concept_id) }}" class="compare-link">
+              {{ cp.target_name }} &rarr;
+            </a>
+          </div>
+          <p class="compare-difference">{{ cp.difference }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Section 3: Commands or Config Examples -->
+  {% if concept.content.commands_or_examples %}
+  <section class="concept-section card">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">실무 명령어 및 보안 설정 예시</h2>
+    </div>
+
+    <div class="commands-grid">
+      {% for ex in concept.content.commands_or_examples %}
+      <div class="command-block card-nested">
+        <h3 class="command-title">{{ ex.title }}</h3>
+        <div class="code-container">
+          <pre class="code-pre"><code>{{ ex.code }}</code></pre>
+        </div>
+        <p class="command-explanation">{{ ex.explanation }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Section 4: Connected Questions -->
+  <section class="concept-section card" id="section-questions">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">연계 기출 및 연습 문제 (총 {{ concept.questions|length }}문항)</h2>
+    </div>
+
+    <div class="connected-questions-list">
+      {% for q in concept.questions %}
+      <div class="question-row-item card-nested">
+        <div class="q-row-top">
+          <div class="q-row-badges">
+            <span class="badge badge-id">{{ q.id }}</span>
+            {% if q.type == 'short' %}
+              <span class="badge badge-type badge-type-short">단답형</span>
+            {% elif q.type == 'descriptive' %}
+              <span class="badge badge-type badge-type-desc">서술형</span>
+            {% elif q.type == 'practical' %}
+              <span class="badge badge-type badge-type-prac">실무형</span>
+            {% endif %}
+            <span class="badge badge-score">{{ q.score }}점</span>
+          </div>
+          {% if q.source_id %}
+            <span class="q-source-hint">출처: {{ q.source_id }}</span>
+          {% endif %}
+        </div>
+
+        <p class="q-row-title">{{ q.question }}</p>
+
+        {% if q.explanation %}
+        <div class="q-quick-hint">
+          <span class="hint-label">핵심 정답 요약:</span>
+          <span class="hint-text">{{ q.explanation }}</span>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Section 5: Official References -->
+  {% if concept.sources %}
+  <section class="concept-section card">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">공식 수험 레퍼런스 및 출처 문헌</h2>
+    </div>
+
+    <div class="sources-grid">
+      {% for s in concept.sources %}
+      <div class="source-ref-card card-nested">
+        <div class="source-top">
+          <span class="badge badge-primary">{{ s.source_id }}</span>
+          <span class="source-page-tag">{{ s.page_hint }}</span>
+        </div>
+        <h3 class="source-title">{{ s.title }}</h3>
+        <p class="source-relevance">{{ s.relevance }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Bottom Action Bar -->
+  <div class="concept-bottom-bar">
+    <a href="{{ url_for('concepts.list_concepts') }}" class="btn btn-secondary">
+      &larr; 개념 목록으로 돌아가기
+    </a>
+    <a href="{{ url_for('exam.take_exam', mode='adaptive') }}" class="btn btn-primary">
+      이 개념 포함 맞춤형 모의고사 응시하기 &rarr;
+    </a>
+  </div>
+</div>
+{% endblock %}

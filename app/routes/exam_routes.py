@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, curren
 from app.services.data_loader import DataLoader
 from app.services.exam_service import ExamService
 from app.services.grader import Grader
+from app.services.csrf_service import csrf_protect
 
 exam_bp = Blueprint("exam", __name__)
 
@@ -102,6 +103,7 @@ def review_exam():
     )
 
 @exam_bp.route("/submit", methods=["POST"])
+@csrf_protect
 def submit_exam():
     service = get_exam_service()
     form_data = request.form
@@ -148,6 +150,12 @@ def submit_exam():
         return redirect(url_for("exam.view_result", attempt_id=attempt_id))
 
     # DB 저장 실패 시 비상 fallback 렌더링
+    for d in result.get("details", []):
+        qid = d.get("question_id")
+        q_meta = loader.get_question_by_id(qid) if qid else None
+        if q_meta:
+            d["concept_id"] = q_meta.get("concept_id")
+            d["deep_explanation"] = loader.get_explanation_for_question(qid)
     return render_template("result.html", result=result, attempt_id=None)
 
 @exam_bp.route("/result/<int:attempt_id>")
@@ -172,12 +180,19 @@ def view_result(attempt_id: int):
 
     details = []
     for ans in detail.get("answers", []):
+        qid = ans.get("question_id")
         q_type = ans.get("question_type", "short")
-        is_sel = (q_type != "practical") or (ans.get("question_id") == selected_prac_id)
+        is_sel = (q_type != "practical") or (qid == selected_prac_id)
+        q_meta = loader.get_question_by_id(qid) if qid else None
+        concept_id = q_meta.get("concept_id") if q_meta else None
+        deep_expl = loader.get_explanation_for_question(qid) if qid else None
+
         details.append({
-            "question_id": ans.get("question_id"),
+            "question_id": qid,
             "type": q_type,
             "category": ans.get("category", ""),
+            "concept_id": concept_id,
+            "deep_explanation": deep_expl,
             "question_text": ans.get("question_text", ""),
             "earned_score": ans.get("earned_score", 0.0),
             "max_score": ans.get("max_score", 0.0),

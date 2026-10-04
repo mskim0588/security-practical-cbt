@@ -10,6 +10,8 @@ class DataLoader:
         self._sources: Optional[List[Dict[str, Any]]] = None
         self._concepts: Optional[List[Dict[str, Any]]] = None
         self._questions: Optional[List[Dict[str, Any]]] = None
+        self._concept_contents: Optional[Dict[str, Any]] = None
+        self._explanations: Optional[Dict[str, Any]] = None
 
     def load_sources(self) -> List[Dict[str, Any]]:
         if self._sources is None:
@@ -32,6 +34,55 @@ class DataLoader:
                 self._questions = json.load(f)
         return self._questions
 
+    def load_concept_contents(self) -> Dict[str, Any]:
+        """concept_contents.json을 안전하게 로드하며 메모리 캐싱 적용"""
+        if self._concept_contents is None:
+            path = os.path.join(self.data_dir, "concept_contents.json")
+            if os.path.exists(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    self._concept_contents = json.load(f)
+            else:
+                self._concept_contents = {}
+        return self._concept_contents
+
+    def load_explanations(self) -> Dict[str, Any]:
+        """explanations.json을 안전하게 로드하며 메모리 캐싱 적용"""
+        if self._explanations is None:
+            path = os.path.join(self.data_dir, "explanations.json")
+            if os.path.exists(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    self._explanations = json.load(f)
+            else:
+                self._explanations = {}
+        return self._explanations
+
+    def get_explanation_for_question(self, question_id: str) -> Dict[str, Any]:
+        """explanations.json 조회 -> 미존재 시 questions.json의 기존 explanation으로 fallback dict 반환"""
+        explanations = self.load_explanations()
+        if question_id in explanations:
+            return explanations[question_id]
+        
+        q = self.get_question_by_id(question_id)
+        if q:
+            return {
+                "question_id": question_id,
+                "overview": q.get("explanation", ""),
+                "key_concept_points": [],
+                "why_correct": q.get("explanation", ""),
+                "why_wrong_common_traps": [],
+                "related_commands": [],
+                "exam_strategy": ""
+            }
+        return {
+            "question_id": question_id,
+            "overview": "해설 정보가 없습니다.",
+            "key_concept_points": [],
+            "why_correct": "",
+            "why_wrong_common_traps": [],
+            "related_commands": [],
+            "exam_strategy": ""
+        }
+
     def get_sources_dict(self) -> Dict[str, Dict[str, Any]]:
         sources = self.load_sources()
         return {s["id"]: s for s in sources}
@@ -40,6 +91,7 @@ class DataLoader:
         """문항 데이터에 출처 메타데이터를 결합하여 반환"""
         questions = self.load_questions()
         sources_dict = self.get_sources_dict()
+        concepts_dict = {c["id"]: c.get("name", "") for c in self.load_concepts()}
 
         enriched = []
         for q in questions:
@@ -52,6 +104,9 @@ class DataLoader:
                     "filename": "Unknown",
                     "title": "미확인 출처"
                 }
+            cid = q.get("concept_id")
+            if cid and cid in concepts_dict:
+                q_copy["concept_name"] = concepts_dict[cid]
             enriched.append(q_copy)
         return enriched
 

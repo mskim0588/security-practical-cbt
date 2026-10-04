@@ -1,0 +1,117 @@
+{# Explanation Card Component: displays structured deep explanation, why-wrong traps, rubrics, and concept link #}
+{% if explanation %}
+<details class="explanation-accordion" id="expl-{{ question_id or explanation.question_id }}">
+  <summary class="explanation-summary-btn">
+    <span class="summary-toggle-icon">▸</span>
+    <span class="summary-title">💡 심층 해설 및 오답 분석 보기</span>
+    {% if concept_id %}
+    <span class="badge badge-id expl-concept-pill">{{ concept_id }}</span>
+    {% endif %}
+  </summary>
+
+  <div class="explanation-body">
+    <!-- Overview -->
+    {% if explanation.overview %}
+    <div class="expl-section">
+      <h4 class="expl-heading">출제 의도 및 개념 개요</h4>
+      <p class="expl-text">{{ explanation.overview }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Why Correct -->
+    {% if explanation.why_correct %}
+    <div class="expl-section expl-why-correct">
+      <h4 class="expl-heading">✓ 정답 인정 및 모범 답안 논리</h4>
+      <div class="expl-box-green">
+        <p>{{ explanation.why_correct }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Scoring Rubrics (for descriptive / practical) -->
+    {% if explanation.practical_scoring_criteria and explanation.practical_scoring_criteria.rubrics %}
+    <div class="expl-section">
+      <h4 class="expl-heading">📋 채점 기준 및 부분 점수 루브릭 (만점 {{ explanation.practical_scoring_criteria.max_score }}점)</h4>
+      <div class="rubrics-table-wrapper">
+        <table class="rubrics-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">배점</th>
+              <th>채점 기준 및 필수 키워드</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in explanation.practical_scoring_criteria.rubrics %}
+            <tr>
+              <td class="rubric-pts"><strong>+{{ r.points }}점</strong></td>
+              <td>
+                <div class="rubric-criteria">{{ r.criteria }}</div>
+                {% if r.required_keywords %}
+                <div class="rubric-keywords">
+                  <span class="kw-label">필수 키워드:</span>
+                  {% for kw in r.required_keywords %}
+                  <span class="kw-tag">{{ kw }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Why Wrong Traps -->
+    {% if explanation.why_wrong_common_traps %}
+    <div class="expl-section">
+      <h4 class="expl-heading">⚠️ 자주 범하는 오답 함정 클리닉 (Why Wrong?)</h4>
+      <div class="expl-traps-list">
+        {% for t in explanation.why_wrong_common_traps %}
+        <div class="expl-trap-card">
+          <div class="trap-head">
+            <span class="trap-label">헷갈리기 쉬운 오답:</span>
+            <strong>{{ t.confused_term_or_misunderstanding }}</strong>
+          </div>
+          <p class="trap-reason">{{ t.explanation }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Exam Strategy -->
+    {% if explanation.exam_strategy %}
+    <div class="expl-section expl-strategy-box">
+      <div class="strategy-icon">🎯</div>
+      <div class="strategy-content">
+        <span class="strategy-title">실제 시험장 답안 작성 전략</span>
+        <p class="strategy-text">{{ explanation.exam_strategy }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Concept Link Action Footer & AI Helper Trigger -->
+    <div class="expl-footer-action">
+      <span class="footer-tip">이 문제를 완벽히 이해하기 위한 학습 도구:</span>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        {% if concept_id %}
+        <a href="{{ url_for('concepts.view_concept_detail', concept_id=concept_id) }}" class="btn btn-outline btn-sm">
+          📖 {{ concept_id }} 개념 상세 학습서 &rarr;
+        </a>
+        {% endif %}
+        <button type="button" class="btn-ai-helper" onclick="openAIPromptModal({
+          qid: '{{ question_id or explanation.question_id }}',
+          concept_id: '{{ concept_id or '' }}',
+          question_text: {{ (question_text or explanation.overview or '')|tojson }},
+          model_answer: {{ (model_answer or explanation.why_correct or '')|tojson }},
+          user_answer: {{ (user_answer or '')|tojson }}
+        })">
+          🤖 AI 질문 프롬프트 생성
+        </button>
+      </div>
+    </div>
+  </div>
+</details>
+{% endif %}

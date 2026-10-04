@@ -155,7 +155,11 @@ class TestHistoryPersistence(unittest.TestCase):
         self.assertIn("아직 저장된 응시 이력이 없습니다", resp.get_data(as_text=True))
 
         # 2. Submit exam via POST /submit
+        with self.client.session_transaction() as sess:
+            sess["csrf_token"] = "test_csrf_token"
+
         form_data = {
+            "csrf_token": "test_csrf_token",
             "exam_mode": "standard",
             "question_ids": "Q-SHORT-001,Q-SHORT-002,Q-SHORT-003,Q-SHORT-004,Q-SHORT-005,Q-SHORT-006,Q-SHORT-007,Q-SHORT-008,Q-SHORT-009,Q-SHORT-010,Q-SHORT-011,Q-SHORT-012,Q-DESC-001,Q-DESC-002,Q-DESC-003,Q-DESC-004,Q-PRAC-001,Q-PRAC-002",
             "selected_practical_id": "Q-PRAC-001",
@@ -183,7 +187,7 @@ class TestHistoryPersistence(unittest.TestCase):
         self.assertEqual(resp404.status_code, 404)
 
         # 6. Delete attempt
-        del_resp = self.client.post("/history/1/delete", follow_redirects=True)
+        del_resp = self.client.post("/history/1/delete", data={"csrf_token": "test_csrf_token"}, follow_redirects=True)
         self.assertEqual(del_resp.status_code, 200)
         self.assertIn("아직 저장된 응시 이력이 없습니다", del_resp.get_data(as_text=True))
 

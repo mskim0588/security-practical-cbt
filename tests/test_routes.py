@@ -37,7 +37,10 @@ class TestExamRoutes(unittest.TestCase):
         self.assertIn("17번 (IPTables) 선택됨".encode("utf-8"), response.data)
 
     def test_submit_route(self):
+        with self.client.session_transaction() as sess:
+            sess["csrf_token"] = "test_csrf_token"
         form_data = {
+            "csrf_token": "test_csrf_token",
             "selected_practical_id": "Q-PRAC-001",
             "ans_Q-SHORT-001_A": "침해요인 발생 가능성",
             "ans_Q-SHORT-001_B": "법적 준거성",

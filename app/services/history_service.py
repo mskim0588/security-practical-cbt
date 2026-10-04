@@ -169,6 +169,7 @@ class HistoryService:
             ans_info["source_page"] = q_meta.get("source_page")
             ans_info["model_answer"] = q_meta.get("model_answer", "")
             ans_info["explanation"] = q_meta.get("explanation", "")
+            ans_info["deep_explanation"] = self.loader.get_explanation_for_question(ans.question_id)
             ans_info["sub_questions"] = q_meta.get("sub_questions", [])
             ans_info["accepted_answers"] = q_meta.get("accepted_answers", [])
             

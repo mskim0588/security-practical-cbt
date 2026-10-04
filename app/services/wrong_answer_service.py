@@ -70,6 +70,7 @@ class WrongAnswerService:
                 "question_text": q_meta.get("question", ""),
                 "model_answer": q_meta.get("model_answer", ""),
                 "explanation": q_meta.get("explanation", ""),
+                "deep_explanation": self.loader.get_explanation_for_question(q_id),
                 "sub_questions": q_meta.get("sub_questions", []),
                 "accepted_answers": q_meta.get("accepted_answers", []),
                 "latest_status": latest.achievement_status,
@@ -134,6 +135,13 @@ class WrongAnswerService:
         sufficient_count = sum(1 for r in records if r.achievement_status == "sufficient")
 
         latest_status = records[0].achievement_status if records else "unattempted"
+        deep_explanation = self.loader.get_explanation_for_question(question_id)
+        
+        # 소속 Concept의 전체 문항 수 계산 (학습 연계용)
+        concept_id = q_meta.get("concept_id")
+        related_questions_count = 0
+        if concept_id:
+            related_questions_count = sum(1 for q in self.loader.load_questions() if q.get("concept_id") == concept_id)
 
         return {
             "question": q_meta,
@@ -142,5 +150,7 @@ class WrongAnswerService:
             "incorrect_count": incorrect_count,
             "partial_count": partial_count,
             "sufficient_count": sufficient_count,
-            "history": history_timeline
+            "history": history_timeline,
+            "deep_explanation": deep_explanation,
+            "related_questions_count": related_questions_count
         }

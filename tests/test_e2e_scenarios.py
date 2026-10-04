@@ -48,7 +48,11 @@ class TestE2EScenarios(unittest.TestCase):
         second_short = [qid for qid in q_ids if "SHORT" in qid][1]
         first_prac = [qid for qid in q_ids if "PRAC" in qid][0]
 
+        m_csrf = re.search(r'name="csrf_token" value="([^"]+)"', exam_html)
+        csrf_token = m_csrf.group(1) if m_csrf else ""
+
         post_data = {
+            "csrf_token": csrf_token,
             "exam_mode": "random",
             "exam_seed": "101",
             "question_ids": ",".join(q_ids),

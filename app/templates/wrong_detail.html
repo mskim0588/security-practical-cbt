@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}문항 심층 복기 | {{ detail.question.id }} | 정보보안기사 실기 CBT{% endblock %}
+{% block title %}문항 심층 복기 리포트 | {{ detail.question.id }} | 정보보안기사 실기 CBT{% endblock %}
 
 {% block header_actions %}
 <a href="/wrong-notes" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
   &larr; 오답노트 목록으로
+</a>
+<a href="/exam?mode=wrong_review" class="btn btn-warning" style="padding: 8px 16px; font-size: 14px; font-weight: 700; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px;">
+  🔥 오답 집중 모의고사
 </a>
 <a href="/exam" class="btn btn-primary" style="padding: 8px 16px; font-size: 14px; margin-left: 8px;">
   새 모의고사 응시
@@ -15,8 +18,8 @@
 <!-- Question Header Card -->
 <div class="card" style="margin-bottom: 24px;">
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-family: monospace; font-size: 16px; font-weight: 800; color: var(--gray-900); background: var(--gray-100); padding: 4px 10px; border-radius: 4px;">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 16px; font-weight: 800; color: var(--neutral-900); background: var(--neutral-100); padding: 4px 10px; border-radius: 4px;">
         {{ detail.question.id }}
       </span>
       {% if detail.question.type == 'short' %}
@@ -27,46 +30,64 @@
         <span class="q-badge badge-prac">실무형</span>
       {% endif %}
       <span class="q-category">{{ detail.question.category }}</span>
-      {% if detail.question.concept_name %}
-      <span style="background: #ede9fe; color: #6d28d9; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-        개념: {{ detail.question.concept_name }}
+
+      {% if detail.incorrect_count >= 2 %}
+      <span class="badge-repeat-fail">
+        🔥 누적 오답 {{ detail.incorrect_count }}회
       </span>
       {% endif %}
     </div>
 
     <div>
       {% if detail.latest_status == 'sufficient' %}
-        <span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 4px; border: 1px solid #bbf7d0;">
+        <span class="status-pill status-pill-sufficient">
           ✓ 최근 정답 (복습 완료)
         </span>
       {% elif detail.latest_status == 'partial' %}
-        <span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 4px; border: 1px solid #fde68a;">
-          ⚠ 최근 부분 감점
+        <span class="status-pill status-pill-partial">
+          △ 최근 부분 감점
         </span>
       {% else %}
-        <span style="background: #fee2e2; color: #b91c1c; font-weight: 700; font-size: 13px; padding: 4px 12px; border-radius: 4px; border: 1px solid #fecaca;">
+        <span class="status-pill status-pill-incorrect">
           ✕ 최근 오답
         </span>
       {% endif %}
     </div>
   </div>
 
-  <div style="font-size: 16px; font-weight: 600; color: var(--gray-900); line-height: 1.7; white-space: pre-line; margin-bottom: 20px; background: var(--gray-50); padding: 16px; border-radius: 6px;">
+  <!-- Connected Concept Banner (Goal 4D) -->
+  {% if detail.question.concept_id %}
+  <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--radius-md); padding: 12px 16px; margin: 12px 0 16px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+      <span style="font-size: 12px; font-weight: 700; color: #6d28d9; text-transform: uppercase;">연계 보안 개념:</span>
+      <span style="font-size: 14px; font-weight: 800; color: #4c1d95;">{{ detail.question.concept_id }} {{ detail.question.concept_name }}</span>
+      {% if detail.related_questions_count > 0 %}
+      <span style="font-size: 12px; color: #7c3aed; background: #ede9fe; padding: 1px 8px; border-radius: 12px;">동일 개념 {{ detail.related_questions_count }}문항 보유</span>
+      {% endif %}
+    </div>
+    <a href="{{ url_for('concepts.view_concept_detail', concept_id=detail.question.concept_id) }}" class="btn-concept-link" style="font-size: 13px; padding: 4px 10px;">
+      📖 개념 심층 학습서 보기 &rarr;
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- Question Body -->
+  <div style="font-size: 16px; font-weight: 600; color: var(--neutral-900); line-height: 1.7; white-space: pre-line; margin-bottom: 20px; background: var(--neutral-50); padding: 16px; border-radius: 6px;">
     {{ detail.question.question }}
   </div>
 
   <!-- Model Answer and Details -->
   <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #1e40af; margin-bottom: 8px;">
-      🎯 모범 정답 및 해설
+      🎯 모범 정답 및 핵심 루브릭
     </h3>
-    <div style="font-size: 14px; color: var(--gray-800); line-height: 1.6; white-space: pre-wrap;">
+    <div style="font-size: 14px; color: var(--neutral-800); line-height: 1.6; white-space: pre-wrap;">
       {% if detail.question.sub_questions %}
         {% for sub in detail.question.sub_questions %}
           <div style="margin-bottom: 6px;">
             <strong>[{{ sub.label or sub.sub_id }}]</strong> {{ sub.expected or sub.model_answer }}
             {% if sub.accepted_answers %}
-              <span style="font-size: 12px; color: var(--gray-600);">(인정: {{ sub.accepted_answers | join(', ') }})</span>
+              <span style="font-size: 12px; color: var(--neutral-600);">(인정: {{ sub.accepted_answers | join(', ') }})</span>
             {% endif %}
           </div>
         {% endfor %}
@@ -76,14 +97,14 @@
     </div>
 
     {% if detail.question.explanation %}
-    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #dbeafe; font-size: 13px; color: var(--gray-700);">
-      <strong>💡 상세 해설:</strong> {{ detail.question.explanation }}
+    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #dbeafe; font-size: 13px; color: var(--neutral-700);">
+      <strong>💡 기본 해설:</strong> {{ detail.question.explanation }}
     </div>
     {% endif %}
   </div>
 
   <!-- Source PDF Reference -->
-  <div style="font-size: 12px; color: var(--gray-600); font-family: monospace;">
+  <div style="font-size: 12px; color: var(--neutral-600); font-family: var(--font-mono);">
     📚 PDF 출처: 
     {% if detail.question.source_info %}
       {{ detail.question.source_info.title if detail.question.source_info is mapping else detail.question.source_info }}
@@ -94,73 +115,129 @@
   </div>
 </div>
 
-<!-- Attempt History Timeline Card -->
-<div class="card">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-    <h2 style="font-size: 18px; font-weight: 800; color: var(--gray-900);">
-      📊 나의 응시 이력 타임라인 (총 {{ detail.total_attempts }}회 응시)
-    </h2>
-    <div style="font-size: 13px; color: var(--gray-700);">
-      정답: <strong style="color: var(--success-color);">{{ detail.sufficient_count }}</strong>회 /
-      부분감점: <strong style="color: var(--warning-color);">{{ detail.partial_count }}</strong>회 /
-      오답: <strong style="color: var(--danger-color);">{{ detail.incorrect_count }}</strong>회
+<!-- Deep Explanation Accordion (Goal 4C & 4D) -->
+{% if detail.deep_explanation %}
+  <div style="margin-bottom: 24px;">
+    {% set explanation = detail.deep_explanation %}
+    {% set concept_id = detail.question.concept_id %}
+    {% set question_id = detail.question.id %}
+    {% set question_text = detail.question.question %}
+    {% set model_answer = detail.question.model_answer %}
+    {% set user_answer = detail.history[0].user_answer if detail.history else '' %}
+    {% include "components/explanation_card.html" %}
+  </div>
+{% endif %}
+
+<!-- Attempt History Timeline Card (Goal 4D) -->
+<div class="card" style="margin-bottom: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+    <div>
+      <h2 style="font-size: 18px; font-weight: 800; color: var(--neutral-900); margin: 0;">
+        📊 나의 응시 이력 타임라인
+      </h2>
+      <span style="font-size: 13px; color: var(--neutral-600);">
+        누적 응시 횟수: <strong>{{ detail.total_attempts }}</strong>회
+      </span>
+    </div>
+    <div style="font-size: 13px; color: var(--neutral-700); display: flex; gap: 8px; align-items: center;">
+      <span class="status-pill status-pill-sufficient" style="font-size: 11px;">✓ 정답: {{ detail.sufficient_count }}</span>
+      <span class="status-pill status-pill-partial" style="font-size: 11px;">△ 부분감점: {{ detail.partial_count }}</span>
+      <span class="status-pill status-pill-incorrect" style="font-size: 11px;">✕ 오답: {{ detail.incorrect_count }}</span>
     </div>
   </div>
 
   {% if not detail.history %}
-    <p style="font-size: 14px; color: var(--gray-600);">아직 응시 이력이 없습니다.</p>
+    <p style="font-size: 14px; color: var(--neutral-600); padding: 20px 0; text-align: center;">
+      아직 저장된 응시 이력이 없습니다.
+    </p>
   {% else %}
-    <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div class="timeline-container">
       {% for h in detail.history %}
-      <div style="border: 1px solid var(--gray-200); border-radius: 6px; padding: 14px; background: white;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <div>
-            <span style="font-weight: 700; font-size: 13px; color: var(--gray-700);">
-              모의고사 회차 #{{ h.attempt_id }}
-            </span>
-            <span style="font-size: 12px; color: var(--gray-600); margin-left: 8px;">
+      <div class="timeline-node status-{{ h.status }}">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <a href="/history/{{ h.attempt_id }}" style="font-weight: 700; font-size: 13px; color: var(--primary-700); text-decoration: none;" title="해당 회차 전체 복기 리포트 이동">
+              모의고사 회차 #{{ h.attempt_id }} &rarr;
+            </a>
+            <span style="font-size: 12px; color: var(--neutral-500);">
               {{ h.date.strftime('%Y-%m-%d %H:%M') if h.date else '-' }}
             </span>
           </div>
-          <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
             {% if h.status == 'sufficient' %}
-              <span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px;">
-                정답 ({{ h.earned_score }} / {{ h.max_score }}점)
+              <span class="status-pill status-pill-sufficient">
+                ✓ 정답
               </span>
             {% elif h.status == 'partial' %}
-              <span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px;">
-                부분감점 ({{ h.earned_score }} / {{ h.max_score }}점)
+              <span class="status-pill status-pill-partial">
+                △ 부분감점
               </span>
             {% else %}
-              <span style="background: #fee2e2; color: #b91c1c; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px;">
-                오답 (0 / {{ h.max_score }}점)
+              <span class="status-pill status-pill-incorrect">
+                ✕ 오답
               </span>
+            {% endif %}
+            <strong style="font-size: 14px; color: var(--neutral-900);">
+              {{ "%.1f"|format(h.earned_score)|replace('.0', '') }} / {{ "%.1f"|format(h.max_score)|replace('.0', '') }}점
+            </strong>
+          </div>
+        </div>
+
+        <div style="font-size: 13px; color: var(--neutral-800); background: var(--neutral-50); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--neutral-200);">
+          <strong style="color: var(--neutral-600);">✍️ 제출 답안:</strong>
+          <div style="margin-top: 4px; white-space: pre-wrap; word-break: break-all;">
+            {% if h.user_answer %}
+              {% if h.user_answer is mapping %}
+                {% for k, v in h.user_answer.items() %}
+                  <div><strong>[{{ k }}]</strong> {{ v if v else '<미작성>' }}</div>
+                {% endfor %}
+              {% else %}
+                {{ h.user_answer }}
+              {% endif %}
+            {% else %}
+              <span style="color: #94a3b8; font-style: italic;">&lt;미작성&gt;</span>
             {% endif %}
           </div>
         </div>
 
-        <div style="font-size: 13px; color: var(--gray-800); background: var(--gray-50); padding: 8px 12px; border-radius: 4px;">
-          <strong style="color: var(--gray-600);">제출 답안:</strong>
-          {% if h.user_answer %}
-            {% if h.user_answer is mapping %}
-              {% for k, v in h.user_answer.items() %}
-                <span>[{{ k }}] {{ v }} </span>
-              {% endfor %}
-            {% else %}
-              <span>{{ h.user_answer }}</span>
-            {% endif %}
-          {% else %}
-            <span style="color: #94a3b8; font-style: italic;">&lt;미작성&gt;</span>
-          {% endif %}
+        {% if h.self_eval_data %}
+        <div style="margin-top: 8px; font-size: 12px; color: var(--neutral-700); background: white; padding: 6px 10px; border-radius: 4px; border: 1px dashed var(--neutral-300);">
+          <strong>채점 피드백:</strong>
+          {% for sub in h.self_eval_data %}
+            <div style="margin-top: 2px;">
+              - 소문항 {{ sub.sub_id or loop.index }}:
+              {% if sub.matched_keywords %}<span style="color: var(--success-color);">✓ 매칭({{ sub.matched_keywords|join(', ') }})</span>{% endif %}
+              {% if sub.missing_keywords %}<span style="color: var(--danger-color); margin-left: 4px;">✕ 누락({{ sub.missing_keywords|join(', ') }})</span>{% endif %}
+            </div>
+          {% endfor %}
         </div>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
   {% endif %}
 </div>
 
-<div style="margin-top: 24px; text-align: center;">
-  <a href="/wrong-notes" class="btn btn-secondary btn-lg">&larr; 오답노트 목록으로 돌아가기</a>
-  <a href="/exam" class="btn btn-primary btn-lg" style="margin-left: 10px;">새 모의고사 응시하기 &rarr;</a>
+<!-- Re-exam & Navigation Action Card -->
+<div class="card" style="text-align: center; padding: 24px; background: white;">
+  <h3 style="font-size: 16px; font-weight: 700; color: var(--neutral-900); margin-bottom: 8px;">
+    취약점 보완 후 실전 모의고사로 실력을 검증하세요
+  </h3>
+  <p style="font-size: 13px; color: var(--neutral-600); margin-bottom: 16px;">
+    오답 집중 모의고사는 지금까지 틀린 문항들을 우선 출제하여 완벽한 복습을 지원합니다.
+  </p>
+  <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+    <a href="/wrong-notes" class="btn btn-secondary btn-lg">
+      &larr; 오답노트 목록
+    </a>
+    <a href="/exam?mode=wrong_review" class="btn btn-warning btn-lg" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+      🔥 오답 집중 모의고사 응시하기 &rarr;
+    </a>
+    <a href="/exam?mode=adaptive" class="btn btn-primary btn-lg" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+      🎯 취약점 맞춤 모의고사 응시하기 &rarr;
+    </a>
+  </div>
 </div>
+
+{% include "components/ai_prompt_modal.html" %}
 {% endblock %}

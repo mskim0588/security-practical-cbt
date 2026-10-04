@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}개념 도서관 - 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<div class="concept-library-container">
+  <div class="page-header">
+    <div class="page-title-group">
+      <span class="badge badge-primary">실기 핵심 20선</span>
+      <h1 class="page-title">개념 도서관 (Concept Library)</h1>
+      <p class="page-subtitle">실기 시험에 반복 출제되는 20개 핵심 보안 개념의 메커니즘, 오답 함정, 실무 명령어 및 연계 기출을 학습합니다.</p>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="concept-filter-panel card">
+    <form method="GET" action="{{ url_for('concepts.list_concepts') }}" class="concept-search-form">
+      {% if selected_category %}
+      <input type="hidden" name="category" value="{{ selected_category }}">
+      {% endif %}
+      <div class="search-input-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ search_query }}" 
+          placeholder="개념명, 키워드(PAM, SQLi, ISMS-P 등), 개념 ID 검색..."
+          class="concept-search-input"
+          aria-label="개념 검색"
+        >
+        {% if search_query %}
+        <a href="{{ url_for('concepts.list_concepts', category=selected_category) }}" class="search-clear-btn" aria-label="검색어 초기화">&times;</a>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-sm search-submit-btn">검색</button>
+      </div>
+    </form>
+
+    <div class="category-pills" role="tablist" aria-label="카테고리 필터">
+      <a href="{{ url_for('concepts.list_concepts', q=search_query) }}" 
+         class="category-pill {% if not selected_category %}is-active{% endif %}"
+         role="tab"
+         aria-selected="{% if not selected_category %}true{% else %}false{% endif %}">
+        전체 <span class="pill-count">{{ total_concepts_count }}</span>
+      </a>
+      {% for cat in categories %}
+      <a href="{{ url_for('concepts.list_concepts', category=cat, q=search_query) }}" 
+         class="category-pill {% if selected_category == cat %}is-active{% endif %}"
+         role="tab"
+         aria-selected="{% if selected_category == cat %}true{% else %}false{% endif %}">
+        {{ cat }} <span class="pill-count">{{ category_counts.get(cat, 0) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Concepts Grid -->
+  {% if concepts %}
+  <div class="concept-grid">
+    {% for c in concepts %}
+    <article class="concept-card card" id="card-{{ c.concept_id }}">
+      <div class="concept-card-top">
+        <div class="concept-meta-badges">
+          <span class="badge badge-category">{{ c.category }}</span>
+          <span class="badge badge-id">{{ c.concept_id }}</span>
+        </div>
+        <div class="concept-status-badge">
+          {% if c.grade_code == 'safe' %}
+            <span class="badge badge-safe">안전 ({{ c.score_rate }}%)</span>
+          {% elif c.grade_code == 'warning' %}
+            <span class="badge badge-warning">주의 ({{ c.score_rate }}%)</span>
+          {% elif c.grade_code == 'danger' %}
+            <span class="badge badge-danger">취약 (VI {{ c.vi }})</span>
+          {% else %}
+            <span class="badge badge-none">미응시</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <h2 class="concept-card-title">
+        <a href="{{ url_for('concepts.view_concept_detail', concept_id=c.concept_id) }}">
+          {{ c.name }}
+        </a>
+      </h2>
+
+      <p class="concept-card-summary">
+        {{ c.summary }}
+      </p>
+
+      {% if c.core_points %}
+      <div class="concept-card-points">
+        <span class="points-header">핵심 키워드 포인트:</span>
+        <ul class="points-list">
+          {% for pt in c.core_points %}
+          <li>{{ pt }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if c.law_review_status and c.law_review_status.status == 'current_law_review_required' %}
+      <div class="law-alert-tag">
+        <svg class="law-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>개정 법령 수험 체크 필요</span>
+      </div>
+      {% endif %}
+
+      <div class="concept-card-footer">
+        <div class="question-stats">
+          <span class="stats-label">연계 문항:</span>
+          <span class="stats-total">총 <strong>{{ c.question_count }}</strong>문항</span>
+          <span class="stats-breakdown">(단 {{ c.short_count }} · 서 {{ c.desc_count }} · 실 {{ c.prac_count }})</span>
+        </div>
+        <a href="{{ url_for('concepts.view_concept_detail', concept_id=c.concept_id) }}" class="btn btn-outline btn-sm concept-action-btn">
+          학습하기 &rarr;
+        </a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state-card card">
+    <div class="empty-state-icon">🔍</div>
+    <h3>일치하는 개념이 없습니다.</h3>
+    <p>검색어 또는 카테고리 필터를 변경해 보세요.</p>
+    <a href="{{ url_for('concepts.list_concepts') }}" class="btn btn-secondary btn-sm">전체 개념 보기</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

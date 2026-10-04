@@ -42,6 +42,7 @@ def list_wrong_notes():
         "practical": sum(1 for q in all_wrong if q["type"] == "practical"),
         "incorrect": sum(1 for q in all_wrong if q["latest_status"] == "incorrect"),
         "partial": sum(1 for q in all_wrong if q["latest_status"] == "partial"),
+        "repeat": sum(1 for q in all_wrong if q.get("fail_count", 0) >= 2),
     }
 
     return render_template(

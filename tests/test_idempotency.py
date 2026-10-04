@@ -20,6 +20,8 @@ class TestSubmissionIdempotency(unittest.TestCase):
         self.app_context.push()
         init_db(self.app, uri="sqlite:///:memory:")
         self.client = self.app.test_client()
+        with self.client.session_transaction() as sess:
+            sess["csrf_token"] = "test_csrf_token"
         self.loader = DataLoader(self.app.config["DATA_DIR"])
         self.history_service = HistoryService(self.loader)
         self.analytics_service = AnalyticsService(self.loader)
@@ -31,6 +33,7 @@ class TestSubmissionIdempotency(unittest.TestCase):
 
     def _sample_post_data(self, token="test_token_123", mode="standard"):
         return {
+            "csrf_token": "test_csrf_token",
             "submission_token": token,
             "exam_mode": mode,
             "exam_seed": "42",

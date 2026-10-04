@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}서버 오류 (500) | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align: center; padding: 60px 20px; max-width: 600px; margin: 40px auto;">
+  <div style="font-size: 56px; margin-bottom: 16px;">⚠️</div>
+  <h1 style="font-size: 24px; font-weight: 800; color: var(--neutral-900); margin-bottom: 10px;">
+    일시적인 시스템 오류가 발생했습니다
+  </h1>
+  <p style="font-size: 14px; color: var(--neutral-600); margin-bottom: 24px; line-height: 1.6;">
+    요청을 처리하는 도중 서버 오류가 발생했습니다.<br>
+    잠시 후 다시 시도해 주시기 바랍니다.
+  </p>
+  <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="/" class="btn btn-secondary btn-lg">&larr; 홈으로 이동</a>
+    <a href="/dashboard" class="btn btn-primary btn-lg">대시보드로 가기 &rarr;</a>
+  </div>
+</div>
+{% endblock %}

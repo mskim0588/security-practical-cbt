@@ -1,0 +1,471 @@
+[
+  {
+    "index": 1,
+    "qid": "Q-PRAC-001",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-02 p.2",
+    "tech": [
+      "iptables"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "IPTables 웹서버 DoS 방어 기본 룰: iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+      "Snort 웹 백도어(cmd.exe) 탐지 룰: alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)"
+    ]
+  },
+  {
+    "index": 2,
+    "qid": "Q-PRAC-002",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-03 p.5",
+    "tech": [
+      "snort"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "IPTables 웹서버 DoS 방어 기본 룰: iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+      "Snort 웹 백도어(cmd.exe) 탐지 룰: alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)"
+    ]
+  },
+  {
+    "index": 3,
+    "qid": "Q-PRAC-003",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-03",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-02 p.41",
+    "tech": [
+      "chown",
+      "chmod"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "SetUID 파일 무단 설정 전수 점검: find / -xdev -user root -perm -4000 -type f -exec ls -al {} \\;",
+      "특정 프로세스의 실제 실행 파일 링크 확인: ls -l /proc/1234/exe"
+    ]
+  },
+  {
+    "index": 4,
+    "qid": "Q-PRAC-004",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-02 p.8",
+    "tech": [
+      "named",
+      "bind"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "IPTables 웹서버 DoS 방어 기본 룰: iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+      "Snort 웹 백도어(cmd.exe) 탐지 룰: alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)"
+    ]
+  },
+  {
+    "index": 5,
+    "qid": "Q-PRAC-005",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-01",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-02 p.1",
+    "tech": [
+      "find",
+      "chmod"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "계정 잠금 설정 (pam_faillock 예시): auth        required      pam_faillock.so preauth silent audit deny=5 unlock_time=900",
+      "r-commands 취약 파일 점검 명령어: ls -l /etc/hosts.equiv ~/.rhosts"
+    ]
+  },
+  {
+    "index": 6,
+    "qid": "Q-PRAC-006",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-02",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-03 p.6",
+    "tech": [
+      "snort"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "리눅스 wpa_supplicant 802.1X 설정 예시: network={"
+    ]
+  },
+  {
+    "index": 7,
+    "qid": "Q-PRAC-007",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-02 p.16",
+    "tech": [
+      "snort"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "IPTables 웹서버 DoS 방어 기본 룰: iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+      "Snort 웹 백도어(cmd.exe) 탐지 룰: alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)"
+    ]
+  },
+  {
+    "index": 8,
+    "qid": "Q-PRAC-008",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-03",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-03 p.35",
+    "tech": [
+      "named",
+      "bind"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "DNS Zone Transfer 취약점 점검 (dig): dig @ns1.target.com target.com axfr",
+      "BIND named.conf 존 전송 제한 설정: options {"
+    ]
+  },
+  {
+    "index": 9,
+    "qid": "Q-PRAC-009",
+    "category": "애플리케이션 보안",
+    "concept_id": "CON-APP-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-02 p.21",
+    "tech": [
+      "apache"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "Java JDBC Prepared Statement 안전한 코드: String sql = \"SELECT * FROM members WHERE user_id = ? AND user_pw = ?\";",
+      "Apache 로그 내 SQL 인젝션 공격 흔적 예시: 192.168.1.100 - - [10/Oct/2026:14:20:15 +0900] \"GET /view.php?id=1'%20AND%20ASCII(SUBSTRING((SELECT%20user()),1,1))=114--%20HTTP/1.1\" 200 4520"
+    ]
+  },
+  {
+    "index": 10,
+    "qid": "Q-PRAC-010",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-01",
+    "score": 16,
+    "sub_count": 4,
+    "source": "SRC-02 p.27",
+    "tech": [
+      "named"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "IPTables 웹서버 DoS 방어 기본 룰: iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+      "Snort 웹 백도어(cmd.exe) 탐지 룰: alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)"
+    ]
+  },
+  {
+    "index": 11,
+    "qid": "Q-PRAC-011",
+    "category": "애플리케이션 보안",
+    "concept_id": "CON-APP-01",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-02 p.28",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "Java JDBC Prepared Statement 안전한 코드: String sql = \"SELECT * FROM members WHERE user_id = ? AND user_pw = ?\";",
+      "Apache 로그 내 SQL 인젝션 공격 흔적 예시: 192.168.1.100 - - [10/Oct/2026:14:20:15 +0900] \"GET /view.php?id=1'%20AND%20ASCII(SUBSTRING((SELECT%20user()),1,1))=114--%20HTTP/1.1\" 200 4520"
+    ]
+  },
+  {
+    "index": 12,
+    "qid": "Q-PRAC-012",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-01",
+    "score": 16,
+    "sub_count": 4,
+    "source": "SRC-02 p.29",
+    "tech": [
+      "chown",
+      "iptables",
+      "pam",
+      "chmod"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "계정 잠금 설정 (pam_faillock 예시): auth        required      pam_faillock.so preauth silent audit deny=5 unlock_time=900",
+      "r-commands 취약 파일 점검 명령어: ls -l /etc/hosts.equiv ~/.rhosts"
+    ]
+  },
+  {
+    "index": 13,
+    "qid": "Q-PRAC-013",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-05 p.10",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "계정 잠금 설정 (pam_faillock 예시): auth        required      pam_faillock.so preauth silent audit deny=5 unlock_time=900",
+      "r-commands 취약 파일 점검 명령어: ls -l /etc/hosts.equiv ~/.rhosts"
+    ]
+  },
+  {
+    "index": 14,
+    "qid": "Q-PRAC-014",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-02",
+    "score": 16,
+    "sub_count": 4,
+    "source": "SRC-05 p.4",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "현재 사용자 SID 확인 명령어: whoami /user",
+      "로그온 감사 실패(4625) PowerShell 조회: Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} -MaxEvents 10 | Format-List TimeCreated, Message"
+    ]
+  },
+  {
+    "index": 15,
+    "qid": "Q-PRAC-015",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-01",
+    "score": 16,
+    "sub_count": 4,
+    "source": "SRC-04 p.88",
+    "tech": [
+      "tcpdump"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "IPTables 웹서버 DoS 방어 기본 룰: iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m limit --limit 50/minute --limit-burst 100 -j ACCEPT",
+      "Snort 웹 백도어(cmd.exe) 탐지 룰: alert tcp any any -> any 80 (msg:\"Web Backdoor cmd.exe detected\"; content:\"/cmd.exe\"; nocase; sid:1000001; rev:1;)"
+    ]
+  },
+  {
+    "index": 16,
+    "qid": "Q-PRAC-016",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-02",
+    "score": 16,
+    "sub_count": 4,
+    "source": "SRC-04 p.174",
+    "tech": [
+      "snort"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "리눅스 wpa_supplicant 802.1X 설정 예시: network={"
+    ]
+  },
+  {
+    "index": 17,
+    "qid": "Q-PRAC-017",
+    "category": "애플리케이션 보안",
+    "concept_id": "CON-APP-01",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-04 p.176",
+    "tech": [
+      "httpd",
+      "apache"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "Java JDBC Prepared Statement 안전한 코드: String sql = \"SELECT * FROM members WHERE user_id = ? AND user_pw = ?\";",
+      "Apache 로그 내 SQL 인젝션 공격 흔적 예시: 192.168.1.100 - - [10/Oct/2026:14:20:15 +0900] \"GET /view.php?id=1'%20AND%20ASCII(SUBSTRING((SELECT%20user()),1,1))=114--%20HTTP/1.1\" 200 4520"
+    ]
+  },
+  {
+    "index": 18,
+    "qid": "Q-PRAC-018",
+    "category": "정보보호 관리 및 법규",
+    "concept_id": "CON-MGT-01",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-10 p.110",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "정량적 위험 분석 계산 예시: 자산 가치(AV) = 200,000,000원 (2억원)"
+    ]
+  },
+  {
+    "index": 19,
+    "qid": "Q-PRAC-019",
+    "category": "정보보호 관리 및 법규",
+    "concept_id": "CON-MGT-02",
+    "score": 16,
+    "sub_count": 2,
+    "source": "SRC-11 p.173",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "가명처리 기법 적용 예시: 원문 데이터: 홍길동, 28세, 서울시 강남구 역삼동, 960101-1234567"
+    ]
+  },
+  {
+    "index": 20,
+    "qid": "Q-PRAC-020",
+    "category": "애플리케이션 보안",
+    "concept_id": "CON-APP-01",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-08 p.163",
+    "tech": [
+      "select"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "Java JDBC Prepared Statement 안전한 코드: String sql = \"SELECT * FROM members WHERE user_id = ? AND user_pw = ?\";",
+      "Apache 로그 내 SQL 인젝션 공격 흔적 예시: 192.168.1.100 - - [10/Oct/2026:14:20:15 +0900] \"GET /view.php?id=1'%20AND%20ASCII(SUBSTRING((SELECT%20user()),1,1))=114--%20HTTP/1.1\" 200 4520"
+    ]
+  },
+  {
+    "index": 21,
+    "qid": "Q-PRAC-021",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-02",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-12 p.104",
+    "tech": [
+      "netstat"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "현재 사용자 SID 확인 명령어: whoami /user",
+      "로그온 감사 실패(4625) PowerShell 조회: Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} -MaxEvents 10 | Format-List TimeCreated, Message"
+    ]
+  },
+  {
+    "index": 22,
+    "qid": "Q-PRAC-022",
+    "category": "시스템 보안",
+    "concept_id": "CON-SYS-03",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-06 p.207",
+    "tech": [
+      "logrotate",
+      "httpd"
+    ],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "SetUID 파일 무단 설정 전수 점검: find / -xdev -user root -perm -4000 -type f -exec ls -al {} \\;",
+      "특정 프로세스의 실제 실행 파일 링크 확인: ls -l /proc/1234/exe"
+    ]
+  },
+  {
+    "index": 23,
+    "qid": "Q-PRAC-023",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-04",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-07 p.449",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "Cisco 스위치 Port Security 설정 예시: switchport mode access"
+    ]
+  },
+  {
+    "index": 24,
+    "qid": "Q-PRAC-024",
+    "category": "네트워크 보안",
+    "concept_id": "CON-NET-04",
+    "score": 16,
+    "sub_count": 3,
+    "source": "SRC-07 p.445",
+    "tech": [],
+    "rubric_sum": 16,
+    "has_overview": true,
+    "has_why_correct": true,
+    "has_traps": true,
+    "related_cmds": [
+      "Cisco 스위치 Port Security 설정 예시: switchport mode access"
+    ]
+  }
+]
