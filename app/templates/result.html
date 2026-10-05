@@ -178,7 +178,7 @@
           </div>
           <div style="font-size: 14px; margin-bottom: 6px;">
             <strong style="color: var(--neutral-700);">나의 답안:</strong>
-            <div style="color: var(--neutral-900); white-space: pre-wrap; margin-top: 4px; background: white; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--neutral-200);">{{ sub.user_text or '(미작성)' }}</div>
+            <div class="prose-wrap" style="color: var(--neutral-900); white-space: pre-wrap; margin-top: 4px; background: white; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--neutral-200);">{{ sub.user_text or '(미작성)' }}</div>
           </div>
           <div style="font-size: 13px; margin-top: 8px; display: flex; gap: 16px; flex-wrap: wrap;">
             <span>매칭 키워드:
@@ -201,7 +201,7 @@
 
         <div style="margin-top: 12px; font-size: 14px; background: white; padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--neutral-200);">
           <strong style="color: var(--primary-800);">모범 답안:</strong>
-          <div style="white-space: pre-wrap; margin-top: 6px; color: var(--neutral-800); line-height: 1.6;">{{ item.model_answer }}</div>
+          <div class="prose-wrap" style="white-space: pre-wrap; margin-top: 6px; color: var(--neutral-800); line-height: 1.6;">{{ item.model_answer }}</div>
         </div>
       {% endif %}
 

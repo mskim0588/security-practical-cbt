@@ -72,7 +72,7 @@
   {% endif %}
 
   <!-- Question Body -->
-  <div style="font-size: 16px; font-weight: 600; color: var(--neutral-900); line-height: 1.7; white-space: pre-line; margin-bottom: 20px; background: var(--neutral-50); padding: 16px; border-radius: 6px;">
+  <div class="prose-wrap" style="font-size: 16px; font-weight: 600; color: var(--neutral-900); line-height: 1.7; white-space: pre-line; margin-bottom: 20px; background: var(--neutral-50); padding: 16px; border-radius: 6px;">
     {{ detail.question.question }}
   </div>
 
@@ -81,7 +81,7 @@
     <h3 style="font-size: 14px; font-weight: 700; color: #1e40af; margin-bottom: 8px;">
       🎯 모범 정답 및 핵심 루브릭
     </h3>
-    <div style="font-size: 14px; color: var(--neutral-800); line-height: 1.6; white-space: pre-wrap;">
+    <div class="prose-wrap" style="font-size: 14px; color: var(--neutral-800); line-height: 1.6; white-space: pre-wrap;">
       {% if detail.question.sub_questions %}
         {% for sub in detail.question.sub_questions %}
           <div style="margin-bottom: 6px;">
@@ -97,7 +97,7 @@
     </div>
 
     {% if detail.question.explanation %}
-    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #dbeafe; font-size: 13px; color: var(--neutral-700);">
+    <div class="prose-wrap" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #dbeafe; font-size: 13px; color: var(--neutral-700);">
       <strong>💡 기본 해설:</strong> {{ detail.question.explanation }}
     </div>
     {% endif %}
@@ -185,7 +185,7 @@
 
         <div style="font-size: 13px; color: var(--neutral-800); background: var(--neutral-50); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--neutral-200);">
           <strong style="color: var(--neutral-600);">✍️ 제출 답안:</strong>
-          <div style="margin-top: 4px; white-space: pre-wrap; word-break: break-all;">
+          <div class="prose-wrap" style="margin-top: 4px; white-space: pre-wrap;">
             {% if h.user_answer %}
               {% if h.user_answer is mapping %}
                 {% for k, v in h.user_answer.items() %}
@@ -239,5 +239,4 @@
   </div>
 </div>
 
-{% include "components/ai_prompt_modal.html" %}
 {% endblock %}

@@ -718,9 +718,31 @@ header.app-header {
   line-height: 1.7;
   color: var(--neutral-900);
   white-space: pre-wrap;
+  min-width: 0;
   word-break: break-word;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   margin-bottom: var(--space-5);
+}
+
+.prose-wrap,
+.expl-text,
+.expl-box-green p,
+.rubric-criteria,
+.trap-reason,
+.strategy-text,
+.concept-card-summary,
+.summary-text,
+.checklist-item > span,
+.mechanism-text-box,
+.trap-content,
+.clarification-content,
+.command-explanation,
+.q-row-title,
+.hint-text,
+.source-relevance {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .question-box {
@@ -1646,14 +1668,25 @@ header.app-header {
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  min-width: 0;
 }
 
 .search-input-wrapper {
-  position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
+  min-width: 0;
+}
+
+.concept-search-form,
+.concept-search-field {
+  min-width: 0;
+}
+
+.concept-search-field {
+  position: relative;
 }
 
 .search-icon {
@@ -1668,7 +1701,9 @@ header.app-header {
 }
 
 .concept-search-input {
-  flex: 1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 10px 40px 10px 42px;
   border: 1px solid var(--neutral-300);
   border-radius: var(--radius-md);
@@ -1683,12 +1718,17 @@ header.app-header {
 
 .search-clear-btn {
   position: absolute;
-  right: 80px;
+  right: 10px;
   font-size: 20px;
   color: var(--neutral-400);
   text-decoration: none;
   padding: 4px 8px;
   line-height: 1;
+}
+
+.search-submit-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .category-pills {
@@ -2249,8 +2289,9 @@ header.app-header {
   font-size: var(--text-xs);
   color: #e2e8f0;
   line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-all;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .command-explanation {
@@ -2801,6 +2842,8 @@ header.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .preview-label {
@@ -2818,6 +2861,13 @@ header.app-header {
   border-radius: var(--radius-sm);
   border: 1px solid #bbf7d0;
   animation: aiModalFadeIn 0.2s ease;
+  overflow-wrap: anywhere;
+}
+
+.ai-copy-status.is-error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
 }
 
 .ai-prompt-textarea {
@@ -3288,6 +3338,16 @@ header.app-header {
 .trend-spark-arrow {
   color: var(--neutral-400);
   font-size: 14px;
+}
+
+.dashboard-page-title {
+  margin: 0;
+  color: var(--neutral-900);
+  font-size: clamp(22px, 5.8vw, 26px);
+  font-weight: 800;
+  line-height: 1.35;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 /* ==========================================================================

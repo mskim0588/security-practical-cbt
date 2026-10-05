@@ -160,7 +160,7 @@
     </div>
 
     <!-- Question Text -->
-    <div style="font-size: 15px; font-weight: 600; color: var(--neutral-800); margin-bottom: 16px; line-height: 1.6; white-space: pre-line; background: var(--neutral-50); padding: 12px; border-radius: 6px;">
+    <div class="prose-wrap" style="font-size: 15px; font-weight: 600; color: var(--neutral-800); margin-bottom: 16px; line-height: 1.6; white-space: pre-line; background: var(--neutral-50); padding: 12px; border-radius: 6px;">
       {{ ans.question_text }}
     </div>
 
@@ -171,7 +171,7 @@
         <div style="font-size: 12px; font-weight: 700; color: var(--neutral-600); margin-bottom: 6px;">
           ✍️ 제출한 수험자 답안:
         </div>
-        <div style="font-size: 14px; color: var(--neutral-900); white-space: pre-wrap; word-break: break-all; min-height: 40px;">
+        <div class="prose-wrap" style="font-size: 14px; color: var(--neutral-900); white-space: pre-wrap; min-height: 40px;">
           {% if ans.achievement_status == 'unselected' %}
             <span style="color: var(--neutral-500); font-style: italic;">(선택하지 않은 실무형 문항)</span>
           {% elif ans.user_answer %}
@@ -193,7 +193,7 @@
         <div style="font-size: 12px; font-weight: 700; color: var(--primary-700); margin-bottom: 6px;">
           🎯 모범 답안 / 인정 정답:
         </div>
-        <div style="font-size: 14px; color: var(--neutral-800); white-space: pre-wrap; word-break: break-all; min-height: 40px;">
+        <div class="prose-wrap" style="font-size: 14px; color: var(--neutral-800); white-space: pre-wrap; min-height: 40px;">
           {% if ans.sub_questions %}
             {% for sub in ans.sub_questions %}
               <div style="margin-bottom: 4px;">
@@ -287,5 +287,4 @@
   <a href="/exam" class="btn btn-primary btn-lg" style="margin-left: 12px;">새 모의고사 응시하기 &rarr;</a>
 </div>
 
-{% include "components/ai_prompt_modal.html" %}
 {% endblock %}

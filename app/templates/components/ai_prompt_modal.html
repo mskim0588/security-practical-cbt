@@ -32,7 +32,7 @@
       <div class="ai-prompt-preview-wrap">
         <div class="preview-header">
           <span class="preview-label">생성된 프롬프트 미리보기:</span>
-          <span id="ai-copy-status" class="ai-copy-status" style="display: none;">✓ 클립보드에 복사되었습니다!</span>
+          <span id="ai-copy-status" class="ai-copy-status" style="display: none;" role="status" aria-live="polite"></span>
         </div>
         <textarea id="ai-prompt-textarea" class="ai-prompt-textarea" readonly rows="8" aria-label="생성된 프롬프트 내용"></textarea>
       </div>
@@ -143,26 +143,58 @@
     updatePreview();
   };
 
+  function selectPromptForManualCopy(ta) {
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+  }
+
+  function fallbackCopyPrompt(ta) {
+    selectPromptForManualCopy(ta);
+    try {
+      return document.execCommand('copy') === true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   window.copyAIPromptText = function() {
     var ta = document.getElementById('ai-prompt-textarea');
-    if (!ta) return;
+    if (!ta) return Promise.resolve(false);
     var text = ta.value;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(showCopiedStatus);
-    } else {
-      ta.select();
-      document.execCommand('copy');
-      showCopiedStatus();
+
+    function completeFallbackCopy() {
+      var copied = fallbackCopyPrompt(ta);
+      if (copied) {
+        showCopyStatus('✓ 클립보드에 복사되었습니다!', true);
+        return true;
+      }
+      selectPromptForManualCopy(ta);
+      showCopyStatus('자동 복사가 지원되지 않습니다. 텍스트를 길게 눌러 복사하세요.', false);
+      return false;
     }
+
+    if (window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).then(function() {
+        showCopyStatus('✓ 클립보드에 복사되었습니다!', true);
+        return true;
+      }).catch(function() {
+        return completeFallbackCopy();
+      });
+    }
+
+    return Promise.resolve(completeFallbackCopy());
   };
 
-  function showCopiedStatus() {
+  function showCopyStatus(message, isSuccess) {
     var status = document.getElementById('ai-copy-status');
     if (status) {
+      status.textContent = message;
+      status.classList.toggle('is-error', !isSuccess);
       status.style.display = 'inline-block';
       setTimeout(function() {
         status.style.display = 'none';
-      }, 3000);
+      }, isSuccess ? 3000 : 6000);
     }
   }
 

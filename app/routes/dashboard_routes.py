@@ -24,7 +24,7 @@ def get_learning_recommendation(summary: Dict[str, Any], wrong_count: int, top_v
             "badge": "학습 진단 추천",
             "title": "첫 모의고사로 나의 보안 실력을 진단해보세요",
             "message": "아직 학습 기록이 없습니다. 표준 또는 랜덤 모의고사를 1회 응시하시면 5대 영역별 가중 성취도와 20개 보안 개념의 취약점을 정밀 진단해 드립니다.",
-            "primary_btn_text": "📘 제1회 표준 모의고사 응시하기 &rarr;",
+            "primary_btn_text": "📘 제1회 표준 모의고사 응시하기 →",
             "primary_btn_url": "/exam?mode=standard",
             "secondary_btn_text": "📖 20대 핵심 보안 개념 둘러보기",
             "secondary_btn_url": "/concepts"
@@ -37,7 +37,7 @@ def get_learning_recommendation(summary: Dict[str, Any], wrong_count: int, top_v
             "badge": "오답 복습 시급",
             "title": f"미해결 오답 문항 {wrong_count}개를 먼저 복습하세요",
             "message": f"현재 모의고사에서 틀렸거나 부분 감점된 문항이 {wrong_count}개 남아있습니다. 오답 집중 모의고사로 취약점을 확실히 보완하세요.",
-            "primary_btn_text": "🔥 오답 집중 모의고사 시작하기 &rarr;",
+            "primary_btn_text": "🔥 오답 집중 모의고사 시작하기 →",
             "primary_btn_url": "/exam?mode=wrong_review",
             "secondary_btn_text": "📝 오답노트에서 확인하기",
             "secondary_btn_url": "/wrong-notes"
@@ -53,7 +53,7 @@ def get_learning_recommendation(summary: Dict[str, Any], wrong_count: int, top_v
             "badge": "취약 개념 보완",
             "title": f"최우선 취약 개념: {c_name}",
             "message": f"'{c_name}({c_id})'의 취약도 지수(VI)가 가장 높습니다. 개념 심층 학습서를 복습하고 맞춤형 모의고사로 실력을 점검하세요.",
-            "primary_btn_text": "🎯 취약 Concept 맞춤 모의고사 시작 &rarr;",
+            "primary_btn_text": "🎯 취약 Concept 맞춤 모의고사 시작 →",
             "primary_btn_url": "/exam?mode=adaptive",
             "secondary_btn_text": f"📖 {c_id} 개념 심층 학습서 보기",
             "secondary_btn_url": f"/concepts/{c_id}"
@@ -66,7 +66,7 @@ def get_learning_recommendation(summary: Dict[str, Any], wrong_count: int, top_v
         "badge": "실전 감각 유지",
         "title": f"우수한 성취도를 안정적으로 유지하고 있습니다! (합격률 {pass_rate}%)",
         "message": "모든 오답을 극복하고 안정적인 합격권에 도달했습니다. 랜덤 실전 모의고사로 다양한 실무 유형을 연습해보세요.",
-        "primary_btn_text": "🎲 랜덤 실전 모의고사 응시하기 &rarr;",
+        "primary_btn_text": "🎲 랜덤 실전 모의고사 응시하기 →",
         "primary_btn_url": "/exam?mode=random",
         "secondary_btn_text": "📜 과거 응시 이력 복기",
         "secondary_btn_url": "/history"

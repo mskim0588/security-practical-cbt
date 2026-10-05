@@ -19,21 +19,23 @@
       <input type="hidden" name="category" value="{{ selected_category }}">
       {% endif %}
       <div class="search-input-wrapper">
-        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input 
-          type="text" 
-          name="q" 
-          value="{{ search_query }}" 
-          placeholder="개념명, 키워드(PAM, SQLi, ISMS-P 등), 개념 ID 검색..."
-          class="concept-search-input"
-          aria-label="개념 검색"
-        >
-        {% if search_query %}
-        <a href="{{ url_for('concepts.list_concepts', category=selected_category) }}" class="search-clear-btn" aria-label="검색어 초기화">&times;</a>
-        {% endif %}
+        <div class="concept-search-field">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="개념명, 키워드(PAM, SQLi, ISMS-P 등), 개념 ID 검색..."
+            class="concept-search-input"
+            aria-label="개념 검색"
+          >
+          {% if search_query %}
+          <a href="{{ url_for('concepts.list_concepts', category=selected_category) }}" class="search-clear-btn" aria-label="검색어 초기화">&times;</a>
+          {% endif %}
+        </div>
         <button type="submit" class="btn btn-primary btn-sm search-submit-btn">검색</button>
       </div>
     </form>
