@@ -26,6 +26,7 @@ class WrongAnswerService:
             .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
             .where(
                 ExamAttempt.is_owner == is_owner,
+                ExamAttempt.exam_mode != "practice",
                 AnswerRecord.achievement_status != "unselected"
             )
             .order_by(desc(AnswerRecord.created_at), desc(AnswerRecord.id))
@@ -117,7 +118,10 @@ class WrongAnswerService:
         stmt = (
             select(AnswerRecord)
             .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
-            .where(ExamAttempt.is_owner == is_owner)
+            .where(
+                ExamAttempt.is_owner == is_owner,
+                ExamAttempt.exam_mode != "practice",
+            )
             .where(AnswerRecord.question_id == question_id)
             .where(AnswerRecord.achievement_status != "unselected")
             .order_by(desc(AnswerRecord.created_at))

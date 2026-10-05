@@ -27,7 +27,10 @@ class AnalyticsService:
         """
         attempts_stmt = (
             select(ExamAttempt)
-            .where(ExamAttempt.is_owner == is_owner)
+            .where(
+                ExamAttempt.is_owner == is_owner,
+                ExamAttempt.exam_mode != "practice",
+            )
             .order_by(desc(ExamAttempt.created_at))
         )
         attempts = list(db_session.scalars(attempts_stmt).all())
@@ -68,6 +71,7 @@ class AnalyticsService:
             .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
             .where(
                 ExamAttempt.is_owner == is_owner,
+                ExamAttempt.exam_mode != "practice",
                 AnswerRecord.achievement_status != "unselected"
             )
         )
@@ -293,7 +297,10 @@ class AnalyticsService:
         """
         stmt = (
             select(ExamAttempt)
-            .where(ExamAttempt.is_owner == is_owner)
+            .where(
+                ExamAttempt.is_owner == is_owner,
+                ExamAttempt.exam_mode != "practice",
+            )
             .order_by(desc(ExamAttempt.created_at))
             .limit(limit)
         )

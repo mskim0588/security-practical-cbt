@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 {% set is_exam_session = (hide_mobile_global_nav is defined and hide_mobile_global_nav) or (request.path == '/exam') or (request.path == '/review') %}
+{% set show_ai_helper_modal = (not is_exam_session) and ((not request.path.startswith('/practice')) or (practice is defined and practice.phase != 'question')) %}
 <body class="{% block body_class %}{% endblock %} {% if is_exam_session %}is-exam-session{% else %}has-mobile-nav{% endif %}">
   <a href="#main-content" class="skip-link">본문 바로가기</a>
 
@@ -19,7 +20,7 @@
           <a href="/" class="nav-desktop-link {% if request.path == '/' %}is-active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>홈</a>
           <a href="/dashboard" class="nav-desktop-link {% if request.path.startswith('/dashboard') %}is-active{% endif %}" {% if request.path.startswith('/dashboard') %}aria-current="page"{% endif %}>대시보드</a>
           <a href="/concepts" class="nav-desktop-link {% if request.path.startswith('/concepts') %}is-active{% endif %}" {% if request.path.startswith('/concepts') %}aria-current="page"{% endif %}>개념학습</a>
-          <a href="/exam" class="nav-desktop-link {% if request.path.startswith('/exam') or request.path.startswith('/review') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') %}aria-current="page"{% endif %}>모의고사</a>
+          <a href="/exam" class="nav-desktop-link {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') %}aria-current="page"{% endif %}>모의고사</a>
           <a href="/history" class="nav-desktop-link {% if request.path.startswith('/history') %}is-active{% endif %}" {% if request.path.startswith('/history') %}aria-current="page"{% endif %}>응시이력</a>
           <a href="/wrong-notes" class="nav-desktop-link {% if request.path.startswith('/wrong-notes') %}is-active{% endif %}" {% if request.path.startswith('/wrong-notes') %}aria-current="page"{% endif %}>오답노트</a>
         </nav>
@@ -65,7 +66,7 @@
         <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         <span class="nav-mobile-label">개념학습</span>
       </a>
-      <a href="/exam" class="nav-mobile-item {% if request.path.startswith('/exam') or request.path.startswith('/review') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') %}aria-current="page"{% endif %}>
+      <a href="/exam" class="nav-mobile-item {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') %}aria-current="page"{% endif %}>
         <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         <span class="nav-mobile-label">모의고사</span>
       </a>
@@ -81,7 +82,7 @@
   </nav>
   {% endif %}
 
-  {% if not is_exam_session %}
+  {% if show_ai_helper_modal %}
   {% include "components/ai_prompt_modal.html" %}
   {% endif %}
 

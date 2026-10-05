@@ -133,7 +133,10 @@ class HistoryService:
         """응시 이력 목록을 최신순으로 조회합니다 (기본적으로 Owner 전용)."""
         stmt = (
             select(ExamAttempt)
-            .where(ExamAttempt.is_owner == is_owner)
+            .where(
+                ExamAttempt.is_owner == is_owner,
+                ExamAttempt.exam_mode != "practice",
+            )
             .order_by(desc(ExamAttempt.created_at))
             .limit(limit)
             .offset(offset)
@@ -142,7 +145,10 @@ class HistoryService:
 
     def get_attempt_count(self, is_owner: bool = True) -> int:
         """총 응시 횟수 반환 (기본적으로 Owner 전용)"""
-        stmt = select(func.count(ExamAttempt.id)).where(ExamAttempt.is_owner == is_owner)
+        stmt = select(func.count(ExamAttempt.id)).where(
+            ExamAttempt.is_owner == is_owner,
+            ExamAttempt.exam_mode != "practice",
+        )
         return db_session.scalar(stmt) or 0
 
     def get_attempt_by_id(self, attempt_id: int) -> Optional[ExamAttempt]:
@@ -156,7 +162,7 @@ class HistoryService:
         DB에 본문을 중복 저장하지 않고 DataLoader의 최신 데이터와 동적 결합합니다.
         """
         attempt = self.get_attempt_by_id(attempt_id)
-        if not attempt:
+        if not attempt or attempt.exam_mode == "practice":
             return None
 
         enriched_answers = []

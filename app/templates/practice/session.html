@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}{{ practice.current_round }}회독 {{ practice.question_number }}번 | 회독 학습{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('practice.setup_practice') }}" class="btn btn-outline header-action-btn">학습 설정</a>
+{% endblock %}
+
+{% block content %}
+<div class="practice-session" data-practice-phase="{{ practice.phase }}">
+  <section class="practice-progress-card" aria-label="회독 진행 상황">
+    <div class="practice-progress-head">
+      <div>
+        <span class="practice-round-label">{{ practice.current_round }}회독</span>
+        <strong>{{ practice.question_number }} / {{ practice.total_questions }} 문제</strong>
+      </div>
+      <span class="practice-scope-label">{{ practice.scope_label }}</span>
+    </div>
+    <div class="practice-progress-track" aria-hidden="true">
+      <span style="width: {{ (practice.round_answered / practice.total_questions * 100) | round(1) }}%"></span>
+    </div>
+    <div class="practice-counts">
+      <span class="practice-count-correct">정답 {{ practice.status_counts.correct }}</span>
+      <span class="practice-count-partial">부분정답 {{ practice.status_counts.partial }}</span>
+      <span class="practice-count-wrong">오답 {{ practice.status_counts.wrong }}</span>
+    </div>
+  </section>
+
+  <article class="card practice-question-card">
+    <header class="practice-question-header">
+      <div class="q-meta">
+        <span class="q-badge {% if practice.question.type == 'short' %}badge-short{% elif practice.question.type == 'descriptive' %}badge-desc{% else %}badge-prac{% endif %}">
+          {{ practice.question.type_label }}
+        </span>
+        <span class="q-category">{{ practice.question.category }}</span>
+      </div>
+      {% if practice.question_attempts %}
+      <span class="practice-attempt-state">시도 {{ practice.question_attempts }}회 · 최근 결과 {{ practice.latest_result_label }}</span>
+      {% else %}
+      <span class="practice-attempt-state">첫 시도</span>
+      {% endif %}
+    </header>
+
+    <div class="question-text practice-question-text">{{ practice.question.question }}</div>
+
+    {% if practice.phase == 'question' %}
+    <form method="POST" action="{{ url_for('practice.answer_practice', attempt_id=practice.attempt_id) }}" class="practice-answer-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% if practice.question.type == 'short' %}
+        {% if practice.question.sub_questions %}
+        <div class="sub-inputs-grid">
+          {% for sub in practice.question.sub_questions %}
+          <div class="input-group">
+            <label for="ans_{{ practice.question.id }}_{{ sub.label }}" class="input-label">({{ sub.label }}) 답안</label>
+            <input type="text" id="ans_{{ practice.question.id }}_{{ sub.label }}" name="ans_{{ practice.question.id }}_{{ sub.label }}" class="text-input" autocomplete="off">
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="input-group">
+          <label for="ans_{{ practice.question.id }}" class="input-label">답안</label>
+          <input type="text" id="ans_{{ practice.question.id }}" name="ans_{{ practice.question.id }}" class="text-input" autocomplete="off">
+        </div>
+        {% endif %}
+      {% else %}
+        {% for sub in practice.question.sub_questions %}
+        <div class="desc-sub-question">
+          <label for="ans_{{ practice.question.id }}_{{ sub.sub_id }}" class="desc-sub-label">
+            <span>{{ sub.sub_id }}) {{ sub.prompt }}</span>
+            <span class="sub-score">{{ sub.score }}점</span>
+          </label>
+          <textarea id="ans_{{ practice.question.id }}_{{ sub.sub_id }}" name="ans_{{ practice.question.id }}_{{ sub.sub_id }}" class="textarea-input" rows="4"></textarea>
+        </div>
+        {% endfor %}
+      {% endif %}
+      <button type="submit" class="btn btn-primary btn-lg practice-submit-btn">답안 제출 및 채점</button>
+    </form>
+    {% else %}
+    {% set result = practice.result %}
+    <section class="practice-result practice-result-{{ result.status }}" aria-labelledby="practice-result-heading">
+      <div class="practice-result-heading-row">
+        <h2 id="practice-result-heading">{{ result.status_label }}</h2>
+        <strong>{{ result.earned_score }} / {{ result.max_score }}점</strong>
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>1. 내 답안</h3>
+        {% if result.user_answer is mapping %}
+        <div class="accepted-answer-list">
+          {% for label, value in result.user_answer.items() %}
+          <p class="accepted-answer-item"><strong>[{{ label }}]</strong> {{ value or '(미작성)' }}</p>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="prose-wrap practice-answer-value">{{ result.user_answer or '(미작성)' }}</div>
+        {% endif %}
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>2. 모범 / 인정 답안</h3>
+        {% if practice.question.type == 'short' %}
+        <div class="accepted-answer-list">
+          {% for sub in result.sub_results %}
+          <p class="accepted-answer-item">
+            {% if sub.label != '단일답안' %}<strong>[{{ sub.label }}]</strong> {% endif %}{{ sub.expected_answer }}
+            {% if sub.accepted_answers %}<span class="accepted-answer-alternatives">인정 답안: {{ sub.accepted_answers | join(', ') }}</span>{% endif %}
+          </p>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="prose-wrap practice-answer-value">{{ result.model_answer }}</div>
+        {% endif %}
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>3. 채점 기준</h3>
+        <div class="practice-rubric-list">
+          {% for sub in result.sub_results %}
+          <div class="practice-rubric-item">
+            <div><strong>{% if practice.question.type == 'short' %}{{ sub.label }}{% else %}{{ sub.sub_id }}) {{ sub.prompt }}{% endif %}</strong><span>{{ sub.score if practice.question.type == 'short' else sub.earned_score }} / {{ sub.max_score }}점</span></div>
+            {% if sub.matched_keywords is defined %}<p>충족 키워드: {{ sub.matched_keywords | join(', ') if sub.matched_keywords else '없음' }}</p>{% endif %}
+            {% if sub.missing_keywords is defined %}<p>누락 키워드: {{ sub.missing_keywords | join(', ') if sub.missing_keywords else '없음' }}</p>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if result.explanation %}
+      <div class="practice-learning-block">
+        <h3>4. 문제 해설</h3>
+        <div class="prose-wrap practice-answer-value">{{ result.explanation }}</div>
+      </div>
+      {% endif %}
+
+      {% if result.deep_explanation %}
+        {% set explanation = result.deep_explanation %}
+        {% set explanation_expanded = true %}
+        {% set concept_id = practice.question.concept_id %}
+        {% set question_id = practice.question.id %}
+        {% set question_text = practice.question.question %}
+        {% set model_answer = result.model_answer_text %}
+        {% set user_answer = result.user_answer_text %}
+        {% set question_type = practice.question.type %}
+        {% set grading_status = result.status %}
+        {% set missing_keywords = result.missing_keywords %}
+        {% include "components/explanation_card.html" %}
+      {% endif %}
+    </section>
+    {% endif %}
+  </article>
+
+  {% if practice.round_summary %}
+  <section class="card practice-round-summary" aria-labelledby="round-summary-heading">
+    <div class="practice-kicker">{{ practice.round_summary.round }}회독 결과</div>
+    <h2 id="round-summary-heading">{% if practice.is_final_complete %}학습 완료{% else %}이번 회독을 마쳤습니다{% endif %}</h2>
+    <div class="practice-summary-grid">
+      <div><span>전체</span><strong>{{ practice.round_summary.total }}</strong></div>
+      <div><span>정답</span><strong>{{ practice.round_summary.correct }}</strong></div>
+      <div><span>부분정답</span><strong>{{ practice.round_summary.partial }}</strong></div>
+      <div><span>오답</span><strong>{{ practice.round_summary.wrong }}</strong></div>
+      <div><span>학습 정확도</span><strong>{{ practice.round_summary.weighted_accuracy }}%</strong></div>
+    </div>
+    {% if practice.round_summary.needs_review %}
+    <details class="practice-review-list">
+      <summary>다시 확인할 문제 {{ practice.round_summary.needs_review | length }}개</summary>
+      <ul>
+        {% for item in practice.round_summary.needs_review %}
+        <li><span>{{ item.question_id }} · {{ item.category }}</span><strong>{{ item.result_label }}</strong></li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <div class="practice-next-actions">
+    {% if practice.phase == 'graded' %}
+    <form method="POST" action="{{ url_for('practice.next_practice', attempt_id=practice.attempt_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-primary btn-lg">다음 문제</button>
+    </form>
+    {% elif practice.phase == 'round_complete' %}
+    <form method="POST" action="{{ url_for('practice.next_practice', attempt_id=practice.attempt_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-primary btn-lg">다음 회독 시작</button>
+    </form>
+    {% elif practice.phase == 'complete' %}
+    <a href="{{ url_for('practice.setup_practice') }}" class="btn btn-primary btn-lg">새 회독 학습 설정</a>
+    <a href="/" class="btn btn-secondary btn-lg">홈으로</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
