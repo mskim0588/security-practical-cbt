@@ -46,7 +46,12 @@
 
 ## Production result
 
-- TODO: push, Railway deployment, health checks, and production smoke.
+- Functional commit: `e33d2481688b7c4d5e61e9c99ce978a2a5701abd`.
+- GitHub push: PASS; `master` synchronized with `origin/master`.
+- Railway deployment: SUCCESS.
+- `GET /`: 200; `GET /healthz`: 200; database `healthy`; environment `production`.
+- Production guest smoke: setup, 1-round start, immediate grading, explanation, concept, next question, and round completion PASS.
+- Normal `/exam` → `/review` smoke PASS; no uncaught JavaScript errors, page overflow, raw source metadata, or AI-provider requests.
 
 ## Known limitations
 
@@ -55,9 +60,9 @@
 
 ## Checkpoint
 
-- DONE: baseline recovery, architecture inspection, implementation, targeted tests, full regression, data integrity, local browser QA.
-- PARTIAL: final Git review and documentation.
-- TODO: commit, push, Railway deployment, production smoke, final report.
+- DONE: baseline recovery, architecture inspection, implementation, targeted tests, full regression, data integrity, local browser QA, functional commit/push, Railway deployment, production smoke.
+- PARTIAL: documentation-only closure push.
+- TODO: verify Railway health after the documentation-only commit.
 - BLOCKED: none.
-- Last Safe Step: full regression passed (248 ran, 247 passed, 1 skipped).
-- Next Step: final Git review, commit `feat: add repetition practice mode`, push, and deploy verification.
+- Last Safe Step: production smoke passed on functional commit `e33d248`.
+- Next Step: commit and push this final production verification record, then recheck `/healthz`.
