@@ -4,7 +4,6 @@ PromptBuilder Service
 Constructs optimized, structured study prompts for ChatGPT and Gemini.
 Zero-cost, zero-API dependency, runs completely deterministic prompt templates.
 """
-import urllib.parse
 from typing import Dict, Any, Optional
 
 class PromptBuilder:
@@ -72,12 +71,11 @@ class PromptBuilder:
 3. 이 문제에서 요구하는 핵심 키워드가 무엇인지, 어떻게 기억해야 실전에서 틀리지 않을지 알기 쉽게 설명해 주세요."""
 
     @classmethod
-    def get_chatgpt_url(cls, prompt_text: str) -> str:
-        """ChatGPT 웹 런처 URL 생성 (URL 인코딩 파라미터 포함)"""
-        encoded = urllib.parse.quote(prompt_text)
-        return f"https://chatgpt.com/?q={encoded}"
+    def get_chatgpt_url(cls, prompt_text: Optional[str] = None) -> str:
+        """Return the provider homepage without transmitting prompt content."""
+        return "https://chatgpt.com/"
 
     @classmethod
     def get_gemini_url(cls, prompt_text: Optional[str] = None) -> str:
-        """Gemini 웹 런처 URL 생성"""
+        """Return the provider homepage without transmitting prompt content."""
         return "https://gemini.google.com/app"

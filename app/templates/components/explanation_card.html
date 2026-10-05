@@ -1,6 +1,6 @@
 {# Explanation Card Component: displays structured deep explanation, why-wrong traps, rubrics, and concept link #}
 {% if explanation %}
-<details class="explanation-accordion" id="expl-{{ question_id or explanation.question_id }}">
+<details class="explanation-accordion" id="expl-{{ question_id or explanation.question_id }}"{% if explanation_expanded %} open{% endif %}>
   <summary class="explanation-summary-btn">
     <span class="summary-toggle-icon">▸</span>
     <span class="summary-title">💡 심층 해설 및 오답 분석 보기</span>
@@ -101,13 +101,18 @@
           📖 {{ concept_id }} 개념 상세 학습서 &rarr;
         </a>
         {% endif %}
-        <button type="button" class="btn-ai-helper" onclick="openAIPromptModal({
-          qid: '{{ question_id or explanation.question_id }}',
-          concept_id: '{{ concept_id or '' }}',
-          question_text: {{ (question_text or explanation.overview or '')|tojson }},
-          model_answer: {{ (model_answer or explanation.why_correct or '')|tojson }},
-          user_answer: {{ (user_answer or '')|tojson }}
-        })">
+        <button type="button" class="btn-ai-helper"
+          data-ai-context='{{ {
+            "qid": question_id or explanation.question_id,
+            "concept_id": concept_id or "",
+            "question_text": question_text or explanation.overview or "",
+            "model_answer": model_answer or explanation.why_correct or "",
+            "user_answer": user_answer or "",
+            "qtype": question_type or "",
+            "grading_status": grading_status or "",
+            "missing_keywords": missing_keywords or []
+          }|tojson }}'
+          onclick="openAIPromptModal(JSON.parse(this.dataset.aiContext))">
           🤖 AI 질문 프롬프트 생성
         </button>
       </div>

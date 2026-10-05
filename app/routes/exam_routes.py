@@ -217,6 +217,12 @@ def view_result(attempt_id: int):
         q_meta = loader.get_question_by_id(qid) if qid else None
         concept_id = q_meta.get("concept_id") if q_meta else None
         deep_expl = loader.get_explanation_for_question(qid) if qid else None
+        sub_results = ans.get("self_eval_data") or []
+        missing_keywords = []
+        for sub_result in sub_results:
+            for keyword in sub_result.get("missing_keywords", []):
+                if keyword not in missing_keywords:
+                    missing_keywords.append(keyword)
 
         details.append({
             "question_id": qid,
@@ -228,7 +234,10 @@ def view_result(attempt_id: int):
             "earned_score": ans.get("earned_score", 0.0),
             "max_score": ans.get("max_score", 0.0),
             "is_selected": is_sel,
-            "sub_results": ans.get("self_eval_data") or [],
+            "sub_results": sub_results,
+            "user_answer": ans.get("user_answer", ""),
+            "grading_status": ans.get("achievement_status", ""),
+            "missing_keywords": missing_keywords,
             "model_answer": ans.get("model_answer", ""),
             "explanation": ans.get("explanation", ""),
             "source_info": ans.get("source_info") or {},
@@ -259,4 +268,3 @@ def view_result(attempt_id: int):
     response = make_response(render_template("result.html", result=result_dict, attempt_id=attempt_id))
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
     return response
-

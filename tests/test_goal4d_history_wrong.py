@@ -259,7 +259,7 @@ class TestGoal4DHistoryWrong(unittest.TestCase):
         # 1. /history/<id>
         r1 = self.client.get(f"/history/{att_id}")
         self.assertIn('id="ai-prompt-modal"', r1.get_data(as_text=True))
-        self.assertIn('ChatGPT & Gemini 맞춤형 질문 생성기', r1.get_data(as_text=True))
+        self.assertIn('학습 프롬프트 생성기', r1.get_data(as_text=True))
 
         # 2. /wrong-notes
         r2 = self.client.get("/wrong-notes")

@@ -124,6 +124,8 @@
     {% set question_text = detail.question.question %}
     {% set model_answer = detail.question.model_answer %}
     {% set user_answer = detail.history[0].user_answer if detail.history else '' %}
+    {% set question_type = detail.question.type %}
+    {% set grading_status = detail.history[0].achievement_status if detail.history else '' %}
     {% include "components/explanation_card.html" %}
   </div>
 {% endif %}

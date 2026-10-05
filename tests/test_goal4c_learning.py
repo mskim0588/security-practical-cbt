@@ -213,7 +213,7 @@ class TestGoal4CLearningContent(unittest.TestCase):
         self.assertIn('href="/concepts/CON-', html)
 
     def test_prompt_builder_templates(self):
-        """Ensure PromptBuilder generates 3 distinct formatted templates and valid web launcher URLs."""
+        """Ensure PromptBuilder generates templates and privacy-safe provider home URLs."""
         from app.services.prompt_builder import PromptBuilder
 
         q_text = "PAM의 4대 인터페이스를 기술하시오."
@@ -257,7 +257,8 @@ class TestGoal4CLearningContent(unittest.TestCase):
 
         # 4. URLs
         chatgpt_url = PromptBuilder.get_chatgpt_url(p_wrong)
-        self.assertTrue(chatgpt_url.startswith("https://chatgpt.com/?q="))
+        self.assertEqual(chatgpt_url, "https://chatgpt.com/")
+        self.assertNotIn(p_wrong, chatgpt_url)
         gemini_url = PromptBuilder.get_gemini_url(p_wrong)
         self.assertEqual(gemini_url, "https://gemini.google.com/app")
 
@@ -267,11 +268,11 @@ class TestGoal4CLearningContent(unittest.TestCase):
         resp_c = self.client.get("/concepts")
         html_c = resp_c.get_data(as_text=True)
         self.assertIn('id="ai-prompt-modal"', html_c)
-        self.assertIn("openChatGPTLauncher", html_c)
+        self.assertIn('href="https://chatgpt.com/"', html_c)
+        self.assertNotIn("openChatGPTLauncher", html_c)
 
         # Exam page must NOT have ai-prompt-modal
         resp_exam = self.client.get("/exam")
         html_exam = resp_exam.get_data(as_text=True)
         self.assertNotIn('id="ai-prompt-modal"', html_exam)
-
 

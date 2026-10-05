@@ -21,11 +21,11 @@ class TestGoal6DPhysicalMobileFixes(unittest.TestCase):
 
     def test_mdev_001_clipboard_success_and_fallback_contract(self):
         self.assertIn("window.isSecureContext", self.ai_modal)
-        self.assertIn("navigator.clipboard.writeText(text)", self.ai_modal)
-        self.assertIn(".catch(function()", self.ai_modal)
+        self.assertIn("navigator.clipboard.writeText(textarea.value)", self.ai_modal)
+        self.assertIn(".catch(completeFallbackCopy)", self.ai_modal)
         self.assertIn("document.execCommand('copy') === true", self.ai_modal)
-        self.assertIn("자동 복사가 지원되지 않습니다. 텍스트를 길게 눌러 복사하세요.", self.ai_modal)
-        self.assertIn("selectPromptForManualCopy(ta)", self.ai_modal)
+        self.assertIn("자동 복사가 지원되지 않습니다. 프롬프트를 길게 눌러 직접 복사하세요.", self.ai_modal)
+        self.assertIn("selectPromptForManualCopy(textarea)", self.ai_modal)
         base_template = (TEMPLATES_DIR / "base.html").read_text(encoding="utf-8")
         self.assertEqual(base_template.count('include "components/ai_prompt_modal.html"'), 1)
         for template_name in ("history_detail.html", "wrong_detail.html", "wrong_notes.html"):

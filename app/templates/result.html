@@ -225,6 +225,10 @@
         {% set question_id = item.question_id %}
         {% set question_text = item.question_text %}
         {% set model_answer = item.model_answer %}
+        {% set user_answer = item.user_answer %}
+        {% set question_type = item.type %}
+        {% set grading_status = item.grading_status %}
+        {% set missing_keywords = item.missing_keywords %}
         {% include "components/explanation_card.html" %}
       {% endif %}
     </div>

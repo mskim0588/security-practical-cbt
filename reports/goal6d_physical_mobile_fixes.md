@@ -155,3 +155,101 @@ Core data result: `5 / 5 MATCH`; no core JSON file changed.
 Status: `READY_FOR_PHYSICAL_DEVICE_RETEST`
 
 The code, automated regression, core data, deployment, health, and available production smoke criteria pass. Final Goal 6D closure and any `v0.6-mobile-final` tag remain blocked on the requested physical-device re-test. Goal 6D was not finalized, and Goal 7 was not started.
+
+---
+
+## R. Goal 6D-PreFinal Integrated Fix Checkpoint
+
+### Recovery checkpoint
+
+- Recovery date: `2026-10-05` (`Asia/Seoul`)
+- Branch: `master`
+- Current HEAD before resumed work: `73d76b8` (`docs: record Goal 6D physical mobile fix verification`)
+- Upstream state: `master` was up to date with `origin/master` before the resumed changes.
+- Preserved interrupted work: 11 modified tracked files and 2 untracked Goal 6D-PreFinal files; nothing was reset, restored, cleaned, or discarded.
+- Prior-session checkpoint lookup: no matching external checkpoint was available, so the repository, working tree, tests, and this report were treated as authoritative.
+
+| Area | Recovery status |
+|---|---|
+| A. Privacy-preserving AI Helper | `DONE` |
+| B. ChatGPT용 / Gemini용 local prompt modes | `DONE` |
+| C. Clipboard fallback | `DONE` |
+| D. ChatGPT / Gemini open buttons | `DONE` |
+| E. AI privacy notice | `DONE` |
+| F. History explanation rendering | `DONE` |
+| G. Raw source metadata removal | `DONE` |
+| H. Multi-answer layout cleanup | `DONE` |
+| I. Previous MDEV-002~005 regression | `DONE` |
+| J. Targeted tests | `PARTIAL` — 10 focused tests pass; browser viewport QA is next |
+| K. Full regression | `TODO` |
+| L. Core data integrity | `TODO` |
+| M. Commit | `TODO` |
+| N. Push | `TODO` |
+| O. Railway deployment | `TODO` |
+
+- Last Safe Step: MDEV-006 through MDEV-009 implementation and focused regression tests were present; the resumed run verified 10 focused tests with 0 failures and 0 errors.
+- Next Step: run the prepared authenticated local browser QA at 360x740, 390x844, 430x932, and 1280x800, then address any finding before full regression.
+- Current Test Result: `Ran 10; Passed 10; Skipped 0; Failures 0; Errors 0`.
+- Current Git Status: 11 modified tracked files and 2 untracked Goal 6D-PreFinal files; no staged changes.
+
+### AI Helper checkpoint
+
+- Status: `DONE`.
+- The shared helper is a local-only prompt builder with separate ChatGPT and Gemini prompt profiles.
+- The generated prompt remains visible in a selectable textarea.
+- Copy uses the Clipboard API only when available in a secure context, then truthfully falls back to selection plus `document.execCommand("copy")`.
+- Provider controls open only `https://chatgpt.com/` and `https://gemini.google.com/app` in a new tab with `noopener noreferrer`; prompt text is not appended or submitted.
+- The privacy notice is present and no `fetch`, `XMLHttpRequest`, `sendBeacon`, provider API, query-prefill, or background provider request exists.
+- Browser QA discovered and fixed a truncated inline click handler: learning context is now stored as escaped local `data-ai-context` JSON and parsed only when the user opens the modal.
+- Anti-cheat isolation remains intact: `/exam` and `/review` do not contain the helper.
+- Last Safe Step: local modal opening, ChatGPT/Gemini mode switching, success/failure copy feedback, fixed provider URLs, and zero provider requests passed at all four target viewports.
+- Next Step: retain these checks while completing history/source/layout and full regression.
+
+### History Explanation checkpoint
+
+- Status: `DONE`.
+- `/history/<attempt_id>` reuses the canonical `explanation_card.html` component and actual `explanations.json` mappings.
+- The history flow renders question, user answer, model/accepted answer, rubric/scoring, expanded explanation, related concept, then AI Helper.
+- Empty explanation cards are not rendered; unexpected missing mappings show a learner-safe mapping warning instead of invented content.
+- Existing explanation coverage test confirms all 180 questions have schema-valid explanations.
+- Last Safe Step: canonical explanation content was present and visible in authenticated local browser QA.
+- Next Step: preserve the canonical component through full regression.
+
+### Source Metadata checkpoint
+
+- Status: `DONE`.
+- History learner UI no longer renders `ans.source_info` or raw registry dictionary/object representations.
+- Internal `source_info`, source IDs, page mappings, `sources.json`, and provenance data remain unchanged and available to services.
+- Local browser QA found no raw source object, `source_type`, or `total_pages` text on History, Result, or Wrong Note detail routes.
+- Last Safe Step: UI-only removal passed focused tests without changing internal source data.
+- Next Step: verify the five protected core data hashes before commit.
+
+### Multi-answer checkpoint
+
+- Status: `DONE`.
+- Accepted answers render from actual `answer`, `expected`, or `model_answer` values; empty entries do not allocate rows.
+- Structured multi-answer content is grouped in a compact flex list without the previous fixed/minimum-height spacer.
+- Browser QA measured a maximum 8px gap between adjacent accepted answers within each answer group at 360, 390, 430, and 1280 pixels.
+- Last Safe Step: 33 accepted-answer items rendered on the representative history attempt with compact spacing and zero page overflow.
+- Next Step: run the complete test suite and data-integrity audit.
+
+### Targeted Tests checkpoint
+
+- Status: `DONE`.
+- Focused command: `python -m unittest tests.test_goal6d_prefinal_ai_history tests.test_goal6d_physical_mobile_fixes tests.test_goal4c_learning tests.test_goal4d_history_wrong -v`.
+- Result before the final privacy-field assertion addition: `Ran 36; Passed 36; Skipped 0; Failures 0; Errors 0`.
+- Authenticated local Chromium QA passed `/history/68`, `/result/68`, `/wrong-notes/Q-SHORT-001`, `/concepts`, and `/dashboard` at 360x740, 390x844, 430x932, and 1280x800.
+- Every checked route returned 200 with page-level horizontal overflow equal to zero; there were no uncaught page errors, failed required resources, or automatic ChatGPT/Gemini requests.
+- Current Git Status: Goal 6D-PreFinal implementation, regression tests, browser QA script, and this checkpoint remain uncommitted for final review.
+- Next Step: rerun focused tests with the final assertion, then run full regression and core data integrity.
+
+### Full Regression checkpoint
+
+- Status: `DONE`.
+- Command: `python -m unittest discover tests -v`.
+- Result: `Ran 234; Passed 233; Skipped 1; Failures 0; Errors 0`.
+- The single skip remains the expected external source-file comparison when `PRIVATE_SOURCE_DIR` is not configured.
+- Core data integrity: `5 / 5 MATCH`; `questions.json`, `concepts.json`, `sources.json`, `concept_contents.json`, and `explanations.json` retain their recorded SHA-256 hashes and have no Git diff.
+- Last Safe Step: focused tests, four-viewport browser QA, full regression, and core hash validation all pass locally.
+- Next Step: perform final Git diff review, commit with the approved message, push `master`, and verify Railway deployment/production health without finalizing Goal 6D.
+- Current Git Status: implementation and verification artifacts are uncommitted pending final Git review.

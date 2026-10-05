@@ -1,156 +1,145 @@
-{# AI Prompt Modal Component: Pure client-side zero-cost ChatGPT / Gemini Prompt Builder #}
+{# Shared, privacy-preserving local prompt builder. No prompt data is transmitted automatically. #}
 <div id="ai-prompt-modal" class="ai-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
   <div class="ai-modal-card">
     <div class="ai-modal-header">
       <div class="ai-modal-title-wrap">
         <span class="ai-modal-badge">AI 학습 도우미</span>
-        <h3 id="ai-modal-title" class="ai-modal-title">ChatGPT & Gemini 맞춤형 질문 생성기</h3>
+        <h3 id="ai-modal-title" class="ai-modal-title">학습 프롬프트 생성기</h3>
       </div>
       <button type="button" class="ai-modal-close-btn" onclick="closeAIPromptModal()" aria-label="창 닫기">&times;</button>
     </div>
 
     <div class="ai-modal-body">
-      <p class="ai-modal-desc">
-        이 문항의 지문, 나의 답안, 모범 답안을 결합하여 최적화된 프롬프트를 원클릭 생성합니다.<br>
-        <strong>API 키 등록이나 결제 없이</strong> 복사 후 ChatGPT 또는 Gemini에서 무료로 심층 피드백을 받으실 수 있습니다.
-      </p>
+      <p class="ai-modal-desc">문항과 답안을 바탕으로 학습용 프롬프트를 이 브라우저 안에서 생성합니다. 내용을 확인한 뒤 직접 복사해 사용하세요.</p>
 
-      <!-- Template Selector Tabs -->
-      <div class="ai-template-tabs" role="tablist" aria-label="질문 템플릿 선택">
-        <button type="button" class="ai-tab-btn active" data-tab="why_wrong" onclick="switchAIPromptTab('why_wrong')">
-          🔍 왜 틀렸는지 심층 분석
-        </button>
-        <button type="button" class="ai-tab-btn" data-tab="real_world" onclick="switchAIPromptTab('real_world')">
-          💻 실무 적용 & 명령어 실습
-        </button>
-        <button type="button" class="ai-tab-btn" data-tab="similar_question" onclick="switchAIPromptTab('similar_question')">
-          📝 유사 기출 변형 문제 요청
-        </button>
+      <div class="ai-provider-tabs" role="tablist" aria-label="AI 제공자용 프롬프트 선택">
+        <button type="button" class="ai-tab-btn ai-provider-btn active" data-provider="chatgpt" aria-selected="true" onclick="selectAIPromptProvider('chatgpt')">ChatGPT용 프롬프트</button>
+        <button type="button" class="ai-tab-btn ai-provider-btn" data-provider="gemini" aria-selected="false" onclick="selectAIPromptProvider('gemini')">Gemini용 프롬프트</button>
       </div>
 
-      <!-- Generated Prompt Preview Box -->
+      <div class="ai-template-tabs" role="tablist" aria-label="학습 요청 선택">
+        <button type="button" class="ai-tab-btn active" data-tab="why_wrong" onclick="switchAIPromptTab('why_wrong')">🔍 왜 틀렸는지 심층 분석</button>
+        <button type="button" class="ai-tab-btn" data-tab="real_world" onclick="switchAIPromptTab('real_world')">💻 실무 적용 &amp; 명령어 실습</button>
+        <button type="button" class="ai-tab-btn" data-tab="similar_question" onclick="switchAIPromptTab('similar_question')">📝 유사 기출 변형 문제 요청</button>
+      </div>
+
       <div class="ai-prompt-preview-wrap">
         <div class="preview-header">
-          <span class="preview-label">생성된 프롬프트 미리보기:</span>
+          <span class="preview-label">생성된 프롬프트:</span>
           <span id="ai-copy-status" class="ai-copy-status" style="display: none;" role="status" aria-live="polite"></span>
         </div>
-        <textarea id="ai-prompt-textarea" class="ai-prompt-textarea" readonly rows="8" aria-label="생성된 프롬프트 내용"></textarea>
+        <textarea id="ai-prompt-textarea" class="ai-prompt-textarea" readonly rows="8" aria-label="생성된 학습 프롬프트"></textarea>
       </div>
 
-      <!-- Quick Launch Actions -->
       <div class="ai-modal-actions">
-        <button type="button" class="btn btn-secondary ai-action-btn" onclick="copyAIPromptText()">
-          📋 프롬프트 복사
-        </button>
-        <button type="button" class="btn btn-primary ai-action-btn btn-chatgpt" onclick="openChatGPTLauncher()">
-          🚀 ChatGPT로 바로 질문하기 &rarr;
-        </button>
-        <button type="button" class="btn btn-secondary ai-action-btn btn-gemini" onclick="openGeminiLauncher()">
-          ✨ Gemini로 바로 질문하기 &rarr;
-        </button>
+        <button type="button" class="btn btn-secondary ai-action-btn" onclick="copyAIPromptText()">📋 프롬프트 복사</button>
+        <a class="btn btn-primary ai-action-btn btn-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT 열기</a>
+        <a class="btn btn-secondary ai-action-btn btn-gemini" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer">Gemini 열기</a>
       </div>
+
+      <p class="ai-privacy-notice">프롬프트는 이 사이트에서만 생성되며 외부 AI에 자동 전송되지 않습니다.</p>
     </div>
   </div>
 </div>
 
 <script>
 (function() {
-  var currentContext = {
-    qid: '',
-    concept_id: '',
-    concept_name: '',
-    question_text: '',
-    user_answer: '',
-    model_answer: '',
-    qtype: '',
-    score: ''
-  };
+  var currentContext = {};
   var currentTab = 'why_wrong';
+  var currentProvider = 'chatgpt';
 
   function buildPromptText(tab) {
-    var cStr = currentContext.concept_id ? (currentContext.concept_id + ' (' + (currentContext.concept_name || '핵심 개념') + ')') : '보안 핵심 개념';
-    var uAns = currentContext.user_answer ? currentContext.user_answer.trim() : '(미작성 또는 오답)';
-    var mAns = currentContext.model_answer ? currentContext.model_answer.trim() : '(표준 정답 기준)';
-    var qText = currentContext.question_text ? currentContext.question_text.trim() : '';
+    var providerLabel = currentProvider === 'gemini' ? 'Gemini' : 'ChatGPT';
+    var concept = currentContext.concept_id
+      ? currentContext.concept_id + ' (' + (currentContext.concept_name || '핵심 개념') + ')'
+      : '보안 핵심 개념';
+    var questionText = currentContext.question_text ? String(currentContext.question_text).trim() : '';
+    var userAnswer = currentContext.user_answer ? String(currentContext.user_answer).trim() : '(미작성 또는 오답)';
+    var modelAnswer = currentContext.model_answer ? String(currentContext.model_answer).trim() : '(표준 정답 기준)';
+    var typeLine = currentContext.qtype ? '- 문항 유형: ' + currentContext.qtype + '\n' : '';
+    var statusLine = currentContext.grading_status ? '- 채점 상태: ' + currentContext.grading_status + '\n' : '';
+    var missingKeywords = Array.isArray(currentContext.missing_keywords) ? currentContext.missing_keywords : [];
+    var missingLine = missingKeywords.length ? '- 누락 키워드: ' + missingKeywords.join(', ') + '\n' : '';
+    var contextText = '- 관련 개념: ' + concept + '\n' + typeLine + statusLine + missingLine +
+      '- 문제 지문:\n' + questionText + '\n\n' +
+      '- 모범/인정 답안:\n' + modelAnswer + '\n\n' +
+      '- 내가 작성한 답안:\n' + userAnswer + '\n\n';
+    var responseStyle = currentProvider === 'gemini'
+      ? '핵심 근거를 먼저 제시하고, 표와 짧은 예시를 활용해 읽기 쉽게 답변해 주세요.'
+      : '핵심을 간결하게 구조화하고, 부족한 키워드와 개선된 모범 답안을 명확히 구분해 주세요.';
 
     if (tab === 'real_world') {
-      return '[정보보안기사 실기 실무 연계 질문]\n' +
-        '- 관련 개념: ' + cStr + '\n' +
-        '- 시험 문제:\n' + qText + '\n\n' +
-        '질문:\n' +
-        '실제 기업 보안 환경(Linux 서버/네트워크 장비/클라우드)에서 이 개념과 관련된 취약점을 점검하고 방어 조치하는 구체적인 명령어 및 설정 예시(config) 3가지를 초보자도 이해하기 쉽게 단계별로 설명해 주세요.';
-    } else if (tab === 'similar_question') {
-      var typeStr = currentContext.qtype === 'short' ? '단답형' : (currentContext.qtype === 'descriptive' ? '서술형' : '실무형');
-      var ptsStr = currentContext.score ? (currentContext.score + '점') : '실기 기준 배점';
-      return '[정보보안기사 실기 모의 출제 요청]\n' +
-        '- 관련 개념: ' + cStr + '\n' +
-        '- 출제 희망 유형: ' + typeStr + ' (배점: ' + ptsStr + ')\n\n' +
-        '요청:\n' +
-        '위 보안 개념을 바탕으로 정보보안기사 실기 시험에 출제될 수 있는 새로운 변형 문제 1문항을 만들어 주세요.\n' +
-        '1. 문제 지문 (로그/명령어/설정 파일 스니펫 포함)\n' +
-        '2. 모범 정답 및 필수 채점 키워드\n' +
-        '3. 단계별 부분 점수 채점 루브릭(기준)';
-    } else {
-      // Default: why_wrong
-      return '[정보보안기사 실기 수험 오답 분석 질문]\n' +
-        '- 관련 개념: ' + cStr + '\n' +
-        '- 문제 지문:\n' + qText + '\n\n' +
-        '- 출제 정답 (모범 답안):\n' + mAns + '\n\n' +
-        '- 내가 작성한 답안:\n' + uAns + '\n\n' +
-        '질문:\n' +
-        '1. 제가 작성한 답안이 정답과 비교했을 때 기술적으로 어떤 오류, 왜곡, 또는 누락이 있나요?\n' +
-        '2. 국가기술자격 실기 채점관 관점에서 제 답안에 부분 점수를 줄 수 없는 결정적 이유는 무엇인가요?\n' +
-        '3. 이 문제에서 요구하는 핵심 키워드가 무엇인지, 어떻게 기억해야 실전에서 틀리지 않을지 알기 쉽게 설명해 주세요.';
+      return '[' + providerLabel + '용 정보보안기사 실기 학습 프롬프트]\n' + contextText +
+        '학습 요청:\n실제 보안 환경에서 이 개념을 점검하고 방어하는 절차와 안전한 명령어 또는 설정 예시를 단계별로 설명해 주세요.\n' + responseStyle;
     }
+    if (tab === 'similar_question') {
+      var questionType = currentContext.qtype === 'short' ? '단답형' : (currentContext.qtype === 'descriptive' ? '서술형' : '실무형');
+      var points = currentContext.score ? currentContext.score + '점' : '실기 기준 배점';
+      return '[' + providerLabel + '용 정보보안기사 실기 학습 프롬프트]\n' + contextText +
+        '- 출제 희망 유형: ' + questionType + ' (배점: ' + points + ')\n\n' +
+        '학습 요청:\n같은 개념을 평가하는 새로운 변형 문제 1문항, 모범 답안, 필수 키워드, 부분 점수 기준을 만들어 주세요.\n' + responseStyle;
+    }
+    return '[' + providerLabel + '용 정보보안기사 실기 학습 프롬프트]\n' + contextText +
+      '학습 요청:\n1. 내 답안의 오류 또는 누락을 설명해 주세요.\n' +
+      '2. 반드시 포함해야 할 핵심 키워드를 알려 주세요.\n' +
+      '3. 개선된 모범 답안과 기억 방법을 제시해 주세요.\n' + responseStyle;
   }
 
   function updatePreview() {
-    var ta = document.getElementById('ai-prompt-textarea');
-    if (ta) {
-      ta.value = buildPromptText(currentTab);
-    }
+    var textarea = document.getElementById('ai-prompt-textarea');
+    if (textarea) textarea.value = buildPromptText(currentTab);
+  }
+
+  function updateProviderButtons() {
+    document.querySelectorAll('.ai-provider-btn').forEach(function(button) {
+      var selected = button.getAttribute('data-provider') === currentProvider;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
   }
 
   window.openAIPromptModal = function(data) {
     currentContext = data || {};
     currentTab = 'why_wrong';
-    var tabs = document.querySelectorAll('.ai-tab-btn');
-    tabs.forEach(function(btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === currentTab);
+    currentProvider = 'chatgpt';
+    updateProviderButtons();
+    document.querySelectorAll('.ai-template-tabs .ai-tab-btn').forEach(function(button) {
+      button.classList.toggle('active', button.getAttribute('data-tab') === currentTab);
     });
     updatePreview();
     var modal = document.getElementById('ai-prompt-modal');
-    if (modal) {
-      modal.style.display = 'flex';
-      var status = document.getElementById('ai-copy-status');
-      if (status) status.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'flex';
+    var status = document.getElementById('ai-copy-status');
+    if (status) status.style.display = 'none';
   };
 
   window.closeAIPromptModal = function() {
     var modal = document.getElementById('ai-prompt-modal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.selectAIPromptProvider = function(provider) {
+    currentProvider = provider === 'gemini' ? 'gemini' : 'chatgpt';
+    updateProviderButtons();
+    updatePreview();
   };
 
   window.switchAIPromptTab = function(tab) {
     currentTab = tab;
-    var tabs = document.querySelectorAll('.ai-tab-btn');
-    tabs.forEach(function(btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+    document.querySelectorAll('.ai-template-tabs .ai-tab-btn').forEach(function(button) {
+      button.classList.toggle('active', button.getAttribute('data-tab') === tab);
     });
     updatePreview();
   };
 
-  function selectPromptForManualCopy(ta) {
-    ta.focus();
-    ta.select();
-    ta.setSelectionRange(0, ta.value.length);
+  function selectPromptForManualCopy(textarea) {
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
   }
 
-  function fallbackCopyPrompt(ta) {
-    selectPromptForManualCopy(ta);
+  function fallbackCopyPrompt(textarea) {
+    selectPromptForManualCopy(textarea);
     try {
       return document.execCommand('copy') === true;
     } catch (error) {
@@ -158,72 +147,45 @@
     }
   }
 
+  function showCopyStatus(message, isSuccess) {
+    var status = document.getElementById('ai-copy-status');
+    if (!status) return;
+    status.textContent = message;
+    status.classList.toggle('is-error', !isSuccess);
+    status.style.display = 'inline-block';
+    setTimeout(function() { status.style.display = 'none'; }, isSuccess ? 3000 : 6000);
+  }
+
   window.copyAIPromptText = function() {
-    var ta = document.getElementById('ai-prompt-textarea');
-    if (!ta) return Promise.resolve(false);
-    var text = ta.value;
+    var textarea = document.getElementById('ai-prompt-textarea');
+    if (!textarea) return Promise.resolve(false);
 
     function completeFallbackCopy() {
-      var copied = fallbackCopyPrompt(ta);
+      var copied = fallbackCopyPrompt(textarea);
       if (copied) {
-        showCopyStatus('✓ 클립보드에 복사되었습니다!', true);
+        showCopyStatus('프롬프트를 복사했습니다.', true);
         return true;
       }
-      selectPromptForManualCopy(ta);
-      showCopyStatus('자동 복사가 지원되지 않습니다. 텍스트를 길게 눌러 복사하세요.', false);
+      selectPromptForManualCopy(textarea);
+      showCopyStatus('자동 복사가 지원되지 않습니다. 프롬프트를 길게 눌러 직접 복사하세요.', false);
       return false;
     }
 
     if (window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      return navigator.clipboard.writeText(text).then(function() {
-        showCopyStatus('✓ 클립보드에 복사되었습니다!', true);
+      return navigator.clipboard.writeText(textarea.value).then(function() {
+        showCopyStatus('프롬프트를 복사했습니다.', true);
         return true;
-      }).catch(function() {
-        return completeFallbackCopy();
-      });
+      }).catch(completeFallbackCopy);
     }
-
     return Promise.resolve(completeFallbackCopy());
   };
 
-  function showCopyStatus(message, isSuccess) {
-    var status = document.getElementById('ai-copy-status');
-    if (status) {
-      status.textContent = message;
-      status.classList.toggle('is-error', !isSuccess);
-      status.style.display = 'inline-block';
-      setTimeout(function() {
-        status.style.display = 'none';
-      }, isSuccess ? 3000 : 6000);
-    }
-  }
-
-  window.openChatGPTLauncher = function() {
-    var ta = document.getElementById('ai-prompt-textarea');
-    if (!ta) return;
-    var text = ta.value;
-    copyAIPromptText();
-    var url = 'https://chatgpt.com/?q=' + encodeURIComponent(text);
-    window.open(url, '_blank');
-  };
-
-  window.openGeminiLauncher = function() {
-    copyAIPromptText();
-    window.open('https://gemini.google.com/app', '_blank');
-  };
-
-  // Close on outside click or ESC key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      window.closeAIPromptModal();
-    }
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') window.closeAIPromptModal();
   });
-
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function(event) {
     var modal = document.getElementById('ai-prompt-modal');
-    if (modal && e.target === modal) {
-      window.closeAIPromptModal();
-    }
+    if (modal && event.target === modal) window.closeAIPromptModal();
   });
 })();
 </script>

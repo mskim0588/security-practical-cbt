@@ -193,23 +193,20 @@
         <div style="font-size: 12px; font-weight: 700; color: var(--primary-700); margin-bottom: 6px;">
           🎯 모범 답안 / 인정 정답:
         </div>
-        <div class="prose-wrap" style="font-size: 14px; color: var(--neutral-800); white-space: pre-wrap; min-height: 40px;">
+        <div class="accepted-answer-list" style="font-size: 14px; color: var(--neutral-800);">
           {% if ans.sub_questions %}
             {% for sub in ans.sub_questions %}
-              <div style="margin-bottom: 4px;">
+              {% set accepted_value = sub.answer or sub.expected or sub.model_answer %}
+              {% if accepted_value or sub.accepted_answers %}
+              <div class="accepted-answer-item prose-wrap">
                 <strong>[{{ sub.label or sub.sub_id }}]</strong>
-                {% if sub.expected %}
-                  {{ sub.expected }}
-                  {% if sub.accepted_answers %}
-                    <span style="font-size: 12px; color: var(--neutral-600);">(인정: {{ sub.accepted_answers | join(', ') }})</span>
-                  {% endif %}
-                {% elif sub.model_answer %}
-                  {{ sub.model_answer }}
-                {% endif %}
+                {% if accepted_value %}{{ accepted_value }}{% endif %}
+                {% if sub.accepted_answers %}<span class="accepted-answer-alternatives">인정: {{ sub.accepted_answers | join(', ') }}</span>{% endif %}
               </div>
+              {% endif %}
             {% endfor %}
           {% elif ans.model_answer %}
-            {{ ans.model_answer }}
+            <div class="accepted-answer-item prose-wrap">{{ ans.model_answer }}</div>
           {% endif %}
         </div>
       </div>
@@ -248,34 +245,20 @@
     </div>
     {% endif %}
 
-    <!-- Explanation & Source Info -->
-    <div style="font-size: 12px; color: var(--neutral-600); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--neutral-200); padding-top: 10px; margin-top: 6px; flex-wrap: wrap; gap: 8px;">
-      <div>
-        {% if ans.concept_name %}
-          <span style="background: #ede9fe; color: #6d28d9; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
-            개념: {{ ans.concept_name }}
-          </span>
-        {% endif %}
-        {% if ans.explanation %}
-          <span style="margin-left: 8px; color: var(--neutral-700);">💡 {{ ans.explanation }}</span>
-        {% endif %}
-      </div>
-      {% if ans.source_info %}
-      <div style="font-family: var(--font-mono); color: var(--neutral-600);">
-        출처: {{ ans.source_info }}{% if ans.source_page %} p.{{ ans.source_page }}{% endif %}
-      </div>
-      {% endif %}
-    </div>
-
-    <!-- Deep Explanation Accordion (Goal 4C & 4D) -->
+    <!-- Canonical Explanation, Related Concept, and AI Helper -->
     {% if ans.deep_explanation %}
       {% set explanation = ans.deep_explanation %}
+      {% set explanation_expanded = true %}
       {% set concept_id = ans.concept_id %}
       {% set question_id = ans.question_id %}
       {% set question_text = ans.question_text %}
       {% set model_answer = ans.model_answer %}
       {% set user_answer = ans.user_answer %}
+      {% set question_type = ans.question_type %}
+      {% set grading_status = ans.achievement_status %}
       {% include "components/explanation_card.html" %}
+    {% else %}
+      <div class="explanation-mapping-missing" role="status">이 문항의 심층 해설 데이터를 불러오지 못했습니다.</div>
     {% endif %}
 
   </div>
