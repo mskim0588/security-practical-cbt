@@ -14,12 +14,12 @@
 
 ## Checkpoint
 
-- DONE: baseline gate, protected-data boundary, architecture selection, 29-item category inventory, 13-item freshness-sensitive mapping, official-source verification policy, additive metadata registry, schema validation service, learner detail integration, owner read-only review queue, anti-cheat boundary, targeted tests, Goal 7A/7B/7C focused regression, full regression, protected-data hashes, and responsive browser QA.
-- PARTIAL: Git/deployment closure and physical-device readability check.
-- TODO: final Git review, commit/push, Railway deployment, production smoke, and user-performed physical Android readability check.
+- DONE: baseline gate, protected-data boundary, architecture selection, 29-item category inventory, 13-item freshness-sensitive mapping, official-source verification policy, additive metadata registry, schema validation service, learner detail integration, owner read-only review queue, anti-cheat boundary, targeted tests, Goal 7A/7B/7C focused regression, full regression, protected-data hashes, responsive browser QA, feature commit/push, Railway deployment, and production smoke.
+- PARTIAL: physical-device readability check only.
+- TODO: user-performed physical Android check of badge readability, detail readability, and owner freshness-page usability.
 - BLOCKED: none.
-- Last Safe Step: 289-test full regression, 5 / 5 protected-data hashes, and all four responsive Chrome viewports passed.
-- Next Step: complete final Git review and commit `feat: add law freshness tracking`.
+- Last Safe Step: Railway reported `SUCCESS`, and production root, health, learner freshness, anti-cheat entry surfaces, and Goal 7A/7B/7C routes passed smoke checks.
+- Next Step: user performs the limited Goal 7D physical Android readability check.
 
 ## Architecture
 
@@ -64,11 +64,17 @@
 
 ## Deployment Checkpoint
 
-- Feature commit: `PENDING`.
-- Push: `PENDING`.
-- Railway: `PENDING`.
-- Production smoke: `PENDING`.
+- Feature commit: `0651d6579cde73df3d2a8d878dd6a74c7f9c3f55` (`feat: add law freshness tracking`).
+- Push: `master` pushed normally; feature commit matched `origin/master` after push.
+- Railway: `SUCCESS` for the feature commit.
+- Production health: `GET /` = 200; `GET /healthz` = 200 with `database=healthy`, `environment=production`, and `status=ok`.
+- Production learner smoke: `/concepts/CON-MGT-02` rendered `VERIFIED` and `REVIEW_REQUIRED` content, recorded dates, safe official links, and no raw metadata dictionary.
+- Production anti-cheat/mode smoke: `/exam`, `/practice`, `/descriptive-training`, and `/mock-exam` returned 200; the three pre-submit entry surfaces contained no freshness card or legal-basis detail.
+- Production owner boundary: unauthenticated `/law-freshness` returned 302 to `/admin-login`; authenticated queue rendering was verified locally because no production owner credential was used.
 - P0: 0.
 - P1: 0.
 - Known unrelated P2: `/favicon.ico` 404.
-- Expected post-deployment state: `GOAL_7D_READY_FOR_PHYSICAL_DEVICE_TEST`.
+- Physical Android: `PENDING`.
+- Goal 7D state: `GOAL_7D_READY_FOR_PHYSICAL_DEVICE_TEST`.
+- Goal 7 integration readiness: pending Goal 7D physical confirmation and separate integration/release closure.
+- Goal 8: `NOT STARTED`.
