@@ -3461,6 +3461,108 @@ header.app-header {
   border-color: #1e40af;
 }
 
+/* Goal 7B: Structured Descriptive Answer Training */
+.desc-training-entry-btn {
+  background: #ecfeff;
+  color: #155e75;
+  border: 1px solid #a5f3fc;
+  text-align: center;
+  text-decoration: none;
+}
+
+.desc-training-setup,
+.desc-training-session {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.desc-training-policy,
+.desc-structure-guide,
+.desc-fp-note {
+  padding: 12px 14px;
+  border: 1px solid #bae6fd;
+  border-radius: var(--radius-md);
+  background: #f0f9ff;
+  color: #0c4a6e;
+  line-height: 1.55;
+}
+
+.desc-structure-guide {
+  margin: 18px 0;
+}
+
+.desc-structure-guide h2 {
+  margin: 0 0 4px;
+  font-size: var(--text-lg);
+}
+
+.desc-structure-guide p,
+.desc-fp-note {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.desc-training-field {
+  padding: 16px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  background: var(--neutral-50);
+}
+
+.desc-field-hint {
+  margin: 6px 0 10px;
+  color: var(--neutral-600);
+  font-size: var(--text-sm);
+}
+
+.desc-evaluation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.desc-evaluation-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  background: white;
+}
+
+.desc-evaluation-card > span,
+.desc-evaluation-card small {
+  color: var(--neutral-600);
+  font-size: var(--text-xs);
+}
+
+.desc-evaluation-card strong {
+  font-size: var(--text-xl);
+}
+
+.desc-status-sufficient { color: #15803d; }
+.desc-status-partial { color: #b45309; }
+.desc-status-incorrect { color: #b91c1c; }
+.desc-model-list { margin-top: 12px; }
+
+@media (max-width: 767px) {
+  .desc-evaluation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .desc-training-field {
+    padding: 12px;
+  }
+
+  .desc-training-session .practice-result-heading-row,
+  .desc-training-session .practice-rubric-item > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 /* AI Launcher Trigger Button */
 .btn-ai-helper {
   display: inline-flex;

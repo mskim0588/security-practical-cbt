@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 from sqlalchemy import select, func, desc
 from app.models.database import db_session
-from app.models.history import ExamAttempt, AnswerRecord
+from app.models.history import AnswerRecord, ExamAttempt, LEARNING_ONLY_EXAM_MODES
 from app.services.data_loader import DataLoader
 
 class HistoryService:
@@ -135,7 +135,7 @@ class HistoryService:
             select(ExamAttempt)
             .where(
                 ExamAttempt.is_owner == is_owner,
-                ExamAttempt.exam_mode != "practice",
+                ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
             )
             .order_by(desc(ExamAttempt.created_at))
             .limit(limit)
@@ -147,7 +147,7 @@ class HistoryService:
         """총 응시 횟수 반환 (기본적으로 Owner 전용)"""
         stmt = select(func.count(ExamAttempt.id)).where(
             ExamAttempt.is_owner == is_owner,
-            ExamAttempt.exam_mode != "practice",
+            ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
         )
         return db_session.scalar(stmt) or 0
 
@@ -162,7 +162,7 @@ class HistoryService:
         DB에 본문을 중복 저장하지 않고 DataLoader의 최신 데이터와 동적 결합합니다.
         """
         attempt = self.get_attempt_by_id(attempt_id)
-        if not attempt or attempt.exam_mode == "practice":
+        if not attempt or attempt.exam_mode in LEARNING_ONLY_EXAM_MODES:
             return None
 
         enriched_answers = []

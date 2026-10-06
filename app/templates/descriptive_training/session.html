@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ training.question_number }}번 | 서술형 구조 훈련{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('descriptive_training.setup_training') }}" class="btn btn-outline header-action-btn">훈련 설정</a>
+{% endblock %}
+
+{% block content %}
+<div class="practice-session desc-training-session" data-training-phase="{{ training.phase }}">
+  <section class="practice-progress-card" aria-label="서술형 훈련 진행 상황">
+    <div class="practice-progress-head">
+      <div><span class="practice-round-label">서술형 구조 훈련</span><strong>{{ training.question_number }} / {{ training.total_questions }} 문제</strong></div>
+      <span class="practice-scope-label">{{ training.scope_label }}</span>
+    </div>
+    <div class="practice-progress-track" aria-hidden="true">
+      <span style="width: {{ (training.answered_count / training.total_questions * 100) | round(1) }}%"></span>
+    </div>
+    <div class="practice-counts">
+      <span class="practice-count-correct">충족 {{ training.status_counts.sufficient }}</span>
+      <span class="practice-count-partial">부분 충족 {{ training.status_counts.partial }}</span>
+      <span class="practice-count-wrong">미충족 {{ training.status_counts.incorrect }}</span>
+    </div>
+  </section>
+
+  <article class="card practice-question-card">
+    <header class="practice-question-header">
+      <div class="q-meta"><span class="q-badge badge-desc">서술형</span><span class="q-category">{{ training.question.category }}</span></div>
+      <span class="practice-attempt-state">{{ training.question.score }}점 · 구조 항목 {{ training.question.sub_questions | length }}개</span>
+    </header>
+    <div class="question-text practice-question-text">{{ training.question.question }}</div>
+
+    {% if training.phase == 'question' %}
+    <section class="desc-structure-guide" aria-labelledby="answer-structure-title">
+      <h2 id="answer-structure-title">문제 맞춤 답안 구조</h2>
+      <p>아래 요구 항목을 각각 작성하세요. 모범답안과 채점 키워드는 제출 전에는 표시되지 않습니다.</p>
+    </section>
+    <form method="POST" action="{{ url_for('descriptive_training.answer_training', attempt_id=training.attempt_id) }}" class="practice-answer-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% for sub in training.question.sub_questions %}
+      <div class="desc-training-field">
+        <label for="ans_{{ training.question.id }}_{{ sub.sub_id }}" class="desc-sub-label">
+          <span><strong>{{ sub.sub_id }}.</strong> {{ sub.prompt }}</span><span class="sub-score">{{ sub.score }}점</span>
+        </label>
+        <p class="desc-field-hint">{{ sub.structure_hint }}</p>
+        <textarea id="ans_{{ training.question.id }}_{{ sub.sub_id }}" name="ans_{{ training.question.id }}_{{ sub.sub_id }}" class="textarea-input" rows="5" autocomplete="off" aria-describedby="hint-{{ sub.sub_id }}"></textarea>
+        <span id="hint-{{ sub.sub_id }}" class="sr-only">{{ sub.structure_hint }}</span>
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-lg practice-submit-btn">구조 및 핵심 키워드 평가</button>
+    </form>
+    {% else %}
+    {% set result = training.result %}
+    <section class="practice-result practice-result-{{ 'correct' if result.achievement_status == 'sufficient' else ('partial' if result.achievement_status == 'partial' else 'wrong') }}" aria-labelledby="desc-result-title">
+      <div class="practice-result-heading-row">
+        <h2 id="desc-result-title">내용 평가 · {{ result.achievement_label }}</h2>
+        <strong>{{ result.earned_score }} / {{ result.max_score }}점</strong>
+      </div>
+
+      <div class="desc-evaluation-grid">
+        <div class="desc-evaluation-card">
+          <span>구조 평가</span>
+          <strong class="desc-status-{{ result.structure_evaluation.status }}">{{ result.structure_evaluation.label }}</strong>
+          <small>{{ result.structure_evaluation.completed_fields }} / {{ result.structure_evaluation.required_fields }}개 요구 항목 작성</small>
+        </div>
+        <div class="desc-evaluation-card">
+          <span>핵심 키워드 그룹</span>
+          <strong>{{ result.keyword_analysis.matched_group_count }} / {{ result.keyword_analysis.required_group_count }}</strong>
+          <small>기존 문항 루브릭 기준</small>
+        </div>
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>1. 내 구조화 답안</h3>
+        <div class="practice-rubric-list">
+          {% for sub in result.sub_results %}
+          <div class="practice-rubric-item">
+            <div><strong>{{ sub.sub_id }}. {{ sub.prompt }}</strong><span>{{ sub.structure_label }}</span></div>
+            <p class="prose-wrap">{{ sub.user_text or '(미작성)' }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>2. 핵심 / 누락 키워드 분석</h3>
+        <div class="practice-rubric-list">
+          {% for sub in result.sub_results %}
+          <div class="practice-rubric-item">
+            <div><strong>{{ sub.sub_id }}. {{ sub.prompt }}</strong><span>{{ sub.earned_score }} / {{ sub.max_score }}점</span></div>
+            <p><b>핵심 키워드:</b> {{ sub.matched_keywords | join(', ') if sub.matched_keywords else '감지된 키워드 없음' }}</p>
+            <p><b>누락 키워드:</b> {{ sub.missing_keywords | join(', ') if sub.missing_keywords else '없음' }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="desc-fp-note">{{ result.keyword_analysis.false_positive_control }} 자동 평가는 학습 참고용이며 문맥의 기술적 정확성은 모범답안과 함께 확인하세요.</p>
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>3. 모범답안 / 채점 루브릭</h3>
+        <div class="prose-wrap practice-answer-value">{{ result.model_answer }}</div>
+        <div class="practice-rubric-list desc-model-list">
+          {% for sub in result.sub_results %}
+          <div class="practice-rubric-item"><div><strong>{{ sub.sub_id }}. {{ sub.prompt }}</strong><span>{{ sub.max_score }}점</span></div><p class="prose-wrap">{{ sub.model_answer }}</p></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="practice-learning-block">
+        <h3>4. 문제 해설</h3>
+        <div class="prose-wrap practice-answer-value">{{ result.explanation }}</div>
+      </div>
+
+      {% if result.deep_explanation %}
+        {% set explanation = result.deep_explanation %}
+        {% set explanation_expanded = true %}
+        {% set concept_id = result.concept_id %}
+        {% set question_id = training.question.id %}
+        {% set question_text = training.question.question %}
+        {% set model_answer = result.model_answer %}
+        {% set user_answer = result.user_answer_text %}
+        {% set question_type = 'descriptive' %}
+        {% set grading_status = result.achievement_status %}
+        {% set missing_keywords = result.keyword_analysis.missing_keywords %}
+        {% include "components/explanation_card.html" %}
+      {% endif %}
+    </section>
+    {% endif %}
+  </article>
+
+  <div class="practice-next-actions">
+    {% if training.phase == 'graded' %}
+    <form method="POST" action="{{ url_for('descriptive_training.next_training', attempt_id=training.attempt_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-primary btn-lg">다음 서술형 문제</button>
+    </form>
+    {% elif training.phase == 'complete' %}
+    <a href="{{ url_for('descriptive_training.setup_training') }}" class="btn btn-primary btn-lg">새 서술형 훈련</a>
+    <a href="/" class="btn btn-secondary btn-lg">홈으로</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

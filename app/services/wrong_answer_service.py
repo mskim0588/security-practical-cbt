@@ -1,7 +1,7 @@
 from typing import Dict, List, Any, Optional
 from sqlalchemy import select, desc
 from app.models.database import db_session
-from app.models.history import ExamAttempt, AnswerRecord
+from app.models.history import AnswerRecord, ExamAttempt, LEARNING_ONLY_EXAM_MODES
 from app.services.data_loader import DataLoader
 
 class WrongAnswerService:
@@ -26,7 +26,7 @@ class WrongAnswerService:
             .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
             .where(
                 ExamAttempt.is_owner == is_owner,
-                ExamAttempt.exam_mode != "practice",
+                ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
                 AnswerRecord.achievement_status != "unselected"
             )
             .order_by(desc(AnswerRecord.created_at), desc(AnswerRecord.id))
@@ -120,7 +120,7 @@ class WrongAnswerService:
             .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
             .where(
                 ExamAttempt.is_owner == is_owner,
-                ExamAttempt.exam_mode != "practice",
+                ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
             )
             .where(AnswerRecord.question_id == question_id)
             .where(AnswerRecord.achievement_status != "unselected")

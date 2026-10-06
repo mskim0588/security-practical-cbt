@@ -5,6 +5,8 @@ from sqlalchemy import Integer, String, Float, Boolean, DateTime, Text, ForeignK
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.database import Base
 
+LEARNING_ONLY_EXAM_MODES = ("practice", "descriptive_training")
+
 class ExamAttempt(Base):
     __tablename__ = "exam_attempts"
 

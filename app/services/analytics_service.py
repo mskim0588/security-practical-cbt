@@ -2,7 +2,7 @@ import math
 from typing import Dict, List, Any, Optional
 from sqlalchemy import select, func, desc, asc
 from app.models.database import db_session
-from app.models.history import ExamAttempt, AnswerRecord
+from app.models.history import AnswerRecord, ExamAttempt, LEARNING_ONLY_EXAM_MODES
 from app.services.data_loader import DataLoader
 
 class AnalyticsService:
@@ -29,7 +29,7 @@ class AnalyticsService:
             select(ExamAttempt)
             .where(
                 ExamAttempt.is_owner == is_owner,
-                ExamAttempt.exam_mode != "practice",
+                ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
             )
             .order_by(desc(ExamAttempt.created_at))
         )
@@ -71,7 +71,7 @@ class AnalyticsService:
             .join(ExamAttempt, AnswerRecord.attempt_id == ExamAttempt.id)
             .where(
                 ExamAttempt.is_owner == is_owner,
-                ExamAttempt.exam_mode != "practice",
+                ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
                 AnswerRecord.achievement_status != "unselected"
             )
         )
@@ -299,7 +299,7 @@ class AnalyticsService:
             select(ExamAttempt)
             .where(
                 ExamAttempt.is_owner == is_owner,
-                ExamAttempt.exam_mode != "practice",
+                ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
             )
             .order_by(desc(ExamAttempt.created_at))
             .limit(limit)
