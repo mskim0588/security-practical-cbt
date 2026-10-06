@@ -23,21 +23,40 @@
 
 ## Checkpoint
 
-- DONE: baseline Git/report parity, protected-data hashes, existing model/generator/grading/ownership inspection, schema-free timer/persistence architecture, dedicated routes, 180-minute timer UI, navigator, Review Flag, answer persistence, review/final-submit flow, 17 Goal 7C targeted tests, Goal 7A/7B targeted regression, and rendered Chrome QA.
-- PARTIAL: deployment and production verification.
-- TODO: Git commit/push, Railway deployment, production smoke, and physical Android verification.
+- Recovery date: 2026-10-07 KST.
+- Recovery HEAD: `86d1eb3961a357e37c6ed59b80705e72444fb2ac` (`feat: add realistic timed mock exam`).
+- Recovery `origin/master`: `86d1eb3961a357e37c6ed59b80705e72444fb2ac`; divergence `0 / 0`.
+- Recovery working tree: clean; no staged, unstaged, or untracked Goal 7C work.
+- DONE: A-AG. Routes/composition, schema-free authoritative timer and expiry enforcement, lifecycle recalculation, navigator, answered state, Review Flag and answer persistence, practical selection, review/final confirmation, manual/expiry idempotency, anti-cheat, isolation/IDOR/CSRF, responsive QA, targeted and full regression, hashes, feature commit/push, Railway deployment, production smoke, and this checkpoint are complete.
+- PARTIAL: none within A-AG.
+- TODO: physical Android verification only; it is intentionally outside the automated/browser A-AG completion evidence.
 - BLOCKED: none.
-- Last Safe Step: full regression and final protected-data integrity checks passed.
-- Next Step: commit and push the reviewed Goal 7C implementation, then wait for Railway and run production smoke.
+- Last Safe Step: Railway deployment `SUCCESS`, production attempt `36` smoke passed, and final protected-data hashes matched 5/5.
+- First Incomplete Step / Next Step: user-performed physical Android verification.
+- Goal state: `GOAL_7C_READY_FOR_PHYSICAL_DEVICE_TEST`; Goal 7C is not marked complete.
+- Goal 7D: `NOT STARTED`.
 
 ## Validation So Far
 
 - Goal 7C targeted tests: 17 passed, 0 failures, 0 errors.
 - Goal 7A + Goal 7B + Goal 7C targeted regression: 43 passed, 0 failures, 0 errors.
 - Full regression: 277 ran, 276 passed, 1 skipped, 0 failures, 0 errors.
+- Resume policy: the test groups above were not rerun because the committed application/test tree was unchanged after the passing checkpoint.
 - Intentional skip: external source filename comparison when `PRIVATE_SOURCE_DIR` is unset.
 - Protected core data: 5 / 5 SHA-256 MATCH.
 - Rendered Chrome QA: PASS at 360x740, 390x844, 430x932, and 1280x800.
 - Browser flow: entry, start, timer, answer save/navigation/refresh persistence, Review Flag, navigator state, practical controls, review, manual submit, and result rendering PASS.
 - Browser anti-cheat: model/rubric feedback and AI Helper absent before submission; AI-provider requests 0.
 - Browser runtime errors: 0. Required-resource failures: 0. Page-level horizontal overflow: 0 viewports.
+
+## Deployment and Production Resume Verification
+
+- GitHub/Railway commit status for `86d1eb3`: `SUCCESS` (`security-practical-cbt - web`).
+- Production health: `GET /healthz` HTTP 200 with `status=ok`, `database=healthy`, and `environment=production`.
+- Production guest smoke attempt: `36`; the unmodified timer began with 10,799 seconds remaining, confirming the 180-minute duration.
+- Production flow PASS: entry/start, 18-item navigator, answer refresh persistence, Review Flag persistence, practical candidate selection, review screen, one manual final submission, and result rendering.
+- Pre-submit anti-cheat scan: no model-answer, accepted-answer, rubric, missing-keyword, or AI-helper payload identifiers found.
+- Existing-mode smoke: `/practice` HTTP 200 and `/descriptive-training` HTTP 200.
+- Existing unrelated P2 remains: `/favicon.ico` HTTP 404.
+- P0: 0. P1: 0.
+- DB schema change: NO; no migration required.
