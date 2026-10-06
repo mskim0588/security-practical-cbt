@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% set hide_mobile_global_nav = true %}
+
+{% block title %}실전 모의고사 최종 검토 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<section class="mock-shell mock-review-shell">
+  <div class="mock-toolbar">
+    <div>
+      <span class="mock-mode-label">최종 검토</span>
+      <span class="mock-progress-text">정답과 채점 결과는 제출 후 공개됩니다.</span>
+    </div>
+    <div class="mock-timer-wrap">
+      <span>남은 시간</span>
+      <time id="mock-timer" class="mock-timer" data-expiry="{{ mock.expiry_iso }}" aria-label="남은 시간" aria-live="off">--:--:--</time>
+    </div>
+  </div>
+
+  <div class="card mock-review-card">
+    <h1>최종 제출 전 답안 검토</h1>
+    <div class="mock-review-summary" aria-label="제출 요약">
+      <div><span>답변 완료</span><strong>{{ mock.answered_count }}</strong></div>
+      <div><span>미응답</span><strong>{{ mock.unanswered_count }}</strong></div>
+      <div><span>다시 보기</span><strong>{{ mock.flagged_count }}</strong></div>
+      <div><span>선택 실무형</span><strong>{{ mock.selected_practical_label }}</strong></div>
+    </div>
+
+    <div class="mock-review-list">
+      {% for item in mock['items'] %}
+      <a href="{{ url_for('mock_exam.view_mock_exam', attempt_id=mock.attempt_id, question=item.index) }}" class="mock-review-item {% if item.is_flagged %}is-flagged{% endif %} {% if not item.is_answered and item.is_required %}is-unanswered{% endif %}">
+        <span class="mock-review-number">{{ item.number }}</span>
+        <span class="mock-review-main">
+          <strong>{{ item.type_label }} · {{ item.category }}</strong>
+          <small>{{ item.state_text }}</small>
+        </span>
+        <span aria-hidden="true">문제로 돌아가기 →</span>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="mock-final-actions">
+      <a class="btn btn-secondary" href="{{ url_for('mock_exam.view_mock_exam', attempt_id=mock.attempt_id, question=0) }}">← 문제로 돌아가기</a>
+      <form id="mock-final-submit" method="POST" action="{{ url_for('mock_exam.submit_mock_exam', attempt_id=mock.attempt_id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary btn-lg" type="submit">최종 제출</button>
+      </form>
+    </div>
+  </div>
+
+  <form id="mock-expiry-form" method="POST" action="{{ url_for('mock_exam.submit_mock_exam', attempt_id=mock.attempt_id) }}" hidden>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/mock_exam.js') }}"></script>
+<script>
+  document.getElementById("mock-final-submit").addEventListener("submit", function (event) {
+    const message = "답변 완료: {{ mock.answered_count }}\n미응답: {{ mock.unanswered_count }}\n다시 보기: {{ mock.flagged_count }}\n선택 실무형: {{ mock.selected_practical_label }}\n\n최종 제출하시겠습니까?";
+    if (!window.confirm(message)) event.preventDefault();
+  });
+</script>
+{% endblock %}

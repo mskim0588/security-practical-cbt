@@ -30,6 +30,7 @@ def create_app(config_class=Config):
     from app.routes.auth_routes import auth_bp
     from app.routes.practice_routes import practice_bp
     from app.routes.descriptive_training_routes import descriptive_training_bp
+    from app.routes.mock_exam_routes import mock_exam_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(exam_bp)
@@ -40,6 +41,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp)
     app.register_blueprint(practice_bp)
     app.register_blueprint(descriptive_training_bp)
+    app.register_blueprint(mock_exam_bp)
 
     # CSRF & Auth Context Processor
     from app.services.csrf_service import generate_csrf_token

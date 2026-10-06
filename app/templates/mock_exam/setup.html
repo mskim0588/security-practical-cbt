@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}실전 모의고사 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<section class="mock-setup-shell" aria-labelledby="mock-setup-title">
+  <div class="card mock-setup-card">
+    <p class="mock-kicker">GOAL 7C · EXAM SIMULATION</p>
+    <h1 id="mock-setup-title" class="mock-title">실전 모의고사</h1>
+    <p class="mock-lead">180분 동안 실제 시험 구성과 동일한 18개 후보 문항을 풉니다. 답안과 다시 보기 상태는 이동 및 새로고침 후에도 유지되며, 제출 전에는 정답·해설·채점 정보가 표시되지 않습니다.</p>
+
+    <div class="mock-composition" aria-label="시험 구성">
+      <div><strong>12문항</strong><span>단답형 · 36점</span></div>
+      <div><strong>4문항</strong><span>서술형 · 48점</span></div>
+      <div><strong>2개 중 1개</strong><span>실무형 · 16점</span></div>
+      <div><strong>180분</strong><span>총 100점</span></div>
+    </div>
+
+    <div class="mock-guidance" aria-label="권장 시간 배분">
+      <h2>권장 시간 배분 <small>학습용 안내이며 공식 규칙이 아닙니다.</small></h2>
+      <ul>
+        <li>단답형 약 40분</li>
+        <li>서술형 약 100분</li>
+        <li>실무형 약 30분</li>
+        <li>최종 검토 약 10분</li>
+      </ul>
+    </div>
+
+    <form method="POST" action="{{ url_for('mock_exam.start_mock_exam') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-primary btn-lg mock-start-btn">180분 실전 모의고사 시작</button>
+    </form>
+  </div>
+
+  {% if active_session %}
+  <div class="card mock-resume-card">
+    <div>
+      <strong>진행 중인 실전 모의고사</strong>
+      <p>답변 완료 {{ active_session.answered_count }}/17 · 다시 보기 {{ active_session.flagged_count }}개</p>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('mock_exam.view_mock_exam', attempt_id=active_session.attempt_id, question=active_session.current_index) }}">계속 응시</a>
+  </div>
+  {% endif %}
+
+  {% if recent_sessions %}
+  <div class="card mock-recent-card">
+    <h2>진행 중인 Owner 시험</h2>
+    <div class="mock-recent-list">
+      {% for item in recent_sessions %}
+      <a href="{{ url_for('mock_exam.view_mock_exam', attempt_id=item.attempt_id, question=0) }}">
+        <span>실전 모의고사 #{{ item.attempt_id }}</span>
+        <small>답변 완료 {{ item.answered_count }}/17 · 다시 보기 {{ item.flagged_count }}개</small>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

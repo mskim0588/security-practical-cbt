@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% set hide_mobile_global_nav = true %}
+
+{% block title %}실전 모의고사 응시 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<section class="mock-shell" data-mock-attempt="{{ mock.attempt_id }}">
+  <div class="mock-toolbar">
+    <div>
+      <span class="mock-mode-label">실전 모의고사</span>
+      <span class="mock-progress-text">답변 완료 {{ mock.answered_count }}/17 · 다시 보기 {{ mock.flagged_count }}</span>
+    </div>
+    <div class="mock-timer-wrap">
+      <span>남은 시간</span>
+      <time id="mock-timer" class="mock-timer" data-expiry="{{ mock.expiry_iso }}" aria-label="남은 시간" aria-live="off">--:--:--</time>
+    </div>
+  </div>
+
+  <div class="mock-layout">
+    <main class="card mock-question-card">
+      <div class="mock-question-head">
+        <div>
+          <span class="mock-question-number">문제 {{ mock.current.number }} / 18</span>
+          <span class="mock-type-badge">{{ mock.current.type_label }}</span>
+          {% if mock.current.is_selected_practical %}<span class="mock-selected-badge">선택 실무형</span>{% endif %}
+          {% if mock.current.is_unselected_practical %}<span class="mock-unselected-badge">미선택 · 채점 제외</span>{% endif %}
+        </div>
+        <strong>{{ mock.current.score }}점</strong>
+      </div>
+      <p class="mock-category">{{ mock.current.category }}</p>
+      <div class="mock-question-text">{{ mock.current.question.question }}</div>
+
+      <form id="mock-answer-form" class="mock-answer-form" method="POST" action="{{ url_for('mock_exam.save_mock_exam', attempt_id=mock.attempt_id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="current_index" value="{{ mock.current_index }}">
+        <input type="hidden" name="question_id" value="{{ mock.current.id }}">
+
+        {% if mock.current.type == 'practical' %}
+        <fieldset class="mock-practical-select">
+          <legend>채점할 실무형 1문항 선택</legend>
+          {% for practical in mock.practical_items %}
+          <label>
+            <input type="radio" name="selected_practical_id" value="{{ practical.id }}" {% if practical.id == mock.selected_practical_id %}checked{% endif %}>
+            <span>{{ practical.number }}번 · {{ practical.category }}</span>
+          </label>
+          {% endfor %}
+        </fieldset>
+        {% endif %}
+
+        <div class="mock-answer-fields">
+          {% if mock.current.type == 'short' and not mock.current.question.sub_questions %}
+          <label for="ans_{{ mock.current.id }}">답안</label>
+          <input class="text-input" id="ans_{{ mock.current.id }}" name="ans_{{ mock.current.id }}" type="text" value="{{ mock.current.answer }}" autocomplete="off">
+          {% elif mock.current.type == 'short' %}
+            {% for sub in mock.current.question.sub_questions %}
+            <label for="ans_{{ mock.current.id }}_{{ sub.label }}">({{ sub.label }}) 답안 <span>{{ sub.score }}점</span></label>
+            <input class="text-input" id="ans_{{ mock.current.id }}_{{ sub.label }}" name="ans_{{ mock.current.id }}_{{ sub.label }}" type="text" value="{{ mock.current.answer.get(sub.label, '') }}" autocomplete="off">
+            {% endfor %}
+          {% else %}
+            {% for sub in mock.current.question.sub_questions %}
+            <label for="ans_{{ mock.current.id }}_{{ sub.sub_id }}">
+              <strong>소문항 {{ sub.sub_id }}</strong>
+              <span>{{ sub.prompt }}</span>
+              <small>{{ sub.score }}점</small>
+            </label>
+            <textarea class="textarea-input" id="ans_{{ mock.current.id }}_{{ sub.sub_id }}" name="ans_{{ mock.current.id }}_{{ sub.sub_id }}" rows="6">{{ mock.current.answer.get(sub.sub_id, '') }}</textarea>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <label class="mock-review-flag" for="review-flag">
+          <input id="review-flag" type="checkbox" name="review_flag" value="1" {% if mock.current.is_flagged %}checked{% endif %}>
+          <span>★ 다시 보기</span>
+          <small>현재 시험에서만 유지됩니다.</small>
+        </label>
+
+        <div class="mock-question-actions">
+          <button class="btn btn-secondary" type="submit" name="destination" value="previous" {% if mock.current_index == 0 %}disabled{% endif %}>← 이전</button>
+          <button class="btn btn-secondary" type="submit" name="destination" value="save">답안 저장</button>
+          {% if mock.current_index < 17 %}
+          <button class="btn btn-primary" type="submit" name="destination" value="next">저장 후 다음 →</button>
+          {% else %}
+          <button class="btn btn-primary" type="submit" name="destination" value="review">저장 후 검토</button>
+          {% endif %}
+        </div>
+
+        <aside class="mock-navigator" aria-label="전체 문항 내비게이터">
+          <div class="mock-navigator-head">
+            <h2>문항 내비게이터</h2>
+            <button class="btn btn-outline" type="submit" name="destination" value="review">최종 검토</button>
+          </div>
+          <p class="mock-nav-legend">상태는 색상뿐 아니라 텍스트와 ★ 기호로 표시됩니다.</p>
+          <div class="mock-nav-grid">
+            {% for item in mock['items'] %}
+            <button type="submit" name="destination" value="question:{{ item.index }}" class="mock-nav-item status-{{ item.status_code }} {% if item.is_flagged %}is-flagged{% endif %} {% if item.index == mock.current_index %}is-current{% endif %}" aria-label="{{ item.number }}번 {{ item.state_text }}" {% if item.index == mock.current_index %}aria-current="true"{% endif %}>
+              <strong>{{ item.number }}</strong>
+              <span>{{ item.state_text }}</span>
+            </button>
+            {% endfor %}
+          </div>
+        </aside>
+      </form>
+    </main>
+
+    <aside class="card mock-time-guide" aria-label="권장 시간 안내">
+      <h2>권장 시간</h2>
+      <p>공식 규칙이 아닌 학습용 안내입니다.</p>
+      <ul>
+        <li><span>단답형</span><strong>약 40분</strong></li>
+        <li><span>서술형</span><strong>약 100분</strong></li>
+        <li><span>실무형</span><strong>약 30분</strong></li>
+        <li><span>최종 검토</span><strong>약 10분</strong></li>
+      </ul>
+    </aside>
+  </div>
+
+  <form id="mock-expiry-form" method="POST" action="{{ url_for('mock_exam.submit_mock_exam', attempt_id=mock.attempt_id) }}" hidden>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/mock_exam.js') }}"></script>
+{% endblock %}
