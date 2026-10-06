@@ -41,6 +41,7 @@
 - Full regression: 260 ran, 259 passed, 1 skipped, 0 failures, 0 errors.
 - Intentional skip: external source filename comparison when `PRIVATE_SOURCE_DIR` is unset.
 - Protected core data: 5 / 5 SHA-256 MATCH; no protected dataset appears in the Git diff.
+- Physical Android Goal 7B: PASS; the user confirmed that the descriptive-training workflow operates normally on the physical device.
 
 ## Protected Core Data Baseline
 
@@ -52,14 +53,25 @@
 
 ## Checkpoint
 
-- DONE: baseline Git/report parity, baseline Railway terminal success, architecture inspection, protected-data baseline hashes, routes, service, structured UI, evaluation feedback, isolation filters, targeted tests, Goal 7A regression, and mobile/desktop Chromium QA.
-- PARTIAL: release handoff.
-- TODO: commit, push, Railway terminal deployment result, and production smoke.
+- DONE: baseline Git/report parity, architecture inspection, protected-data hashes, implementation, targeted tests, full regression, Goal 7A regression, mobile/desktop Chromium QA, feature commit/push, Railway deployment, production smoke, and physical Android verification.
+- PARTIAL: none.
+- TODO: none for Goal 7B.
 - BLOCKED: none.
-- Last Safe Step: full regression and protected-data integrity gates passed.
-- Next Step: commit as `feat: add structured descriptive answer training`, push `master`, wait for Railway, and run production smoke.
+- Last Safe Step: Physical Android Goal 7B PASS was explicitly confirmed by the user.
+- Next Step: Goal 7C is ready but must start only on explicit user instruction.
 
-## Release State
+## Finalization Status
 
-- Goal 7B is not marked complete.
-- Expected final state after successful deployment and smoke: `GOAL_7B_READY_FOR_PHYSICAL_DEVICE_TEST`.
+- Goal 7B: COMPLETE.
+- Functional Status: PASS.
+- Physical Android: PASS.
+- Railway: SUCCESS.
+- Production: HEALTHY.
+- Regression: 260 ran, 259 passed, 1 skipped, 0 failures, 0 errors.
+- Core Data: 5 / 5 SHA-256 MATCH.
+- P0: 0.
+- P1: 0.
+- Known non-blocking issue: existing `/favicon.ico` 404; retained as a P2 backlog item.
+- Goal 7B Final Verdict: `GOAL_7B_COMPLETE`.
+- Goal 7C Readiness: `GOAL_7C_READY`.
+- Release tag: not created; `v0.6-mobile-final` remains unchanged because Goal 7 still includes 7C and 7D.
