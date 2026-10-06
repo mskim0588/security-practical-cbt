@@ -164,6 +164,9 @@
       {{ ans.question_text }}
     </div>
 
+    {% set freshness = ans.law_freshness %}
+    {% include "components/law_freshness.html" %}
+
     <!-- User Answer vs Model Answer -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
       <!-- Submitted Answer -->

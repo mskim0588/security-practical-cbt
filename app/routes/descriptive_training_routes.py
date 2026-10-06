@@ -3,6 +3,7 @@ from flask import Blueprint, abort, current_app, redirect, render_template, requ
 from app.services.auth_service import is_admin_authenticated
 from app.services.csrf_service import csrf_protect
 from app.services.data_loader import DataLoader
+from app.services.law_freshness_service import LawFreshnessService
 from app.services.descriptive_training_service import (
     DescriptiveTrainingService,
     DescriptiveTrainingStateError,
@@ -104,6 +105,10 @@ def view_training(attempt_id: int):
         abort(409, description=str(error))
     if not state:
         abort(404, description="서술형 훈련 세션을 찾을 수 없습니다.")
+    if state.get("result"):
+        state["result"]["law_freshness"] = LawFreshnessService(
+            DataLoader(current_app.config["DATA_DIR"])
+        ).get_for_question(state["question"]["id"])
     _remember_session(attempt_id)
     return render_template(
         "descriptive_training/session.html",

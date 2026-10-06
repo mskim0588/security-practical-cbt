@@ -5,6 +5,7 @@ from sqlalchemy import select, func, desc
 from app.models.database import db_session
 from app.models.history import AnswerRecord, ExamAttempt, LEARNING_ONLY_EXAM_MODES
 from app.services.data_loader import DataLoader
+from app.services.law_freshness_service import LawFreshnessService
 
 class HistoryService:
     def __init__(self, data_loader: Optional[DataLoader] = None):
@@ -165,6 +166,7 @@ class HistoryService:
         if not attempt or attempt.exam_mode in LEARNING_ONLY_EXAM_MODES:
             return None
 
+        freshness_service = LawFreshnessService(self.loader)
         enriched_answers = []
         for ans in attempt.answers:
             q_meta = self.loader.get_question_by_id(ans.question_id) or {}
@@ -181,6 +183,7 @@ class HistoryService:
             ans_info["deep_explanation"] = self.loader.get_explanation_for_question(ans.question_id)
             ans_info["sub_questions"] = q_meta.get("sub_questions", [])
             ans_info["accepted_answers"] = q_meta.get("accepted_answers", [])
+            ans_info["law_freshness"] = freshness_service.get_for_question(ans.question_id)
             
             enriched_answers.append(ans_info)
 

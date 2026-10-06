@@ -57,6 +57,9 @@
         <strong>{{ result.earned_score }} / {{ result.max_score }}점</strong>
       </div>
 
+      {% set freshness = result.law_freshness %}
+      {% include "components/law_freshness.html" %}
+
       <div class="desc-evaluation-grid">
         <div class="desc-evaluation-card">
           <span>구조 평가</span>

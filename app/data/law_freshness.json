@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "inventory": {
+    "inventory_date": "2026-10-07",
+    "candidates_inspected": 29,
+    "freshness_sensitive_mapped": 13,
+    "non_sensitive_excluded": 16,
+    "verified_count": 4,
+    "review_required_count": 9,
+    "scope_note": "정보보호 관리 및 법규 범주의 29개 문항을 전수 검토하고 법정 의무, 기한, 기준, 기관, 정의 또는 공식 기준에 직접 의존하는 문항만 매핑했다."
+  },
+  "records": [
+    {
+      "record_id": "LAW-Q-SHORT-001",
+      "target_type": "question",
+      "target_id": "Q-SHORT-001",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "개인정보 영향평가 수행 안내서의 현행판과 위험도 산정 공식을 다시 대조해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-023",
+      "target_type": "question",
+      "target_id": "Q-SHORT-023",
+      "status": "VERIFIED",
+      "reference_date": "2026-10-07",
+      "last_reviewed_at": "2026-10-07",
+      "authority": "개인정보보호위원회 고시 / 국가법령정보센터",
+      "source_url": "https://www.law.go.kr/LSW/admRulSideInfoP.do?admRulSeq=2100000281400&chrClsCd=010201&docCls=jo&joNo=0008",
+      "legal_basis": "개인정보의 안전성 확보조치 기준 제8조제1항",
+      "review_note": "현행 고시의 접속기록 보관기간, 5만명 기준 및 고유식별정보·민감정보 예외를 대조했습니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-034",
+      "target_type": "question",
+      "target_id": "Q-SHORT-034",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "최신 ISMS-P 인증기준 고시와 인증 영역 구성을 공식 자료로 재확인해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-DESC-015",
+      "target_type": "question",
+      "target_id": "Q-DESC-015",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "2026년 현행 안전성 확보조치 기준의 접근통제, 접속기록 및 암호화 조항 전체와 재대조해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-052",
+      "target_type": "question",
+      "target_id": "Q-SHORT-052",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "정보보호최고책임자 지정 근거와 적용 법령의 현행 조문을 다시 확인해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-DESC-019",
+      "target_type": "question",
+      "target_id": "Q-DESC-019",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "법률상 가명정보 정의·활용 목적뿐 아니라 가명처리 절차 안내서까지 문항 전체를 공식 자료로 재검토해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-083",
+      "target_type": "question",
+      "target_id": "Q-SHORT-083",
+      "status": "VERIFIED",
+      "reference_date": "2026-10-07",
+      "last_reviewed_at": "2026-10-07",
+      "authority": "국가법령정보센터(법제처)",
+      "source_url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EC%A0%95%EB%B3%B4%ED%86%B5%EC%8B%A0%EA%B8%B0%EB%B0%98%EB%B3%B4%ED%98%B8%EB%B2%95/%EC%A0%9C16%EC%A1%B0",
+      "legal_basis": "정보통신기반 보호법 제16조제1항",
+      "review_note": "현행 조문의 정보공유·분석센터 명칭과 주요 업무를 대조했습니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-084",
+      "target_type": "question",
+      "target_id": "Q-SHORT-084",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "고유식별정보의 법정 정의와 현행 암호화 의무 범위를 함께 재대조해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-085",
+      "target_type": "question",
+      "target_id": "Q-SHORT-085",
+      "status": "VERIFIED",
+      "reference_date": "2026-10-07",
+      "last_reviewed_at": "2026-10-07",
+      "authority": "국가법령정보센터(법제처)",
+      "source_url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%EB%B3%B4%ED%98%B8%EB%B2%95/%EC%A0%9C34%EC%A1%B0",
+      "legal_basis": "개인정보 보호법 제34조제1항",
+      "review_note": "현행 조문의 정보주체 통지 시점 원칙을 대조했습니다."
+    },
+    {
+      "record_id": "LAW-Q-SHORT-087",
+      "target_type": "question",
+      "target_id": "Q-SHORT-087",
+      "status": "VERIFIED",
+      "reference_date": "2026-10-07",
+      "last_reviewed_at": "2026-10-07",
+      "authority": "국가법령정보센터(법제처)",
+      "source_url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%EB%B3%B4%ED%98%B8%EB%B2%95/%EC%A0%9C25%EC%A1%B0",
+      "legal_basis": "개인정보 보호법 제25조제4항",
+      "review_note": "현행 조문의 고정형 영상정보처리기기 안내판 필수 기재사항을 대조했습니다."
+    },
+    {
+      "record_id": "LAW-Q-DESC-031",
+      "target_type": "question",
+      "target_id": "Q-DESC-031",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "CISO의 현행 법정 역할과 문항에 적힌 적용 법령·조문을 공식 원문으로 재검토해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-DESC-032",
+      "target_type": "question",
+      "target_id": "Q-DESC-032",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "2026년 고시의 접근권한 관리, 인증 및 인터넷망 차단 대상 기준을 문항 전체와 재대조해야 합니다."
+    },
+    {
+      "record_id": "LAW-Q-PRAC-019",
+      "target_type": "question",
+      "target_id": "Q-PRAC-019",
+      "status": "REVIEW_REQUIRED",
+      "reference_date": null,
+      "last_reviewed_at": null,
+      "authority": "",
+      "source_url": "",
+      "legal_basis": "",
+      "review_note": "만 14세 미만 동의와 선택정보 거부 시 불이익 금지의 현행 조문을 사례 전체와 재대조해야 합니다."
+    }
+  ]
+}

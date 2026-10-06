@@ -129,6 +129,262 @@
   --touch-target-min: 44px;
 }
 
+/* =========================================================
+   Goal 7D: Law / Regulation Freshness Management
+   ========================================================= */
+.law-freshness-card {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid #cbd5e1;
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  overflow-wrap: anywhere;
+}
+
+.law-freshness-card.status-verified {
+  border-left-color: #15803d;
+  background: #f0fdf4;
+}
+
+.law-freshness-card.status-review_required {
+  border-left-color: #b45309;
+  background: #fffbeb;
+}
+
+.law-freshness-heading,
+.law-concept-summary,
+.law-review-item-head,
+.law-review-actions,
+.law-review-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.law-freshness-heading p,
+.law-concept-summary p,
+.law-review-hero p,
+.law-freshness-note {
+  margin: 0;
+  color: var(--neutral-700);
+  line-height: 1.6;
+}
+
+.law-freshness-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.law-freshness-badge.status-verified {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.law-freshness-badge.status-review_required {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.law-freshness-details {
+  margin-top: 10px;
+}
+
+.law-freshness-details summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--primary-700);
+  font-weight: 700;
+}
+
+.law-freshness-details dl,
+.law-review-meta {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.law-freshness-details dl div,
+.law-review-meta div {
+  display: grid;
+  grid-template-columns: minmax(90px, 120px) 1fr;
+  gap: 10px;
+}
+
+.law-freshness-details dt,
+.law-review-meta dt {
+  font-weight: 800;
+  color: var(--neutral-700);
+}
+
+.law-freshness-details dd,
+.law-review-meta dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.law-source-link {
+  display: inline-flex;
+  margin-top: 10px;
+  color: var(--primary-700);
+  font-weight: 700;
+}
+
+.law-concept-summary {
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 18px;
+  border-left: 4px solid #b45309;
+}
+
+.law-concept-summary > div {
+  flex: 1 1 520px;
+}
+
+.law-concept-summary h2 {
+  display: inline;
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+.law-concept-summary small {
+  display: block;
+  margin-top: 6px;
+  color: var(--neutral-600);
+}
+
+.law-review-page {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.law-review-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+}
+
+.law-review-hero > div:first-child {
+  flex: 1 1 580px;
+}
+
+.law-review-hero h1 {
+  margin: 8px 0;
+}
+
+.law-review-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(80px, 1fr));
+  gap: 8px;
+  flex: 0 1 360px;
+  width: 100%;
+}
+
+.law-review-counts div {
+  padding: 12px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  text-align: center;
+  background: var(--neutral-50);
+}
+
+.law-review-counts strong,
+.law-review-counts span {
+  display: block;
+}
+
+.law-review-counts strong {
+  font-size: 24px;
+}
+
+.law-review-counts span {
+  margin-top: 3px;
+  color: var(--neutral-600);
+  font-size: 12px;
+}
+
+.law-review-filters {
+  margin: 18px 0;
+}
+
+.law-review-list {
+  display: grid;
+  gap: 14px;
+}
+
+.law-review-item {
+  padding: 18px;
+  overflow-wrap: anywhere;
+}
+
+.law-review-item-head {
+  justify-content: space-between;
+}
+
+.law-review-item-head > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.law-review-item h2 {
+  margin: 12px 0 8px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.law-review-actions {
+  margin-top: 12px;
+}
+
+.law-review-empty {
+  padding: 30px;
+  text-align: center;
+  color: var(--neutral-600);
+}
+
+@media (max-width: 767px) {
+  .law-review-hero {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .law-review-counts {
+    flex-basis: 100%;
+  }
+
+  .law-freshness-card,
+  .law-review-item {
+    padding: 14px;
+  }
+
+  .law-freshness-details dl div,
+  .law-review-meta div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .law-review-actions .btn,
+  .law-review-filters .btn {
+    flex: 1 1 140px;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 /* ==========================================================================
    Accessibility & Base Reset
    ========================================================================== */

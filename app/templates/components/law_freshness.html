@@ -1,0 +1,22 @@
+{% if freshness %}
+<aside class="law-freshness-card status-{{ freshness.status | lower }}" aria-label="법규 최신성 상태">
+  <div class="law-freshness-heading">
+    <span class="law-freshness-badge status-{{ freshness.status | lower }}">{{ freshness.status_label }}</span>
+    <p>{{ freshness.learner_note }}</p>
+  </div>
+  <details class="law-freshness-details">
+    <summary>최신성 근거 보기</summary>
+    {% if freshness.status == 'VERIFIED' %}
+    <dl>
+      <div><dt>기준일</dt><dd>{{ freshness.reference_date }}</dd></div>
+      <div><dt>마지막 검토</dt><dd>{{ freshness.last_reviewed_at }}</dd></div>
+      <div><dt>근거</dt><dd>{{ freshness.authority }} · {{ freshness.legal_basis }}</dd></div>
+    </dl>
+    <p class="law-freshness-note">{{ freshness.review_note }}</p>
+    <a class="law-source-link" href="{{ freshness.source_url }}" target="_blank" rel="noopener noreferrer">공식 출처 확인 <span aria-hidden="true">↗</span></a>
+    {% else %}
+    <p class="law-freshness-note">{{ freshness.review_note }}</p>
+    {% endif %}
+  </details>
+</aside>
+{% endif %}

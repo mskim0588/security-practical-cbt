@@ -46,8 +46,18 @@
     </div>
   </header>
 
-  <!-- Legal Notice Callout if applicable -->
-  {% if concept.content.law_review_status and concept.content.law_review_status.status == 'current_law_review_required' %}
+  <!-- Goal 7D evidence-based legal freshness summary -->
+  {% if law_freshness_summary %}
+  <section class="law-concept-summary card" aria-labelledby="law-freshness-title">
+    <div>
+      <span class="law-freshness-badge status-{{ law_freshness_summary.status | lower }}">{{ law_freshness_summary.status_label }}</span>
+      <h2 id="law-freshness-title">법규 최신성</h2>
+      <p>연계 문항 {{ law_freshness_summary.records | length }}건 중 검증됨 {{ law_freshness_summary.verified_count }}건, 검토 필요 {{ law_freshness_summary.review_required_count }}건입니다.</p>
+      <small>검증됨은 기록된 공식 출처와 기준일을 기준으로 확인했다는 의미이며, 향후 개정까지 보장하지 않습니다.</small>
+    </div>
+    {% if is_admin_authenticated() %}<a class="btn btn-secondary" href="{{ url_for('law_freshness.review_queue') }}">Owner 검토 큐</a>{% endif %}
+  </section>
+  {% elif concept.content.law_review_status and concept.content.law_review_status.status == 'current_law_review_required' %}
   <div class="alert-box alert-warning">
     <div class="alert-icon">⚖️</div>
     <div class="alert-body">
@@ -188,6 +198,7 @@
 
     <div class="connected-questions-list">
       {% for q in concept.questions %}
+      {% set freshness = law_freshness_summary.by_target_id.get(q.id) if law_freshness_summary else none %}
       <div class="question-row-item card-nested">
         <div class="q-row-top">
           <div class="q-row-badges">
@@ -200,6 +211,7 @@
               <span class="badge badge-type badge-type-prac">실무형</span>
             {% endif %}
             <span class="badge badge-score">{{ q.score }}점</span>
+            {% if freshness %}<span class="law-freshness-badge status-{{ freshness.status | lower }}">{{ freshness.status_label }}</span>{% endif %}
           </div>
           {% if q.source_id %}
             <span class="q-source-hint">출처: {{ q.source_id }}</span>
@@ -207,6 +219,8 @@
         </div>
 
         <p class="q-row-title">{{ q.question }}</p>
+
+        {% include "components/law_freshness.html" %}
 
         {% if q.explanation %}
         <div class="q-quick-hint">

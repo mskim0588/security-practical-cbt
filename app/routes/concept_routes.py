@@ -6,6 +6,7 @@ Provides routes for the Concept Library (/concepts) and individual Concept Detai
 from flask import Blueprint, render_template, request, abort, current_app
 from app.services.data_loader import DataLoader
 from app.services.learning_service import LearningService
+from app.services.law_freshness_service import LawFreshnessService
 
 concept_bp = Blueprint("concepts", __name__)
 
@@ -66,7 +67,9 @@ def view_concept_detail(concept_id: str):
     if not detail:
         abort(404, description=f"개념 ID '{concept_id}'를 찾을 수 없습니다.")
 
+    freshness_service = LawFreshnessService(DataLoader(current_app.config.get("DATA_DIR")))
     return render_template(
         "concepts/detail.html",
-        concept=detail
+        concept=detail,
+        law_freshness_summary=freshness_service.get_concept_summary(concept_id),
     )

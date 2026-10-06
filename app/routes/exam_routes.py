@@ -5,6 +5,7 @@ from app.services.exam_service import ExamService
 from app.services.grader import Grader
 from app.services.csrf_service import csrf_protect
 from app.services.auth_service import is_admin_authenticated
+from app.services.law_freshness_service import LawFreshnessService
 
 exam_bp = Blueprint("exam", __name__)
 
@@ -168,12 +169,14 @@ def submit_exam():
         return redirect(url_for("exam.view_result", attempt_id=attempt_id))
 
     # DB 저장 실패 시 비상 fallback 렌더링
+    freshness_service = LawFreshnessService(loader)
     for d in result.get("details", []):
         qid = d.get("question_id")
         q_meta = loader.get_question_by_id(qid) if qid else None
         if q_meta:
             d["concept_id"] = q_meta.get("concept_id")
             d["deep_explanation"] = loader.get_explanation_for_question(qid)
+            d["law_freshness"] = freshness_service.get_for_question(qid)
     return render_template("result.html", result=result, attempt_id=None)
 
 @exam_bp.route("/result/<int:attempt_id>")
@@ -241,7 +244,8 @@ def view_result(attempt_id: int):
             "model_answer": ans.get("model_answer", ""),
             "explanation": ans.get("explanation", ""),
             "source_info": ans.get("source_info") or {},
-            "source_page": ans.get("source_page", 1)
+            "source_page": ans.get("source_page", 1),
+            "law_freshness": ans.get("law_freshness"),
         })
 
     result_dict = {

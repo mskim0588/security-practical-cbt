@@ -76,6 +76,9 @@
     {{ detail.question.question }}
   </div>
 
+  {% set freshness = detail.law_freshness %}
+  {% include "components/law_freshness.html" %}
+
   <!-- Model Answer and Details -->
   <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #1e40af; margin-bottom: 8px;">

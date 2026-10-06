@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}법규 최신성 검토 | 정보보안기사 실기 CBT{% endblock %}
+
+{% block content %}
+<section class="law-review-page">
+  <header class="law-review-hero card">
+    <div>
+      <span class="badge badge-category">Owner Review</span>
+      <h1>법규 최신성 검토</h1>
+      <p>기록된 공식 출처와 검토 기준일을 관리하는 읽기 전용 검토 큐입니다. 검토 필요는 법적으로 틀렸다는 뜻이 아닙니다.</p>
+    </div>
+    <div class="law-review-counts" aria-label="최신성 현황">
+      <div><strong>{{ inventory.freshness_sensitive_mapped }}</strong><span>매핑</span></div>
+      <div><strong>{{ inventory.verified_count }}</strong><span>검증됨</span></div>
+      <div><strong>{{ inventory.review_required_count }}</strong><span>검토 필요</span></div>
+    </div>
+  </header>
+
+  <nav class="law-review-filters" aria-label="법규 최신성 상태 필터">
+    <a href="{{ url_for('law_freshness.review_queue') }}" class="btn {% if selected_status == 'ALL' %}btn-primary{% else %}btn-secondary{% endif %}">전체</a>
+    <a href="{{ url_for('law_freshness.review_queue', status='VERIFIED') }}" class="btn {% if selected_status == 'VERIFIED' %}btn-primary{% else %}btn-secondary{% endif %}">검증됨</a>
+    <a href="{{ url_for('law_freshness.review_queue', status='REVIEW_REQUIRED') }}" class="btn {% if selected_status == 'REVIEW_REQUIRED' %}btn-primary{% else %}btn-secondary{% endif %}">검토 필요</a>
+  </nav>
+
+  <div class="law-review-list">
+    {% for record in records %}
+    <article class="law-review-item card">
+      <div class="law-review-item-head">
+        <div>
+          <span class="badge badge-id">{{ record.target_id }}</span>
+          <span class="law-freshness-badge status-{{ record.status | lower }}">{{ record.status_label }}</span>
+        </div>
+        <span class="q-category">{{ record.category }}</span>
+      </div>
+      <h2>{{ record.target_title }}</h2>
+      <p class="law-freshness-note">{{ record.review_note }}</p>
+      <dl class="law-review-meta">
+        <div><dt>마지막 검토</dt><dd>{{ record.last_reviewed_at or '미검토' }}</dd></div>
+        <div><dt>기준일</dt><dd>{{ record.reference_date or '미설정' }}</dd></div>
+        <div><dt>공식 근거</dt><dd>{{ record.authority or '확인 필요' }}{% if record.legal_basis %} · {{ record.legal_basis }}{% endif %}</dd></div>
+      </dl>
+      <div class="law-review-actions">
+        <a class="btn btn-secondary" href="{{ url_for('concepts.view_concept_detail', concept_id=record.concept_id) }}">연계 개념 보기</a>
+        {% if record.source_url %}<a class="btn btn-outline" href="{{ record.source_url }}" target="_blank" rel="noopener noreferrer">공식 출처 확인</a>{% endif %}
+      </div>
+    </article>
+    {% else %}
+    <div class="card law-review-empty">선택한 상태의 기록이 없습니다.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

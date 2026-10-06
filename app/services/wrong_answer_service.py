@@ -3,6 +3,7 @@ from sqlalchemy import select, desc
 from app.models.database import db_session
 from app.models.history import AnswerRecord, ExamAttempt, LEARNING_ONLY_EXAM_MODES
 from app.services.data_loader import DataLoader
+from app.services.law_freshness_service import LawFreshnessService
 
 class WrongAnswerService:
     def __init__(self, data_loader: Optional[DataLoader] = None):
@@ -163,5 +164,6 @@ class WrongAnswerService:
             "sufficient_count": sufficient_count,
             "history": history_timeline,
             "deep_explanation": deep_explanation,
-            "related_questions_count": related_questions_count
+            "related_questions_count": related_questions_count,
+            "law_freshness": LawFreshnessService(self.loader).get_for_question(question_id),
         }
