@@ -14,12 +14,12 @@
 
 ## Checkpoint
 
-- DONE: baseline gate, protected-data boundary, architecture selection, 29-item category inventory, 13-item freshness-sensitive mapping, official-source verification policy, additive metadata registry, schema validation service, learner detail integration, owner read-only review queue, anti-cheat boundary, targeted tests, Goal 7A/7B/7C focused regression, full regression, protected-data hashes, responsive browser QA, feature commit/push, Railway deployment, and production smoke.
-- PARTIAL: physical-device readability check only.
-- TODO: user-performed physical Android check of badge readability, detail readability, and owner freshness-page usability.
+- DONE: baseline gate, protected-data boundary, architecture selection, 29-item category inventory, 13-item freshness-sensitive mapping, official-source verification policy, additive metadata registry, schema validation service, learner detail integration, owner read-only review queue, anti-cheat boundary, targeted tests, Goal 7A/7B/7C focused regression, full regression, protected-data hashes, responsive browser QA, feature commit/push, Railway deployment, production smoke, and physical Android validation.
+- PARTIAL: none.
+- TODO: none within Goal 7D; the nine `REVIEW_REQUIRED` records remain an explicit legal-content review backlog rather than an implementation failure.
 - BLOCKED: none.
-- Last Safe Step: Railway reported `SUCCESS`, and production root, health, learner freshness, anti-cheat entry surfaces, and Goal 7A/7B/7C routes passed smoke checks.
-- Next Step: user performs the limited Goal 7D physical Android readability check.
+- Last Safe Step: the user completed the physical Android Goal 7D check and confirmed the law-freshness UI is readable and usable.
+- Next Step: perform a separate Goal 7 integration/release closure; do not start Goal 8 in this closure.
 
 ## Architecture
 
@@ -46,8 +46,9 @@
 
 - Nine records remain `REVIEW_REQUIRED`; no official dates, citations, or URLs were fabricated for them.
 - Review due and legal incorrectness are intentionally separate; no age-only invalidation rule is used.
-- Physical Android status: `PENDING` until the user checks badge/detail/owner-page readability.
-- Goal 7D and the Goal 7 integration are not finalized; Goal 8 is not started.
+- Physical Android status: `PASS`.
+- The nine remaining records are an explicit legal-content review backlog and are not a Goal 7D implementation failure.
+- Goal 7D is complete; Goal 7 is ready for a separate integration/release closure; Goal 8 is not started.
 
 ## Validation
 
@@ -74,7 +75,24 @@
 - P0: 0.
 - P1: 0.
 - Known unrelated P2: `/favicon.ico` 404.
-- Physical Android: `PENDING`.
-- Goal 7D state: `GOAL_7D_READY_FOR_PHYSICAL_DEVICE_TEST`.
-- Goal 7 integration readiness: pending Goal 7D physical confirmation and separate integration/release closure.
+- Physical Android: `PASS` — freshness badges, both status detail types, official-source links, integrated learning/result views, and `/law-freshness` were readable and usable; no horizontal overflow or navigation obstruction was observed.
+- Goal 7D state: `GOAL_7D_COMPLETE`.
+- Goal 7 integration readiness: `GOAL_7_INTEGRATION_READY`.
 - Goal 8: `NOT STARTED`.
+
+## Final Closure
+
+- Goal 7D: `COMPLETE`.
+- Functional Status: `PASS`.
+- Physical Android: `PASS`.
+- Railway: `SUCCESS`.
+- Production: `HEALTHY`.
+- Regression: 289 ran, 288 passed, 1 skipped, 0 failures, 0 errors.
+- Core Data: 5 / 5 SHA-256 MATCH.
+- `VERIFIED`: 4.
+- `REVIEW_REQUIRED`: 9.
+- Manual Legal Review Remaining: 9.
+- P0: 0.
+- P1: 0.
+- Goal 7D Final Verdict: `GOAL_7D_COMPLETE`.
+- Goal 7 Integration Readiness: `GOAL_7_INTEGRATION_READY`.
