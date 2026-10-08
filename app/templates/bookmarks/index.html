@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}다시 볼 문제 - 정보보안기사 CBT{% endblock %}
+
+{% block content %}
+<div class="bookmark-page" id="bookmark-page">
+  <header class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">다시 볼 문제</h1>
+      <p class="page-subtitle">직접 저장한 문제를 나중에 다시 확인할 수 있습니다.</p>
+    </div>
+  </header>
+  <p class="bookmark-scope">Bookmarks are stored on this browser/device. 이 브라우저·기기에만 저장되며 계정이나 다른 기기와 동기화되지 않습니다.</p>
+  <nav class="bookmark-filters" aria-label="저장한 문제 유형">
+    {% for kind, label in [('all', '전체'), ('short', '단답형'), ('descriptive', '서술형'), ('practical', '실무형')] %}
+    <button type="button" class="bookmark-filter" data-bookmark-filter="{{ kind }}" aria-pressed="{{ 'true' if kind == 'all' else 'false' }}">{{ label }}</button>
+    {% endfor %}
+  </nav>
+  <p id="bookmark-status" role="status">저장한 문제를 불러오는 중입니다.</p>
+  <div id="bookmark-list" class="bookmark-list" aria-live="polite"></div>
+  <p id="bookmark-empty" class="card bookmark-empty" hidden>아직 저장한 문제가 없습니다. 학습 화면에서 원하는 문제를 직접 저장해 다시 확인할 수 있습니다.</p>
+  <noscript><p class="card bookmark-empty">이 기기의 저장된 문제를 보려면 JavaScript를 켜 주세요.</p></noscript>
+</div>
+{% endblock %}

@@ -249,6 +249,7 @@
         </div>
 
         <p class="q-row-title">{{ q.question }}</p>
+        {% set bookmark_question_id = q.id %}{% include "components/bookmark_button.html" %}
 
         {% include "components/law_freshness.html" %}
 

@@ -148,6 +148,7 @@
     </div>
 
     <div class="question-text">{{ item.question_text }}</div>
+    {% set bookmark_question_id = item.question_id %}{% include "components/bookmark_button.html" %}
 
     {% set freshness = item.law_freshness %}
     {% include "components/law_freshness.html" %}

@@ -33,6 +33,7 @@ def create_app(config_class=Config):
     from app.routes.mock_exam_routes import mock_exam_bp
     from app.routes.law_freshness_routes import law_freshness_bp
     from app.routes.search_routes import search_bp
+    from app.routes.bookmark_routes import bookmark_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(exam_bp)
@@ -46,6 +47,7 @@ def create_app(config_class=Config):
     app.register_blueprint(mock_exam_bp)
     app.register_blueprint(law_freshness_bp)
     app.register_blueprint(search_bp)
+    app.register_blueprint(bookmark_bp)
 
     # CSRF & Auth Context Processor
     from app.services.csrf_service import generate_csrf_token

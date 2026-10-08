@@ -57,6 +57,7 @@
           {% if q.source_id %}<span class="q-source-hint">출처: {{ q.source_id }}</span>{% endif %}
         </div>
         <p class="q-row-title">{{ q.question }}</p>
+        {% set bookmark_question_id = q.id %}{% include "components/bookmark_button.html" %}
         {% include "components/law_freshness.html" %}
         <a class="topic-question-link" href="{{ url_for('concepts.view_concept_detail', concept_id=topic.parent_concept_id) }}#question-{{ q.id }}">
           Parent Concept의 문제 위치에서 보기 &rarr;

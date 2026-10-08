@@ -1,0 +1,106 @@
+# Goal 8D — Persistent Question Bookmark / 다시 볼 문제
+
+## Checkpoint
+
+- Status: implementation and local verification `DONE`; Railway and production smoke `TODO`; physical Android `PENDING`.
+- Last Safe Step: browser-local implementation passed targeted Python and JavaScript tests, the full regression, and Chrome responsive QA. Baseline was clean `master` at `b023e97e6d8d78fa223c15e76ab01e394910d42e`, equal to `origin/master`.
+- Next Step: review the Goal 8D diff, commit and push, wait for Railway `SUCCESS`, run production smoke, then update this report. Physical Android verification remains with the user.
+
+## A. Baseline — DONE
+
+- Goal 7, Goal 8A, Goal 8B, and Goal 8C are complete; Goal 8D entry state is `GOAL_8D_READY`.
+- 20 Concepts, 67 Topics, 180 Questions, 39 aliases; prior regression 312 ran / 311 passed / 1 skipped / 0 failures / 0 errors.
+- Branch `master`, clean at entry; HEAD and `origin/master` both `b023e97e6d8d78fa223c15e76ab01e394910d42e`.
+
+## B. Persistence Architecture — DONE
+
+- Existing SQLAlchemy persistence stores `ExamAttempt` and `AnswerRecord` only. Neither is an appropriate manual saved-item store.
+- Goal 8D uses `localStorage` with separate `goal8d.question_bookmarks.v1.guest` and `.owner` keys. Each value is a JSON array of canonical Question IDs only. Bookmarks are stored on this browser/device; no account, browser, or device synchronization.
+- The current catalog is served from canonical Questions and Topic mappings; saved IDs are validated and deduplicated against it on load. Invalid or stale IDs are cleaned. Canonical bank order controls list sorting; no timestamps are stored.
+
+## C. DB Schema Decision — DONE
+
+- No DB schema change. No `create_all`, startup migration, or production `ALTER TABLE` change for Goal 8D.
+
+## D. Bookmark Semantics — DONE
+
+- Manual add/remove only, independent of correctness, partial credit, Wrong Notes, attempts, and scores. No implicit conversion from review flags.
+- Target is `question_id` only. No Concept, Topic, alias, query, or attempt bookmarks.
+- Controls show `☆ 다시 볼 문제에 추가` or `★ 저장됨 · 제거` with an accessible state label; color is not the sole state signal.
+
+## E. Wrong Notes Separation — DONE
+
+- Wrong Notes continue to derive from graded owner history. Bookmark actions only change the browser's scoped ID list. A Question can exist in both; removing either record does not remove the other.
+
+## F. Review Flag Separation — DONE
+
+- Goal 7C Review Flag remains attempt-local mock state. Bookmark JS reads/writes no review-flag data; finishing a mock does not create bookmarks.
+
+## G. Bookmarkable Surfaces — DONE
+
+- Shared control partial: Search Question results, Topic and Parent Concept related-question lists, post-submit result detail, history detail, Wrong Note detail, graded Practice feedback, and graded Descriptive Training feedback.
+- No control on active Exam, active Mock Exam, pre-submit Descriptive Training, or pre-answer Practice.
+
+## H. Dedicated Bookmark Page — DONE
+
+- `GET /bookmarks` renders `다시 볼 문제`; `GET /bookmarks/catalog` supplies answer-free canonical display metadata for 180 Questions. The list renders saved Questions only.
+- Each card shows ID, type, category, Parent Concept, Topic, concise preview, open/study link to Topic Question anchor, and remove action. No model answer in cards.
+- Empty and filtered-empty states are explicit. Filters: All, Short, Descriptive, Practical. Canonical question order is deterministic.
+
+## I. Guest / Owner Behavior — DONE
+
+- Guest and owner each have same-browser/device persistence under separate keys. Neither has account synchronization. No owner attempt, Wrong Note, or history data enters the guest bookmark catalog.
+
+## J. Security — DONE
+
+- Browser storage contains Question IDs only; no answers, scores, source metadata, secrets, or personal data. Catalog is derived from trusted application records and contains no model answers/rubrics.
+- Invalid IDs are ignored/cleaned. The browser renders canonical catalog text using `textContent`, never stored HTML. The catalog is GET-only with `Cache-Control: no-store`; bookmark mutation has no server POST or database write.
+
+## K. Anti-cheat — DONE
+
+- No persistent bookmark control, script, or navigation entry in active Exam/Mock or pre-submit Descriptive Training. Practice exposes its control only after feedback.
+
+## L. Goal 8A Preservation — DONE
+
+- 20 Concepts, 67 Topics, 180 Questions; 180 mappings, 0 unmapped, 0 zero-question Topics, 0 invalid references, 0 parent mismatches. Taxonomy files and Question-to-Concept/Topic mappings unchanged.
+
+## M. Goal 8B Preservation — DONE
+
+- 39 aliases unchanged; audit finds 0 exact/normalized duplicates, cross-target collisions, ambiguous aliases, or invalid targets. Bookmarks use Question IDs only.
+
+## N. Goal 8C Preservation — DONE
+
+- `GET /search`, matching, normalization, ranking, filters, keywords, commands, aliases, and deduplication remain unchanged. The Question card only adds a manual bookmark control. Existing Goal 8C tests pass in the full regression.
+
+## O. Goal 7 Regression — DONE
+
+- Goal 7A/7B/7C/7D suites pass in the full regression. No VI, adaptive, analytics, weakness, grading, dashboard, or Wrong Note service changes.
+- Law freshness remains 4 `VERIFIED` / 9 `REVIEW_REQUIRED`.
+
+## P. Mobile QA — DONE (browser); physical Android PENDING
+
+- Chrome checks at 360×740, 390×844, 430×932, and 1280×800. Cards, previews, filters, add/remove actions, and empty state fit; no horizontal overflow. At mobile widths, open/remove controls remain visible above the bottom navigation.
+- Real-browser add, navigation, reload persistence, type filter, Question destination, remove, and removed-state reload passed. Keyboard Enter activated filter and removal. Physical Android remains unverified.
+
+## Q. Tests — DONE
+
+- Goal 8D targeted Python: 6 ran / 6 passed / 0 skipped / 0 failures / 0 errors. JavaScript storage tests: 3 passed, including stale/duplicate cleanup and guest/owner key separation.
+- Full `py -3 -m unittest discover tests -v`: 318 ran / 317 passed / 1 skipped / 0 failures / 0 errors. The skip is the existing optional private-source comparison.
+
+## R. Core Hashes — DONE
+
+- `questions.json` `661098ce80e957b033fbb1a2b540701815791169ecd57c0f367720b94f3d5dc9`
+- `concepts.json` `d33cdd63824c01c6537dd6f2cb6829b58bf121883a05eb406803bbe58bad5943`
+- `sources.json` `9ae37ce41f1b3bccf0047474fca8e8332ad18f1ead298ee2f17fe85574049a21`
+- `concept_contents.json` `025c54ca679ac3e15ac8f8d98a9bf7ae3f120577e13ee44a5911b6beac335171`
+- `explanations.json` `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696`
+- Result: 5 / 5 SHA-256 MATCH. Protected files unchanged.
+
+## S. Production Smoke — TODO
+
+- Await feature push and terminal Railway deployment. Then verify `/`, `/healthz`, `/bookmarks`, catalog, real-browser add/reload/remove, search, Wrong Notes separation, and active-exam boundary.
+
+## T. Goal 8 Integration Readiness — PARTIAL
+
+- Goal 8D physical Android remains `PENDING`; do not mark Goal 8D complete or create a Goal 8 tag.
+- Goal 8 Integration QA and release closure remain separate after physical Goal 8D verification. Existing `v0.7-learning-final` is unchanged.

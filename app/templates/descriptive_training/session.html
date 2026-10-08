@@ -51,6 +51,7 @@
     </form>
     {% else %}
     {% set result = training.result %}
+    {% set bookmark_question_id = training.question.id %}{% include "components/bookmark_button.html" %}
     <section class="practice-result practice-result-{{ 'correct' if result.achievement_status == 'sufficient' else ('partial' if result.achievement_status == 'partial' else 'wrong') }}" aria-labelledby="desc-result-title">
       <div class="practice-result-heading-row">
         <h2 id="desc-result-title">내용 평가 · {{ result.achievement_label }}</h2>

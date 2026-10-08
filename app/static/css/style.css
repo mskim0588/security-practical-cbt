@@ -853,6 +853,9 @@ header.app-header {
     max-width: var(--container-max);
     margin: 0 auto;
   }
+  .nav-mobile-grid.has-bookmarks {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
 
   .nav-mobile-item {
     display: flex;
@@ -5222,6 +5225,40 @@ header.app-header {
 .learning-search-result-preview { margin: 0; line-height: 1.55; overflow-wrap: anywhere; }
 .learning-search-result-reason { margin: .6rem 0 0; font-size: .84rem; color: #475569; }
 .learning-search-state { padding: 1.2rem; overflow-wrap: anywhere; }
+
+/* Goal 8D: manual question bookmarks */
+.bookmark-toggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: .7rem;
+  padding: .5rem .8rem;
+  border: 1px solid var(--primary-400);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--primary-800);
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+.bookmark-toggle[hidden] { display: none; }
+.bookmark-toggle.is-saved { background: var(--primary-50); }
+.bookmark-toggle:focus-visible, .bookmark-filter:focus-visible { outline: 3px solid var(--primary-600); outline-offset: 2px; }
+.bookmark-page { min-width: 0; }
+.bookmark-scope { line-height: 1.5; color: var(--neutral-600); overflow-wrap: anywhere; }
+.bookmark-filters { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.bookmark-filter { min-height: 44px; padding: .5rem .85rem; border: 1px solid var(--neutral-300); border-radius: var(--radius-md); background: white; color: var(--neutral-800); font: inherit; cursor: pointer; }
+.bookmark-filter[aria-pressed="true"] { background: var(--primary-800); border-color: var(--primary-800); color: white; }
+.bookmark-list { display: grid; gap: .8rem; margin-top: 1rem; }
+.bookmark-card { min-width: 0; padding: 1rem 1.2rem; overflow-wrap: anywhere; }
+.bookmark-card-meta { color: var(--neutral-600); font-size: .85rem; }
+.bookmark-card-title { margin: .5rem 0; font-size: 1.05rem; }
+.bookmark-card-topic, .bookmark-card-preview { margin: .45rem 0; line-height: 1.5; overflow-wrap: anywhere; }
+.bookmark-card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .7rem; }
+.bookmark-card-actions .bookmark-toggle { margin-top: 0; }
+.bookmark-empty { padding: 1.2rem; line-height: 1.5; }
 @media (max-width: 390px) {
   .learning-search-panel, .learning-search-result { padding: .85rem; }
   .learning-search-field { gap: .35rem; }

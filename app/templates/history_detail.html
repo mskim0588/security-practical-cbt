@@ -163,6 +163,7 @@
     <div class="prose-wrap" style="font-size: 15px; font-weight: 600; color: var(--neutral-800); margin-bottom: 16px; line-height: 1.6; white-space: pre-line; background: var(--neutral-50); padding: 12px; border-radius: 6px;">
       {{ ans.question_text }}
     </div>
+    {% set bookmark_question_id = ans.question_id %}{% include "components/bookmark_button.html" %}
 
     {% set freshness = ans.law_freshness %}
     {% include "components/law_freshness.html" %}

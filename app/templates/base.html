@@ -10,6 +10,9 @@
 {% set show_ai_helper_modal = (not is_exam_session)
   and ((not request.path.startswith('/practice')) or (practice is defined and practice.phase != 'question'))
   and ((not request.path.startswith('/descriptive-training')) or (training is defined and training.phase != 'question')) %}
+{% set show_bookmark_tools = (not is_exam_session)
+  and ((not request.path.startswith('/practice')) or (practice is defined and practice.phase != 'question'))
+  and ((not request.path.startswith('/descriptive-training')) or (training is defined and training.phase != 'question')) %}
 <body class="{% block body_class %}{% endblock %} {% if is_exam_session %}is-exam-session{% else %}has-mobile-nav{% endif %}">
   <a href="#main-content" class="skip-link">본문 바로가기</a>
 
@@ -25,6 +28,7 @@
           <a href="/exam" class="nav-desktop-link {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}aria-current="page"{% endif %}>모의고사</a>
           <a href="/history" class="nav-desktop-link {% if request.path.startswith('/history') %}is-active{% endif %}" {% if request.path.startswith('/history') %}aria-current="page"{% endif %}>응시이력</a>
           <a href="/wrong-notes" class="nav-desktop-link {% if request.path.startswith('/wrong-notes') %}is-active{% endif %}" {% if request.path.startswith('/wrong-notes') %}aria-current="page"{% endif %}>오답노트</a>
+          {% if show_bookmark_tools %}<a href="{{ url_for('bookmarks.list_bookmarks') }}" class="nav-desktop-link {% if request.path.startswith('/bookmarks') %}is-active{% endif %}" {% if request.path.startswith('/bookmarks') %}aria-current="page"{% endif %}>다시 볼 문제</a>{% endif %}
         </nav>
       </div>
       <div class="header-actions">
@@ -56,7 +60,7 @@
   {% if not is_exam_session %}
   <!-- Mobile Global Bottom Navigation (< 768px) -->
   <nav class="nav-mobile-bottom" aria-label="모바일 하단 내비게이션">
-    <div class="nav-mobile-grid">
+    <div class="nav-mobile-grid{% if show_bookmark_tools %} has-bookmarks{% endif %}">
       <a href="/" class="nav-mobile-item {% if request.path == '/' %}is-active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>
         <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5v11.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="nav-mobile-label">홈</span>
@@ -81,6 +85,10 @@
         <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>
         <span class="nav-mobile-label">오답노트</span>
       </a>
+      {% if show_bookmark_tools %}<a href="{{ url_for('bookmarks.list_bookmarks') }}" class="nav-mobile-item {% if request.path.startswith('/bookmarks') %}is-active{% endif %}" {% if request.path.startswith('/bookmarks') %}aria-current="page"{% endif %}>
+        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-7-4-7 4z"/></svg>
+        <span class="nav-mobile-label">저장문제</span>
+      </a>{% endif %}
     </div>
   </nav>
   {% endif %}
@@ -89,6 +97,7 @@
   {% include "components/ai_prompt_modal.html" %}
   {% endif %}
 
+  {% if show_bookmark_tools %}<script src="{{ url_for('static', filename='js/bookmarks.js') }}" data-bookmark-scope="{{ 'owner' if is_admin_authenticated() else 'guest' }}" defer></script>{% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

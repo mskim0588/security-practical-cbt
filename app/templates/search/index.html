@@ -66,6 +66,7 @@
       <h2 class="learning-search-result-title"><a href="{{ destination }}">{{ item.title }}</a></h2>
       <p class="learning-search-result-preview">{{ item.preview }}</p>
       <p class="learning-search-result-reason">{{ item.reason }}</p>
+      {% if item.type == 'question' %}{% set bookmark_question_id = item.id %}{% include "components/bookmark_button.html" %}{% endif %}
     </article>
     {% endfor %}
   </div>
