@@ -143,21 +143,26 @@
 - `concept_contents.json`: `025c54ca679ac3e15ac8f8d98a9bf7ae3f120577e13ee44a5911b6beac335171`.
 - `explanations.json`: `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696`.
 
-## N. Limitations — PARTIAL
+## N. Limitations — DONE
 
 - Topic metadata is intentionally static and has no learner-specific Topic analytics.
 - No DB schema change is required or introduced.
 - Physical Android verification remains pending by policy.
-- Deployment and production smoke remain pending at this checkpoint.
+- Feature commit: `5d4107c` (`feat: add topic learning hierarchy`).
+- Push: `master` pushed normally; no force push.
+- Railway: terminal `SUCCESS` for the feature commit.
+- Production health: `GET /` = 200; `GET /healthz` = 200 with `status=ok`, `database=healthy`, and `environment=production`.
+- Production Topic smoke: `/concepts`, Parent Concept detail, and Topic detail all return 200; the sampled Topic renders 3 related-question links.
+- Goal 7 smoke: `/practice`, `/descriptive-training`, and `/mock-exam` return 200; `/law-freshness` returns the expected unauthenticated 302 to owner login.
 
-## O. Goal 8B Readiness — TODO
+## O. Goal 8B Readiness — DONE
 
 - Goal 8B is not started.
 - No alternative names, English aliases, acronyms, synonyms, or global search were implemented.
-- Readiness will be reported only after Goal 8A deployment and production smoke complete.
+- Goal 8B remains `NOT STARTED`; it may begin only after the user separately finalizes Goal 8A following physical Android verification.
 
 ## Checkpoint State
 
-- Current status: `PARTIAL`.
-- Last Safe Step: additive taxonomy, UI integration, 5/5 hash validation, 77-test targeted regression, 298-test full regression, and four-viewport browser QA all pass.
-- Next Step: complete Git review, commit, push, Railway terminal deployment, and production smoke.
+- Current status: `GOAL_8A_READY_FOR_PHYSICAL_DEVICE_TEST`.
+- Last Safe Step: feature commit `5d4107c` is pushed; Railway is `SUCCESS`; production health, Topic hierarchy, related-question links, and Goal 7 smoke checks pass.
+- Next Step: user performs the four requested physical Android readability/overflow checks. Do not finalize Goal 8A or start Goal 8B before that confirmation.
