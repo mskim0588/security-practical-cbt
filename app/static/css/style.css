@@ -385,6 +385,62 @@
   }
 }
 
+/* Goal 8B: lightweight aliases on learning detail pages */
+.learning-aliases {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: -5px 0 18px;
+  font-size: var(--text-sm);
+  color: var(--neutral-700);
+}
+
+.learning-alias-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.learning-alias-label {
+  flex: 0 0 4.5em;
+  font-weight: 800;
+  color: var(--neutral-600);
+}
+
+.learning-alias-row ul {
+  display: flex;
+  flex: 1 1 180px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.learning-alias-row li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.learning-alias-row li + li::before {
+  content: "·";
+  margin-right: 10px;
+  color: var(--neutral-500);
+}
+
+.learning-alias-acronym {
+  display: inline-block;
+  max-width: 100%;
+  padding: 1px 8px;
+  border-radius: var(--radius-md);
+  background: var(--primary-50);
+  color: var(--primary-800);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
 /* Goal 8A: additive Parent Concept -> Topic -> Question learning hierarchy */
 .topic-section-intro {
   margin: -4px 0 18px;

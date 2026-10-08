@@ -1,0 +1,13 @@
+{% if aliases.ko_alt or aliases.en_full or aliases.acronym or aliases.synonym %}
+<div class="learning-aliases" aria-label="다른 이름과 표기">
+  {% if aliases.en_full %}
+  <div class="learning-alias-row"><span class="learning-alias-label">영문</span><ul>{% for alias in aliases.en_full %}<li>{{ alias }}</li>{% endfor %}</ul></div>
+  {% endif %}
+  {% if aliases.acronym %}
+  <div class="learning-alias-row"><span class="learning-alias-label">약어</span><ul>{% for alias in aliases.acronym %}<li><span class="learning-alias-acronym">{{ alias }}</span></li>{% endfor %}</ul></div>
+  {% endif %}
+  {% if aliases.ko_alt or aliases.synonym %}
+  <div class="learning-alias-row"><span class="learning-alias-label">다른 이름</span><ul>{% for alias in aliases.ko_alt %}<li>{{ alias }}</li>{% endfor %}{% for alias in aliases.synonym %}<li>{{ alias }}</li>{% endfor %}</ul></div>
+  {% endif %}
+</div>
+{% endif %}

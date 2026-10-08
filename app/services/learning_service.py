@@ -5,13 +5,22 @@ Handles concept overview listings, concept detailed study packs, dynamic questio
 and integration with analytics and sources.
 """
 from typing import Dict, List, Any, Optional
+import logging
 from app.services.data_loader import DataLoader
 from app.services.analytics_service import AnalyticsService
+from app.services.alias_service import ALIAS_TYPES, AliasService
 
 class LearningService:
     def __init__(self, data_loader: Optional[DataLoader] = None, analytics_service: Optional[AnalyticsService] = None):
         self.loader = data_loader or DataLoader()
         self.analytics_svc = analytics_service or AnalyticsService(self.loader)
+
+    def _get_aliases(self, target_type: str, target_id: str) -> Dict[str, List[str]]:
+        try:
+            return AliasService(self.loader).group_for_target(target_type, target_id)
+        except ValueError:
+            logging.getLogger(__name__).exception("Invalid alias inventory; omitting alias display")
+            return {kind: [] for kind in ALIAS_TYPES}
 
     def get_concept_overview_list(self) -> List[Dict[str, Any]]:
         """
@@ -163,7 +172,8 @@ class LearningService:
             "topics": connected_topics,
             "questions": connected_questions,
             "sources": enriched_sources,
-            "analytics": concept_analytics
+            "analytics": concept_analytics,
+            "aliases": self._get_aliases("concept", concept_id),
         }
 
     def get_topic_detail(self, topic_id: str) -> Optional[Dict[str, Any]]:
@@ -201,6 +211,7 @@ class LearningService:
             "parent_concept_id": parent_concept_id,
             "parent_concept_name": parent.get("name", ""),
             "questions": questions,
+            "aliases": self._get_aliases("topic", topic_id),
         }
 
     def get_question_study_pack(self, question_id: str) -> Optional[Dict[str, Any]]:

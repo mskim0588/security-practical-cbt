@@ -14,6 +14,7 @@ class DataLoader:
         self._explanations: Optional[Dict[str, Any]] = None
         self._topics: Optional[List[Dict[str, Any]]] = None
         self._question_topics: Optional[List[Dict[str, str]]] = None
+        self._aliases: Optional[List[Dict[str, Any]]] = None
 
     def load_sources(self) -> List[Dict[str, Any]]:
         if self._sources is None:
@@ -51,6 +52,14 @@ class DataLoader:
             with open(path, "r", encoding="utf-8") as f:
                 self._question_topics = json.load(f)
         return self._question_topics
+
+    def load_aliases(self) -> List[Dict[str, Any]]:
+        """Load additive Concept and Topic aliases from separate static metadata."""
+        if self._aliases is None:
+            path = os.path.join(self.data_dir, "aliases.json")
+            with open(path, "r", encoding="utf-8") as f:
+                self._aliases = json.load(f)
+        return self._aliases
 
     def load_concept_contents(self) -> Dict[str, Any]:
         """concept_contents.json을 안전하게 로드하며 메모리 캐싱 적용"""

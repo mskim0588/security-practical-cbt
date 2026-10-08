@@ -25,6 +25,7 @@
       {{ topic.parent_concept_id }} · {{ topic.parent_concept_name }}
     </a>
     <h1 class="concept-hero-title">{{ topic.name }}</h1>
+    {% with aliases=topic.aliases %}{% include "concepts/_aliases.html" %}{% endwith %}
     <div class="concept-hero-summary-box">
       <span class="summary-label">Topic 요약</span>
       <p class="summary-text">{{ topic.summary }}</p>

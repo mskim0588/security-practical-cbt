@@ -39,6 +39,7 @@
     </div>
 
     <h1 class="concept-hero-title">{{ concept.name }}</h1>
+    {% with aliases=concept.aliases %}{% include "concepts/_aliases.html" %}{% endwith %}
 
     <div class="concept-hero-summary-box">
       <span class="summary-label">개념 정의</span>
