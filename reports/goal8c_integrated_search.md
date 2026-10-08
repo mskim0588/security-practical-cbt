@@ -2,9 +2,9 @@
 
 ## Checkpoint
 
-- Status: `GOAL_8C_READY_FOR_PHYSICAL_DEVICE_TEST`; functional PASS, physical Android PENDING.
-- Last Safe Step: feature commit `1b69bc8` pushed, Railway `SUCCESS`, production smoke passed, and this checkpoint updated.
-- Next Step: user physical Android verification only. Do not mark Goal 8C COMPLETE or begin Goal 8D automatically.
+- Status: `GOAL_8C_COMPLETE`; functional PASS, physical Android PASS (user-confirmed).
+- Final closure: feature commit `1b69bc8` and checkpoint commit `ebd8f99` were pushed; Railway `SUCCESS` and production `HEALTHY` were recorded for the feature deployment. The user completed physical Android verification.
+- Next goal: `GOAL_8D_READY`; Goal 8D remains `NOT STARTED` and requires separate authorization.
 
 ## A. Baseline — DONE
 
@@ -73,10 +73,10 @@
 
 - Full suite passes; Goal 7A/7B/7C/7D modes and Concept-based VI/analytics/adaptive/weakness aggregation unchanged. Law freshness remains 4 VERIFIED / 9 REVIEW_REQUIRED.
 
-## P. Mobile QA — DONE (browser); PENDING (physical Android)
+## P. Mobile QA — DONE (browser and physical Android)
 
 - Chrome responsive checks at 360×740, 390×844, 430×932, 1280×800: field/submit reachable, filters and previews wrap, no page horizontal overflow, mobile bottom navigation present only at mobile widths, Question result anchor works. Empty and no-result states checked. Long English alias query fits; result remains readable.
-- Physical Android: PENDING. User must verify input, Korean/English/acronym query, filters, card readability/navigation, and overflow.
+- Physical Android: PASS (user-confirmed). `/search` is usable; input and submit work; Korean, English/acronym alias, keyword, and command queries work; filters work; result cards are readable and navigate correctly; no problematic duplicate presentation or horizontal overflow was observed; mobile bottom navigation does not obstruct results.
 
 ## Q. Tests — DONE
 
@@ -103,4 +103,18 @@
 
 ## T. Goal 8D Readiness — DONE
 
-- Goal 8D remains `NOT STARTED`. Goal 8C is not COMPLETE until user physical Android confirmation; no Goal 8 tag. Existing `v0.7-learning-final` remains unchanged.
+- Goal 8C final verdict: `GOAL_8C_COMPLETE`. Goal 8D readiness: `GOAL_8D_READY`; Goal 8D remains `NOT STARTED`. Persistent Bookmark / 다시 볼 문제 is separate from Wrong Notes, Goal 7C Review Flag, search, and practice state.
+- No Goal 8 release tag. Existing `v0.7-learning-final` remains unchanged.
+
+## U. Final Closure Record
+
+- Functional status: PASS. Physical Android: PASS (user-confirmed). Search route: GET `/search`.
+- Corpus: 20 Concepts, 67 Topics, 180 Questions, 39 aliases. Normalization: Unicode NFC + whitespace collapse + casefold. Ranking: deterministic.
+- Filtering: PASS. Keyword search: PASS. Command search: PASS. Alias search: PASS. Canonical-result deduplication: PASS. Zero, one, and multiple alias target resolution: supported.
+- Security: PASS. Anti-cheat: PASS. Search remains read-only and navigation-oriented; no DB schema change.
+- Architecture preserved: Question to Concept and Question to Topic mappings unchanged; Goal 8B alias data unchanged; analytics, VI, and adaptive learning remain Concept-based.
+- Scope boundary: no fuzzy matching, typo correction, autocomplete, search history, embeddings, vector search, RAG, or external AI search.
+- Regression evidence retained: 312 ran / 311 passed / 1 skipped / 0 failures / 0 errors. The full suite was not rerun for this report-only closure.
+- Core data: 5 / 5 SHA-256 MATCH. Railway: SUCCESS. Production: HEALTHY. P0: 0. P1: 0.
+- Remaining P2: `/favicon.ico` 404; 9 `REVIEW_REQUIRED` law-freshness records; existing Goal 5 backlog.
+- Final verdict: `GOAL_8C_COMPLETE`. Next-goal readiness: `GOAL_8D_READY`.
