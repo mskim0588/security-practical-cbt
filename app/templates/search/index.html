@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}통합 학습 검색 - 정보보안기사 CBT{% endblock %}
+
+{% block content %}
+<div class="learning-search-page">
+  <nav class="breadcrumb-nav" aria-label="경로 탐색">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="{{ url_for('concepts.list_concepts') }}">개념 학습</a></li>
+      <li class="breadcrumb-item is-active" aria-current="page">통합 학습 검색</li>
+    </ol>
+  </nav>
+
+  <header class="page-header">
+    <div class="page-title-group">
+      <h1 class="page-title">통합 학습 검색</h1>
+      <p class="page-subtitle">개념, Topic, 문제를 이름·별칭·학습 내용으로 찾습니다.</p>
+    </div>
+  </header>
+
+  <section class="card learning-search-panel" aria-label="학습 항목 검색">
+    <form method="get" action="{{ url_for('search.learning_search') }}" class="learning-search-form">
+      <label for="learning-search-input">검색어</label>
+      {% if selected_type != 'all' %}<input type="hidden" name="type" value="{{ selected_type }}">{% endif %}
+      <div class="learning-search-field">
+        <input id="learning-search-input" name="q" type="search" maxlength="120"
+               value="{{ query }}" placeholder="개념, Topic, 문제, 키워드, 명령어 검색">
+        <button class="btn btn-primary" type="submit">검색</button>
+      </div>
+    </form>
+  </section>
+
+  {% if error %}
+  <p class="learning-search-state" role="alert">{{ error }}</p>
+  {% elif not has_query %}
+  <p class="learning-search-state">검색어를 입력해 학습 항목을 찾아보세요. 예: SQLi, iptables, lastb</p>
+  {% else %}
+  <nav class="learning-search-filters" aria-label="검색 결과 유형">
+    {% for kind, label in [('all', '전체'), ('concept', '개념'), ('topic', 'Topic'), ('question', '문제')] %}
+    <a href="{{ url_for('search.learning_search', q=query, type=kind) }}"
+       class="learning-search-filter{% if selected_type == kind %} is-active{% endif %}"
+       {% if selected_type == kind %}aria-current="page"{% endif %}>{{ label }} <span>{{ type_counts[kind] }}</span></a>
+    {% endfor %}
+  </nav>
+  <p class="learning-search-count" role="status">검색 결과 {{ total }}건</p>
+  {% if results %}
+  <div class="learning-search-results">
+    {% for item in results %}
+    <article class="card learning-search-result">
+      {% if item.type == 'concept' %}
+        {% set destination = url_for('concepts.view_concept_detail', concept_id=item.id) %}
+        {% set type_label = '개념' %}
+      {% elif item.type == 'topic' %}
+        {% set destination = url_for('concepts.view_topic_detail', topic_id=item.id) %}
+        {% set type_label = 'Topic' %}
+      {% else %}
+        {% set destination = url_for('concepts.view_topic_detail', topic_id=item.topic_id) ~ '#question-' ~ item.id %}
+        {% set type_label = '문제' %}
+      {% endif %}
+      <div class="learning-search-result-meta">
+        <span class="badge badge-type">{{ type_label }}</span>
+        {% if item.question_type %}<span>{{ item.question_type }}</span>{% endif %}
+        <span>{{ item.category }}</span>
+        {% if item.parent_name %}<span>{{ item.parent_name }}</span>{% endif %}
+      </div>
+      <h2 class="learning-search-result-title"><a href="{{ destination }}">{{ item.title }}</a></h2>
+      <p class="learning-search-result-preview">{{ item.preview }}</p>
+      <p class="learning-search-result-reason">{{ item.reason }}</p>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="learning-search-state">일치하는 학습 항목을 찾지 못했습니다. 철자나 약어·영문 표기를 확인해 보세요.</p>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

@@ -14,6 +14,7 @@
 
   <!-- Search & Filter Controls -->
   <div class="concept-filter-panel card">
+    <p class="integrated-search-entry">개념·Topic·문제를 함께 찾으려면 <a href="{{ url_for('search.learning_search') }}">통합 학습 검색</a></p>
     <form method="GET" action="{{ url_for('concepts.list_concepts') }}" class="concept-search-form">
       {% if selected_category %}
       <input type="hidden" name="category" value="{{ selected_category }}">
