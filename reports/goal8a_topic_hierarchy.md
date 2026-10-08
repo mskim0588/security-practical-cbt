@@ -147,7 +147,8 @@
 
 - Topic metadata is intentionally static and has no learner-specific Topic analytics.
 - No DB schema change is required or introduced.
-- Physical Android verification remains pending by policy.
+- Physical Android verification: `PASS` (user-confirmed).
+- Confirmed on physical Android: Concept-to-Topic hierarchy readability, Topic-name wrapping, Topic-detail readability, understandable Parent Concept relationship, working related-question links, unobstructed mobile navigation, and no observed horizontal overflow.
 - Feature commit: `5d4107c` (`feat: add topic learning hierarchy`).
 - Push: `master` pushed normally; no force push.
 - Railway: terminal `SUCCESS` for the feature commit.
@@ -159,10 +160,34 @@
 
 - Goal 8B is not started.
 - No alternative names, English aliases, acronyms, synonyms, or global search were implemented.
-- Goal 8B remains `NOT STARTED`; it may begin only after the user separately finalizes Goal 8A following physical Android verification.
+- Goal 8B readiness: `GOAL_8B_READY`.
+- Goal 8B remains `NOT STARTED` and must not begin without a separate user instruction.
+
+## Final Closure Summary
+
+- Goal 8A: `COMPLETE`.
+- Functional Status: `PASS`.
+- Physical Android: `PASS`.
+- Parent Concepts: 20.
+- Topics: 67.
+- Questions: 180.
+- Mapped: 180.
+- Unmapped: 0.
+- Zero-question Topics: 0.
+- Invalid References: 0.
+- Parent Mismatches: 0.
+- Railway: `SUCCESS`.
+- Production: `HEALTHY`.
+- Regression: 298 ran, 297 passed, 1 skipped, 0 failures, 0 errors.
+- Core Data: 5 / 5 SHA-256 MATCH.
+- P0: 0.
+- P1: 0.
+- Goal 8A Final Verdict: `GOAL_8A_COMPLETE`.
+- Goal 8B Readiness: `GOAL_8B_READY`.
+- Architecture preservation: all 20 Parent Concepts and existing Question-to-Concept mappings remain unchanged; Topic remains additive; analytics, VI, and adaptive learning remain Concept-based.
 
 ## Checkpoint State
 
-- Current status: `GOAL_8A_READY_FOR_PHYSICAL_DEVICE_TEST`.
-- Last Safe Step: feature commit `5d4107c` is pushed; Railway is `SUCCESS`; production health, Topic hierarchy, related-question links, and Goal 7 smoke checks pass.
-- Next Step: user performs the four requested physical Android readability/overflow checks. Do not finalize Goal 8A or start Goal 8B before that confirmation.
+- Current status: `GOAL_8A_COMPLETE`.
+- Last Safe Step: physical Android `PASS` is recorded after the pushed feature, successful Railway deployment, healthy production smoke, zero-regression validation, and 5 / 5 protected-data hash matches.
+- Next Step: Goal 8B is `GOAL_8B_READY` but remains not started pending a separate user instruction.
