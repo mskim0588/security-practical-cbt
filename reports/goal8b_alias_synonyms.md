@@ -2,12 +2,12 @@
 
 ## Checkpoint
 
-- Status: IN PROGRESS.
+- Status: `GOAL_8B_READY_FOR_PHYSICAL_DEVICE_TEST` (physical Android PENDING; not finalized).
 - Baseline HEAD: `1f9212cafd46c42aecbf81858a2786647fb72fa8` on clean `master`, equal to `origin/master`.
 - Goal 8A: `GOAL_8A_COMPLETE`; Goal 8B entry: `GOAL_8B_READY`.
 - Parent Concepts: 20; Topics: 67; Questions: 180.
-- Last Safe Step: local implementation, data audit, targeted and full regression, and four-viewport browser QA passed.
-- Next Step: final Git review, feature commit, normal push, Railway terminal status, production smoke, and deployment checkpoint.
+- Last Safe Step: feature commit `66b39b8018c432aa897f663fb159c5fa2f243da4` pushed with Railway success and passing production smoke.
+- Next Step: user verifies Concept and Topic alias readability, English wrapping, acronym display, and no horizontal overflow on physical Android; then a separate Goal 8B finalization decision.
 
 ## A. Baseline — DONE
 
@@ -128,8 +128,19 @@ All five protected files match the Goal 8A SHA-256 baseline (5 / 5):
 | `concept_contents.json` | `025c54ca679ac3e15ac8f8d98a9bf7ae3f120577e13ee44a5911b6beac335171` |
 | `explanations.json` | `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696` |
 
-## R. Goal 8C Readiness — PARTIAL
+## R. Goal 8C Readiness — DONE
 
 - Deterministic normalization, multi-target resolution, grouping, and collision audit are ready for later reuse.
 - Goal 8C integrated search: **NOT STARTED**. No search route, global bar, fuzzy logic, ranking, or autocomplete exists from this work.
-- Feature commit, push, Railway terminal status, and production smoke remain before `GOAL_8B_READY_FOR_PHYSICAL_DEVICE_TEST`.
+- Infrastructure for future exact alias lookup exists; Goal 8C remains **NOT STARTED** and requires a separate instruction.
+
+## Deployment Checkpoint — DONE
+
+- Feature commit: `66b39b8018c432aa897f663fb159c5fa2f243da4` (`feat: add concept and topic aliases`).
+- Push: normal `master` push; local, `origin/master`, and the remote ref matched after push. No force push or release tag.
+- Railway: GitHub/Railway deployment status for the feature commit reached `success` with description `Success - web-production-246f1.up.railway.app` at `2026-10-08T13:27:23Z`.
+- Production: `GET /` and `/healthz` returned 200; health JSON reported `status=ok`, `database=healthy`, `environment=production`.
+- Production learning smoke: `/concepts`, `/concepts/CON-MGT-04`, and `/topics/TOP-APP-01-02` returned 200. The Concept alias, Topic English alias, and acronym badge rendered.
+- Production mode smoke: `/practice`, `/descriptive-training`, `/mock-exam`, and `/exam` returned 200. `/law-freshness` returned the expected unauthenticated 302. Active assessment setup pages contained no alias block.
+- P0: **0**. P1: **0**. Remaining P2: existing `/favicon.ico` 404, 9 `REVIEW_REQUIRED` law records, and existing Goal 5 operational/security backlog.
+- Goal 8B status: **`GOAL_8B_READY_FOR_PHYSICAL_DEVICE_TEST`**. Physical Android: **PENDING**. Goal 8B is not COMPLETE.
