@@ -2,12 +2,12 @@
 
 ## Checkpoint
 
-- Status: `GOAL_8B_READY_FOR_PHYSICAL_DEVICE_TEST` (physical Android PENDING; not finalized).
+- Status: `GOAL_8B_COMPLETE` (physical Android PASS, user-confirmed).
 - Baseline HEAD: `1f9212cafd46c42aecbf81858a2786647fb72fa8` on clean `master`, equal to `origin/master`.
 - Goal 8A: `GOAL_8A_COMPLETE`; Goal 8B entry: `GOAL_8B_READY`.
 - Parent Concepts: 20; Topics: 67; Questions: 180.
-- Last Safe Step: feature commit `66b39b8018c432aa897f663fb159c5fa2f243da4` pushed with Railway success and passing production smoke.
-- Next Step: user verifies Concept and Topic alias readability, English wrapping, acronym display, and no horizontal overflow on physical Android; then a separate Goal 8B finalization decision.
+- Last Safe Step: feature commit `66b39b8018c432aa897f663fb159c5fa2f243da4` and checkpoint HEAD `14e9728569f88b9abd1ca24267db70b59a90c9ce` were pushed and deployed; production smoke passed; the user confirmed physical Android PASS.
+- Next Step: Goal 8C is ready for a separate instruction. Goal 8C and Goal 8D have not started.
 
 ## A. Baseline — DONE
 
@@ -94,8 +94,9 @@ Languages are `ko` and `en`. Existing names remain canonical display names.
 ## M. Goal 8A Preservation — DONE
 
 - 20 Concepts, 67 Topics, 180 Questions, 180 primary mappings, 0 unmapped, 0 zero-question Topics, 0 invalid references, and 0 parent mismatches verified.
-- `topics.json`, `question_topics.json`, all Concept/Question IDs, and all Question-to-Concept/Topic mappings are unchanged.
+- Concept IDs, Topic IDs, Question IDs, Question-to-Concept mappings, and Question-to-Topic mappings are unchanged. `topics.json` and `question_topics.json` are unchanged.
 - Alias-to-Concept/Topic is parallel to Concept-to-Topic-to-Question.
+- VI, analytics, and adaptive learning remain Concept-based.
 
 ## N. Goal 7 Regression — DONE
 
@@ -108,7 +109,7 @@ Languages are `ko` and `en`. Existing names remain canonical display names.
 - Browser-rendered Concept and Topic detail pages checked at 360×740, 390×844, 430×932, and 1280×800.
 - Alias blocks were visible at all eight page/viewport combinations; document width stayed within viewport width.
 - Long English text, Korean alternatives, acronym badge, hierarchy, and navigation were visually inspected on representative mobile and desktop screenshots. No page-level horizontal overflow.
-- Physical Android: **PENDING**; user verification remains the finalization gate.
+- Physical Android: **PASS** (user-confirmed). Concept and Topic aliases are readable and usable; long English names wrap; acronym display is readable; alias sections do not dominate learning content; no horizontal overflow was observed; bottom mobile navigation does not obstruct alias content.
 
 ## P. Tests — DONE
 
@@ -132,7 +133,7 @@ All five protected files match the Goal 8A SHA-256 baseline (5 / 5):
 
 - Deterministic normalization, multi-target resolution, grouping, and collision audit are ready for later reuse.
 - Goal 8C integrated search: **NOT STARTED**. No search route, global bar, fuzzy logic, ranking, or autocomplete exists from this work.
-- Infrastructure for future exact alias lookup exists; Goal 8C remains **NOT STARTED** and requires a separate instruction.
+- Goal 8C readiness: **`GOAL_8C_READY`**. It may later reuse alias normalization/resolution and Concept, Topic, and Question metadata, but requires a separate implementation instruction.
 
 ## Deployment Checkpoint — DONE
 
@@ -143,4 +144,15 @@ All five protected files match the Goal 8A SHA-256 baseline (5 / 5):
 - Production learning smoke: `/concepts`, `/concepts/CON-MGT-04`, and `/topics/TOP-APP-01-02` returned 200. The Concept alias, Topic English alias, and acronym badge rendered.
 - Production mode smoke: `/practice`, `/descriptive-training`, `/mock-exam`, and `/exam` returned 200. `/law-freshness` returned the expected unauthenticated 302. Active assessment setup pages contained no alias block.
 - P0: **0**. P1: **0**. Remaining P2: existing `/favicon.ico` 404, 9 `REVIEW_REQUIRED` law records, and existing Goal 5 operational/security backlog.
-- Goal 8B status: **`GOAL_8B_READY_FOR_PHYSICAL_DEVICE_TEST`**. Physical Android: **PENDING**. Goal 8B is not COMPLETE.
+- Goal 8B status: **`GOAL_8B_COMPLETE`**. Functional status: **PASS**. Physical Android: **PASS** (user-confirmed).
+
+## Final Closure Summary — DONE
+
+- Goal 8B: **COMPLETE**. Final verdict: **`GOAL_8B_COMPLETE`**. Functional status: **PASS**. Physical Android: **PASS** (user-confirmed).
+- Parent Concepts: **20**; Topics: **67**; Questions: **180**. Total aliases: **39**; Concepts with aliases: **9**; Topics with aliases: **23**.
+- Alias types: `ko_alt` **7**, `en_full` **28**, `acronym` **3**, `synonym` **1**.
+- Exact duplicates: **0**; normalized duplicates: **0**; cross-target collisions: **0**; ambiguous aliases: **0**; invalid targets: **0**.
+- Regression retained from implementation: **306 run, 305 passed, 1 skipped, 0 failures, 0 errors**. Report-only closure does not rerun tests.
+- Protected core data: **5 / 5 SHA-256 MATCH**. DB schema change: **NO**.
+- Railway: **SUCCESS**; production: **HEALTHY**; P0: **0**; P1: **0**.
+- Goal 8C readiness: **`GOAL_8C_READY`**; implementation **NOT STARTED**. Goal 8D is also not started. No Goal 8 release tag was created; `v0.7-learning-final` remains unchanged.
