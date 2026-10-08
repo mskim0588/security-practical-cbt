@@ -2,9 +2,9 @@
 
 ## Checkpoint
 
-- Status: `IN PROGRESS` until deployment and production smoke finish.
-- Last Safe Step: implementation, targeted/full tests, and four-size browser QA passed locally.
-- Next Step: review/commit/push, wait for Railway `SUCCESS`, smoke production, then set `GOAL_8C_READY_FOR_PHYSICAL_DEVICE_TEST`.
+- Status: `GOAL_8C_READY_FOR_PHYSICAL_DEVICE_TEST`; functional PASS, physical Android PENDING.
+- Last Safe Step: feature commit `1b69bc8` pushed, Railway `SUCCESS`, production smoke passed, and this checkpoint updated.
+- Next Step: user physical Android verification only. Do not mark Goal 8C COMPLETE or begin Goal 8D automatically.
 
 ## A. Baseline — DONE
 
@@ -92,10 +92,15 @@
 - `explanations.json` `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696`
 - 5/5 SHA-256 match; protected files untouched.
 
-## S. Production Smoke — TODO
+## S. Production Smoke — DONE
 
-- Railway terminal status, `/` and `/healthz`, representative `/search` queries, result links, and Goal 7 modes to verify after push.
+- Feature commit `1b69bc8` pushed to `master`; Railway terminal status `SUCCESS`.
+- `GET /` and `GET /healthz` both 200; health reports database `healthy`, environment `production`, status `ok`.
+- `GET /concepts`, `/practice`, `/descriptive-training`, `/mock-exam`, `/law-freshness`, `/exam`, `/dashboard`, `/history`, and `/wrong-notes` all 200.
+- Canonical Concept and Topic, English alias, acronym, Korean alternative, `lastb`, `iptables`, and unknown query all 200 with expected first canonical destinations; no duplicate destinations in the tested result sets.
+- Concept and Topic detail links 200; Question anchor resolves within existing Topic detail. No raw search metadata in result main content or search block in active exam route.
+- P0 0; P1 0. Remaining P2: `/favicon.ico` 404, 9 `REVIEW_REQUIRED` law-freshness records, existing Goal 5 operational/security backlog.
 
-## T. Goal 8D Readiness — TODO
+## T. Goal 8D Readiness — DONE
 
-- Goal 8D remains NOT STARTED. Goal 8C is not COMPLETE until user physical Android confirmation; no Goal 8 tag.
+- Goal 8D remains `NOT STARTED`. Goal 8C is not COMPLETE until user physical Android confirmation; no Goal 8 tag. Existing `v0.7-learning-final` remains unchanged.
