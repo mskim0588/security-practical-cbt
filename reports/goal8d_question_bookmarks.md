@@ -2,9 +2,9 @@
 
 ## Checkpoint
 
-- Status: implementation and local verification `DONE`; Railway and production smoke `TODO`; physical Android `PENDING`.
-- Last Safe Step: browser-local implementation passed targeted Python and JavaScript tests, the full regression, and Chrome responsive QA. Baseline was clean `master` at `b023e97e6d8d78fa223c15e76ab01e394910d42e`, equal to `origin/master`.
-- Next Step: review the Goal 8D diff, commit and push, wait for Railway `SUCCESS`, run production smoke, then update this report. Physical Android verification remains with the user.
+- Status: `GOAL_8D_READY_FOR_PHYSICAL_DEVICE_TEST`; functional PASS, physical Android `PENDING`.
+- Last Safe Step: feature commit `d682531` was pushed, Railway reached terminal `SUCCESS`, production health and real-browser bookmark smoke passed, full regression passed, and protected core hashes matched. Baseline was clean `master` at `b023e97e6d8d78fa223c15e76ab01e394910d42e`, equal to `origin/master`.
+- Next Step: user physical Android verification. Do not mark Goal 8D complete or create a Goal 8 release tag automatically.
 
 ## A. Baseline — DONE
 
@@ -96,11 +96,19 @@
 - `explanations.json` `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696`
 - Result: 5 / 5 SHA-256 MATCH. Protected files unchanged.
 
-## S. Production Smoke — TODO
+## S. Production Smoke — DONE
 
-- Await feature push and terminal Railway deployment. Then verify `/`, `/healthz`, `/bookmarks`, catalog, real-browser add/reload/remove, search, Wrong Notes separation, and active-exam boundary.
+- Feature commit `d682531deab9ab867d6a28f35f1c4760e6d3fd1f` pushed to `master` normally; local HEAD matched `origin/master`. Railway deployment `6938332853` reached terminal `success`.
+- `GET /` and `/healthz` returned 200; health JSON reported `status=ok`, `database=healthy`, `environment=production`.
+- `GET /bookmarks` and `/bookmarks/catalog` returned 200; catalog contains 180 Questions. `/search?q=lastb`, `/search?q=SQLi`, and `/search?q=iptables` returned 200. `/practice`, `/concepts`, `/exam`, `/mock-exam`, and `/descriptive-training` returned 200.
+- In a real Chrome guest browser on production: empty state, add `Q-SHORT-062` from Search, saved card, reload persistence, Topic Question navigation, remove, and removed-state reload all passed. Stored state remained browser-local.
+- Production `/exam`, mock setup, and descriptive setup contained 0 Question bookmark controls. The active Mock session/Review Flag boundary was verified locally by targeted and full regression tests; no synthetic attempt was created in production.
+- Guest access to owner `/dashboard`, `/history`, `/wrong-notes`, and `/law-freshness` retained the expected login redirect. Bookmark actions do not touch Wrong Notes or Review Flag server data.
+- P0: 0. P1: 0. Remaining P2: `/favicon.ico` 404, 9 `REVIEW_REQUIRED` law-freshness records, existing Goal 5 operational/security backlog.
 
 ## T. Goal 8 Integration Readiness — PARTIAL
 
-- Goal 8D physical Android remains `PENDING`; do not mark Goal 8D complete or create a Goal 8 tag.
+- Goal 8D is `GOAL_8D_READY_FOR_PHYSICAL_DEVICE_TEST`; physical Android remains `PENDING`. Functional status: PASS. Do not mark Goal 8D complete or create a Goal 8 tag.
+- Physical device checklist: add, refresh persistence, `/bookmarks` list, remove, Wrong Notes distinction, mobile readability, and no horizontal overflow.
+- Goal 8 Integration status: `PENDING PHYSICAL GOAL 8D CLOSURE`.
 - Goal 8 Integration QA and release closure remain separate after physical Goal 8D verification. Existing `v0.7-learning-final` is unchanged.
