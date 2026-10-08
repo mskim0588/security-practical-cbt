@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic.name }} - Topic 학습{% endblock %}
+
+{% block content %}
+<div class="concept-detail-container topic-detail-container">
+  <nav class="breadcrumb-nav" aria-label="경로 탐색">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="/">홈</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('concepts.list_concepts') }}">개념 도서관</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('concepts.list_concepts', category=topic.category) }}">{{ topic.category }}</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('concepts.view_concept_detail', concept_id=topic.parent_concept_id) }}">{{ topic.parent_concept_name }}</a></li>
+      <li class="breadcrumb-item is-active" aria-current="page">{{ topic.name }}</li>
+    </ol>
+  </nav>
+
+  <header class="concept-hero-card card topic-hero-card">
+    <div class="hero-badges">
+      <span class="badge badge-category">{{ topic.category }}</span>
+      <span class="badge badge-id">{{ topic.topic_id }}</span>
+      <span class="badge badge-type">{{ topic.questions|length }}문항</span>
+    </div>
+    <p class="topic-parent-label">Parent Concept</p>
+    <a class="topic-parent-link" href="{{ url_for('concepts.view_concept_detail', concept_id=topic.parent_concept_id) }}">
+      {{ topic.parent_concept_id }} · {{ topic.parent_concept_name }}
+    </a>
+    <h1 class="concept-hero-title">{{ topic.name }}</h1>
+    <div class="concept-hero-summary-box">
+      <span class="summary-label">Topic 요약</span>
+      <p class="summary-text">{{ topic.summary }}</p>
+    </div>
+  </header>
+
+  <section class="concept-section card" aria-labelledby="topic-related-questions">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title" id="topic-related-questions">관련 문제 ({{ topic.questions|length }}문항)</h2>
+    </div>
+    <div class="connected-questions-list topic-question-list">
+      {% for q in topic.questions %}
+      {% set freshness = law_freshness_summary.by_target_id.get(q.id) if law_freshness_summary else none %}
+      <article class="question-row-item card-nested" id="question-{{ q.id }}">
+        <div class="q-row-top">
+          <div class="q-row-badges">
+            <span class="badge badge-id">{{ q.id }}</span>
+            {% if q.type == 'short' %}
+              <span class="badge badge-type badge-type-short">단답형</span>
+            {% elif q.type == 'descriptive' %}
+              <span class="badge badge-type badge-type-desc">서술형</span>
+            {% elif q.type == 'practical' %}
+              <span class="badge badge-type badge-type-prac">실무형</span>
+            {% endif %}
+            <span class="badge badge-score">{{ q.score }}점</span>
+            {% if freshness %}<span class="law-freshness-badge status-{{ freshness.status | lower }}">{{ freshness.status_label }}</span>{% endif %}
+          </div>
+          {% if q.source_id %}<span class="q-source-hint">출처: {{ q.source_id }}</span>{% endif %}
+        </div>
+        <p class="q-row-title">{{ q.question }}</p>
+        {% include "components/law_freshness.html" %}
+        <a class="topic-question-link" href="{{ url_for('concepts.view_concept_detail', concept_id=topic.parent_concept_id) }}#question-{{ q.id }}">
+          Parent Concept의 문제 위치에서 보기 &rarr;
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="concept-bottom-bar">
+    <a href="{{ url_for('concepts.view_concept_detail', concept_id=topic.parent_concept_id) }}#section-topics" class="btn btn-secondary">
+      &larr; Parent Concept로 돌아가기
+    </a>
+    <a href="{{ url_for('concepts.list_concepts') }}" class="btn btn-primary">개념 도서관 보기</a>
+  </div>
+</div>
+{% endblock %}

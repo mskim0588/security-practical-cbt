@@ -33,7 +33,7 @@
         {% endif %}
       </div>
       <div class="hero-actions">
-        <a href="#section-questions" class="btn btn-secondary btn-sm">연계 기출 {{ concept.questions|length }}문항 보기</a>
+        <a href="#section-topics" class="btn btn-secondary btn-sm">Topic {{ concept.topics|length }}개 보기</a>
         <a href="{{ url_for('exam.take_exam', mode='adaptive') }}" class="btn btn-primary btn-sm">맞춤형 모의고사 풀기</a>
       </div>
     </div>
@@ -189,17 +189,43 @@
   </section>
   {% endif %}
 
-  <!-- Section 4: Connected Questions -->
-  <section class="concept-section card" id="section-questions">
+  <!-- Section 4: Topic hierarchy -->
+  <section class="concept-section card" id="section-topics">
     <div class="section-header">
       <span class="section-num">04</span>
+      <h2 class="section-title">세부 Topic ({{ concept.topics|length }}개)</h2>
+    </div>
+    <p class="topic-section-intro">이 Parent Concept의 학습 범위를 Topic 단위로 나누었습니다. Topic을 선택하면 연결된 문제만 모아 볼 수 있습니다.</p>
+    <div class="topic-card-grid">
+      {% for topic in concept.topics %}
+      <article class="topic-card card-nested">
+        <div class="topic-card-meta">
+          <span class="badge badge-id">{{ topic.topic_id }}</span>
+          <span class="badge badge-type">{{ topic.question_count }}문항</span>
+        </div>
+        <h3 class="topic-card-title">
+          <a href="{{ url_for('concepts.view_topic_detail', topic_id=topic.topic_id) }}">{{ topic.name }}</a>
+        </h3>
+        <p class="topic-card-summary">{{ topic.summary }}</p>
+        <a class="topic-card-link" href="{{ url_for('concepts.view_topic_detail', topic_id=topic.topic_id) }}">
+          관련 문제 보기 &rarr;
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Section 5: Connected Questions -->
+  <section class="concept-section card" id="section-questions">
+    <div class="section-header">
+      <span class="section-num">05</span>
       <h2 class="section-title">연계 기출 및 연습 문제 (총 {{ concept.questions|length }}문항)</h2>
     </div>
 
     <div class="connected-questions-list">
       {% for q in concept.questions %}
       {% set freshness = law_freshness_summary.by_target_id.get(q.id) if law_freshness_summary else none %}
-      <div class="question-row-item card-nested">
+      <div class="question-row-item card-nested" id="question-{{ q.id }}">
         <div class="q-row-top">
           <div class="q-row-badges">
             <span class="badge badge-id">{{ q.id }}</span>
@@ -211,6 +237,9 @@
               <span class="badge badge-type badge-type-prac">실무형</span>
             {% endif %}
             <span class="badge badge-score">{{ q.score }}점</span>
+            {% if q.topic_id %}
+              <a class="badge badge-topic-link" href="{{ url_for('concepts.view_topic_detail', topic_id=q.topic_id) }}">{{ q.topic_name }}</a>
+            {% endif %}
             {% if freshness %}<span class="law-freshness-badge status-{{ freshness.status | lower }}">{{ freshness.status_label }}</span>{% endif %}
           </div>
           {% if q.source_id %}
@@ -233,11 +262,11 @@
     </div>
   </section>
 
-  <!-- Section 5: Official References -->
+  <!-- Section 6: Official References -->
   {% if concept.sources %}
   <section class="concept-section card">
     <div class="section-header">
-      <span class="section-num">05</span>
+      <span class="section-num">06</span>
       <h2 class="section-title">공식 수험 레퍼런스 및 출처 문헌</h2>
     </div>
 

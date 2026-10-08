@@ -20,6 +20,13 @@ class LearningService:
         concepts = self.loader.load_concepts()
         concept_contents = self.loader.load_concept_contents()
         questions = self.loader.load_questions()
+        topics = self.loader.load_topics()
+
+        topic_counts: Dict[str, int] = {}
+        for topic in topics:
+            parent_id = topic.get("parent_concept_id")
+            if parent_id:
+                topic_counts[parent_id] = topic_counts.get(parent_id, 0) + 1
 
         # 취약도 통계 매핑
         try:
@@ -65,6 +72,7 @@ class LearningService:
                 "summary": summary_text,
                 "core_points": core_points[:3] if core_points else [],  # 카드 미리보기용 최대 3개
                 "question_count": stats["total"],
+                "topic_count": topic_counts.get(cid, 0),
                 "short_count": stats["short"],
                 "desc_count": stats["descriptive"],
                 "prac_count": stats["practical"],
@@ -92,12 +100,37 @@ class LearningService:
 
         # 동적 연계 문항 추출 (questions.json 180문항 중 해당 concept_id 매핑)
         questions = self.loader.load_questions()
+        topics = self.loader.load_topics()
+        question_topics = self.loader.load_question_topics()
+        topic_by_id = {topic["topic_id"]: topic for topic in topics}
+        topic_id_by_question = {
+            mapping["question_id"]: mapping["topic_id"] for mapping in question_topics
+        }
         connected_questions = [
-            q for q in questions if q.get("concept_id") == concept_id
+            dict(q) for q in questions if q.get("concept_id") == concept_id
         ]
+        for question in connected_questions:
+            topic_id = topic_id_by_question.get(question["id"])
+            topic = topic_by_id.get(topic_id, {})
+            question["topic_id"] = topic_id
+            question["topic_name"] = topic.get("name", "")
         # 정렬: 단답형 -> 서술형 -> 실무형 순서
         type_order = {"short": 1, "descriptive": 2, "practical": 3}
         connected_questions.sort(key=lambda x: (type_order.get(x.get("type", ""), 99), x.get("id", "")))
+
+        topic_question_counts: Dict[str, int] = {}
+        for question in connected_questions:
+            topic_id = question.get("topic_id")
+            if topic_id:
+                topic_question_counts[topic_id] = topic_question_counts.get(topic_id, 0) + 1
+        connected_topics = []
+        for topic in topics:
+            if topic.get("parent_concept_id") != concept_id:
+                continue
+            topic_copy = dict(topic)
+            topic_copy["question_count"] = topic_question_counts.get(topic["topic_id"], 0)
+            connected_topics.append(topic_copy)
+        connected_topics.sort(key=lambda x: (x.get("display_order", 999), x.get("topic_id", "")))
 
         # 출처 딕셔너리 매핑
         sources_dict = self.loader.get_sources_dict()
@@ -127,9 +160,47 @@ class LearningService:
             "category": concept_meta.get("category", ""),
             "meta": concept_meta,
             "content": content,
+            "topics": connected_topics,
             "questions": connected_questions,
             "sources": enriched_sources,
             "analytics": concept_analytics
+        }
+
+    def get_topic_detail(self, topic_id: str) -> Optional[Dict[str, Any]]:
+        """Return one Topic, its stable parent Concept, and mapped questions."""
+        topics = self.loader.load_topics()
+        topic = next((item for item in topics if item.get("topic_id") == topic_id), None)
+        if not topic:
+            return None
+
+        parent_concept_id = topic.get("parent_concept_id")
+        concepts = self.loader.load_concepts()
+        parent = next((item for item in concepts if item.get("id") == parent_concept_id), None)
+        if not parent:
+            return None
+
+        mapped_question_ids = {
+            item["question_id"]
+            for item in self.loader.load_question_topics()
+            if item.get("topic_id") == topic_id
+        }
+        questions = [
+            dict(question)
+            for question in self.loader.load_questions()
+            if question.get("id") in mapped_question_ids
+        ]
+        type_order = {"short": 1, "descriptive": 2, "practical": 3}
+        questions.sort(key=lambda x: (type_order.get(x.get("type", ""), 99), x.get("id", "")))
+
+        return {
+            "topic_id": topic["topic_id"],
+            "name": topic.get("name", ""),
+            "summary": topic.get("summary", ""),
+            "category": topic.get("category", ""),
+            "display_order": topic.get("display_order"),
+            "parent_concept_id": parent_concept_id,
+            "parent_concept_name": parent.get("name", ""),
+            "questions": questions,
         }
 
     def get_question_study_pack(self, question_id: str) -> Optional[Dict[str, Any]]:

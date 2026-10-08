@@ -12,6 +12,8 @@ class DataLoader:
         self._questions: Optional[List[Dict[str, Any]]] = None
         self._concept_contents: Optional[Dict[str, Any]] = None
         self._explanations: Optional[Dict[str, Any]] = None
+        self._topics: Optional[List[Dict[str, Any]]] = None
+        self._question_topics: Optional[List[Dict[str, str]]] = None
 
     def load_sources(self) -> List[Dict[str, Any]]:
         if self._sources is None:
@@ -33,6 +35,22 @@ class DataLoader:
             with open(path, "r", encoding="utf-8") as f:
                 self._questions = json.load(f)
         return self._questions
+
+    def load_topics(self) -> List[Dict[str, Any]]:
+        """Load the additive Topic learning taxonomy."""
+        if self._topics is None:
+            path = os.path.join(self.data_dir, "topics.json")
+            with open(path, "r", encoding="utf-8") as f:
+                self._topics = json.load(f)
+        return self._topics
+
+    def load_question_topics(self) -> List[Dict[str, str]]:
+        """Load primary Question-to-Topic mappings without changing questions.json."""
+        if self._question_topics is None:
+            path = os.path.join(self.data_dir, "question_topics.json")
+            with open(path, "r", encoding="utf-8") as f:
+                self._question_topics = json.load(f)
+        return self._question_topics
 
     def load_concept_contents(self) -> Dict[str, Any]:
         """concept_contents.json을 안전하게 로드하며 메모리 캐싱 적용"""

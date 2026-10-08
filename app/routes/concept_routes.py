@@ -73,3 +73,18 @@ def view_concept_detail(concept_id: str):
         concept=detail,
         law_freshness_summary=freshness_service.get_concept_summary(concept_id),
     )
+
+
+@concept_bp.route("/topics/<topic_id>")
+def view_topic_detail(topic_id: str):
+    service = get_learning_service()
+    detail = service.get_topic_detail(topic_id)
+    if not detail:
+        abort(404, description=f"Topic ID '{topic_id}'를 찾을 수 없습니다.")
+
+    freshness_service = LawFreshnessService(DataLoader(current_app.config.get("DATA_DIR")))
+    return render_template(
+        "concepts/topic_detail.html",
+        topic=detail,
+        law_freshness_summary=freshness_service.get_concept_summary(detail["parent_concept_id"]),
+    )
