@@ -13,6 +13,11 @@
 {% set show_bookmark_tools = (not is_exam_session)
   and ((not request.path.startswith('/practice')) or (practice is defined and practice.phase != 'question'))
   and ((not request.path.startswith('/descriptive-training')) or (training is defined and training.phase != 'question')) %}
+{% set owner_nav = is_admin_authenticated() %}
+{% set solving_active = request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}
+{% set learning_active = request.path.startswith('/concepts') or request.path.startswith('/topics') %}
+{% set my_learning_active = request.path.startswith('/dashboard') or request.path.startswith('/history') or request.path.startswith('/wrong-notes') or (owner_nav and request.path.startswith('/bookmarks')) %}
+{% set more_active = request.path.startswith('/search') or (not owner_nav and request.path.startswith('/bookmarks')) or request.path.startswith('/law-freshness') %}
 <body class="{% block body_class %}{% endblock %} {% if is_exam_session %}is-exam-session{% else %}has-mobile-nav{% endif %}">
   <a href="#main-content" class="skip-link">본문 바로가기</a>
 
@@ -23,24 +28,29 @@
         <a href="/" class="logo-title">정보보안기사 실기시험 CBT</a>
         <nav class="nav-desktop" aria-label="메인 내비게이션">
           <a href="/" class="nav-desktop-link {% if request.path == '/' %}is-active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>홈</a>
-          <a href="/dashboard" class="nav-desktop-link {% if request.path.startswith('/dashboard') %}is-active{% endif %}" {% if request.path.startswith('/dashboard') %}aria-current="page"{% endif %}>대시보드</a>
-          <a href="/concepts" class="nav-desktop-link {% if request.path.startswith('/concepts') %}is-active{% endif %}" {% if request.path.startswith('/concepts') %}aria-current="page"{% endif %}>개념학습</a>
-          <a href="/exam" class="nav-desktop-link {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}aria-current="page"{% endif %}>모의고사</a>
-          <a href="/history" class="nav-desktop-link {% if request.path.startswith('/history') %}is-active{% endif %}" {% if request.path.startswith('/history') %}aria-current="page"{% endif %}>응시이력</a>
-          <a href="/wrong-notes" class="nav-desktop-link {% if request.path.startswith('/wrong-notes') %}is-active{% endif %}" {% if request.path.startswith('/wrong-notes') %}aria-current="page"{% endif %}>오답노트</a>
-          {% if show_bookmark_tools %}<a href="{{ url_for('bookmarks.list_bookmarks') }}" class="nav-desktop-link {% if request.path.startswith('/bookmarks') %}is-active{% endif %}" {% if request.path.startswith('/bookmarks') %}aria-current="page"{% endif %}>다시 볼 문제</a>{% endif %}
+          <a href="/exam" class="nav-desktop-link {% if solving_active %}is-active{% endif %}" {% if solving_active %}aria-current="page"{% endif %}>문제풀기</a>
+          <a href="/concepts" class="nav-desktop-link {% if learning_active %}is-active{% endif %}" {% if learning_active %}aria-current="page"{% endif %}>개념정리</a>
+          {% if owner_nav and show_bookmark_tools %}
+          <details class="nav-menu nav-menu-desktop">
+            <summary class="nav-desktop-link {% if my_learning_active %}is-active{% endif %}" aria-expanded="false">내 학습</summary>
+            <div class="nav-menu-panel" aria-label="내 학습 이동">
+              {% set menu_kind = 'my_learning' %}{% include 'components/navigation_menu_links.html' %}
+            </div>
+          </details>
+          {% endif %}
+          {% if show_bookmark_tools %}
+          <details class="nav-menu nav-menu-desktop">
+            <summary class="nav-desktop-link {% if more_active %}is-active{% endif %}" aria-expanded="false">더보기</summary>
+            <div class="nav-menu-panel" aria-label="더보기 이동">
+              {% set menu_kind = 'more' %}{% include 'components/navigation_menu_links.html' %}
+            </div>
+          </details>
+          {% endif %}
         </nav>
       </div>
       <div class="header-actions">
         {% block header_actions %}
         <span class="header-status-text">총 100점 만점 / 합격 기준 60점</span>
-        {% if admin_access_key_configured and is_admin_authenticated() %}
-        <a href="{{ url_for('law_freshness.review_queue') }}" class="btn btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">법규 최신성</a>
-        <form method="POST" action="/admin-logout" style="display:inline; margin-left: 0.75rem;">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-color: #cbd5e1; color: #64748b; cursor: pointer;" title="관리자 세션 로그아웃">로그아웃</button>
-        </form>
-        {% endif %}
         {% endblock %}
       </div>
     </div>
@@ -60,35 +70,41 @@
   {% if not is_exam_session %}
   <!-- Mobile Global Bottom Navigation (< 768px) -->
   <nav class="nav-mobile-bottom" aria-label="모바일 하단 내비게이션">
-    <div class="nav-mobile-grid{% if show_bookmark_tools %} has-bookmarks{% endif %}">
+    <div class="nav-mobile-grid{% if owner_nav and show_bookmark_tools %} has-owner-menu{% elif not show_bookmark_tools %} has-three-items{% endif %}">
       <a href="/" class="nav-mobile-item {% if request.path == '/' %}is-active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>
         <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5v11.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="nav-mobile-label">홈</span>
       </a>
-      <a href="/dashboard" class="nav-mobile-item {% if request.path.startswith('/dashboard') %}is-active{% endif %}" {% if request.path.startswith('/dashboard') %}aria-current="page"{% endif %}>
-        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="5"/><rect x="3" y="16" width="7" height="5"/></svg>
-        <span class="nav-mobile-label">대시보드</span>
-      </a>
-      <a href="/concepts" class="nav-mobile-item {% if request.path.startswith('/concepts') %}is-active{% endif %}" {% if request.path.startswith('/concepts') %}aria-current="page"{% endif %}>
-        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <span class="nav-mobile-label">개념학습</span>
-      </a>
-      <a href="/exam" class="nav-mobile-item {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}is-active{% endif %}" {% if request.path.startswith('/exam') or request.path.startswith('/review') or request.path.startswith('/practice') or request.path.startswith('/descriptive-training') or request.path.startswith('/mock-exam') %}aria-current="page"{% endif %}>
+      <a href="/exam" class="nav-mobile-item {% if solving_active %}is-active{% endif %}" {% if solving_active %}aria-current="page"{% endif %}>
         <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        <span class="nav-mobile-label">모의고사</span>
+        <span class="nav-mobile-label">문제풀기</span>
       </a>
-      <a href="/history" class="nav-mobile-item {% if request.path.startswith('/history') %}is-active{% endif %}" {% if request.path.startswith('/history') %}aria-current="page"{% endif %}>
-        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span class="nav-mobile-label">응시이력</span>
+      <a href="/concepts" class="nav-mobile-item {% if learning_active %}is-active{% endif %}" {% if learning_active %}aria-current="page"{% endif %}>
+        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span class="nav-mobile-label">개념정리</span>
       </a>
-      <a href="/wrong-notes" class="nav-mobile-item {% if request.path.startswith('/wrong-notes') %}is-active{% endif %}" {% if request.path.startswith('/wrong-notes') %}aria-current="page"{% endif %}>
-        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>
-        <span class="nav-mobile-label">오답노트</span>
-      </a>
-      {% if show_bookmark_tools %}<a href="{{ url_for('bookmarks.list_bookmarks') }}" class="nav-mobile-item {% if request.path.startswith('/bookmarks') %}is-active{% endif %}" {% if request.path.startswith('/bookmarks') %}aria-current="page"{% endif %}>
-        <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-7-4-7 4z"/></svg>
-        <span class="nav-mobile-label">저장문제</span>
-      </a>{% endif %}
+      {% if owner_nav and show_bookmark_tools %}
+      <details class="nav-menu nav-menu-mobile">
+        <summary class="nav-mobile-item {% if my_learning_active %}is-active{% endif %}" aria-expanded="false">
+          <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="5"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span class="nav-mobile-label">내 학습</span>
+        </summary>
+        <div class="nav-menu-panel" aria-label="내 학습 이동">
+          {% set menu_kind = 'my_learning' %}{% include 'components/navigation_menu_links.html' %}
+        </div>
+      </details>
+      {% endif %}
+      {% if show_bookmark_tools %}
+      <details class="nav-menu nav-menu-mobile">
+        <summary class="nav-mobile-item {% if more_active %}is-active{% endif %}" aria-expanded="false">
+          <svg class="nav-mobile-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="7" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="17" cy="12" r="1"/></svg>
+          <span class="nav-mobile-label">더보기</span>
+        </summary>
+        <div class="nav-menu-panel" aria-label="더보기 이동">
+          {% set menu_kind = 'more' %}{% include 'components/navigation_menu_links.html' %}
+        </div>
+      </details>
+      {% endif %}
     </div>
   </nav>
   {% endif %}
@@ -98,6 +114,7 @@
   {% endif %}
 
   {% if show_bookmark_tools %}<script src="{{ url_for('static', filename='js/bookmarks.js') }}" data-bookmark-scope="{{ 'owner' if is_admin_authenticated() else 'guest' }}" defer></script>{% endif %}
+  {% if show_bookmark_tools %}<script src="{{ url_for('static', filename='js/navigation.js') }}" defer></script>{% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

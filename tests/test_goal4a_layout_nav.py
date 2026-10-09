@@ -82,12 +82,13 @@ class TestGoal4ALayoutNavigation(unittest.TestCase):
         self.assertIn('class="nav-desktop"', html)
         self.assertIn('class="nav-mobile-bottom"', html)
 
-        # Check all 5 menu items in desktop and mobile nav
+        # Goal 9A keeps the shared destinations and groups owner views.
         for path, name in [
             ("/", "홈"),
-            ("/dashboard", "대시보드"),
-            ("/exam", "모의고사"),
-            ("/history", "응시이력"),
+            ("/exam", "문제풀기"),
+            ("/concepts", "개념정리"),
+            ("/dashboard", "학습 현황"),
+            ("/history", "응시 기록"),
             ("/wrong-notes", "오답노트"),
         ]:
             self.assertIn(f'href="{path}"', html)
@@ -100,9 +101,9 @@ class TestGoal4ALayoutNavigation(unittest.TestCase):
     def test_active_navigation_across_pages(self):
         """Test active state styling across different pages."""
         pages = [
-            ("/dashboard", 'href="/dashboard" class="nav-desktop-link is-active" aria-current="page"'),
-            ("/history", 'href="/history" class="nav-desktop-link is-active" aria-current="page"'),
-            ("/wrong-notes", 'href="/wrong-notes" class="nav-desktop-link is-active" aria-current="page"'),
+            ("/dashboard", 'href="/dashboard" class="nav-menu-link is-active" aria-current="page"'),
+            ("/history", 'href="/history" class="nav-menu-link is-active" aria-current="page"'),
+            ("/wrong-notes", 'href="/wrong-notes" class="nav-menu-link is-active" aria-current="page"'),
         ]
         for url, expected_active_snippet in pages:
             with self.subTest(url=url):
@@ -110,6 +111,7 @@ class TestGoal4ALayoutNavigation(unittest.TestCase):
                 self.assertEqual(resp.status_code, 200)
                 html = resp.get_data(as_text=True)
                 self.assertIn(expected_active_snippet, html)
+                self.assertIn('class="nav-desktop-link is-active" aria-expanded="false">내 학습', html)
                 self.assertIn('class="nav-mobile-bottom"', html)
                 self.assertIn('has-mobile-nav', html)
 

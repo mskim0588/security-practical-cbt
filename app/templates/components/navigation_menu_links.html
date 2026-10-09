@@ -1,0 +1,24 @@
+{% if menu_kind == 'my_learning' %}
+<a href="/dashboard" class="nav-menu-link {% if request.path.startswith('/dashboard') %}is-active{% endif %}" {% if request.path.startswith('/dashboard') %}aria-current="page"{% endif %}>학습 현황</a>
+<a href="/history" class="nav-menu-link {% if request.path.startswith('/history') %}is-active{% endif %}" {% if request.path.startswith('/history') %}aria-current="page"{% endif %}>응시 기록</a>
+<a href="/wrong-notes" class="nav-menu-link {% if request.path.startswith('/wrong-notes') %}is-active{% endif %}" {% if request.path.startswith('/wrong-notes') %}aria-current="page"{% endif %}>오답노트</a>
+<a href="/bookmarks" class="nav-menu-link {% if request.path.startswith('/bookmarks') %}is-active{% endif %}" {% if request.path.startswith('/bookmarks') %}aria-current="page"{% endif %}>다시 볼 문제</a>
+{% elif menu_kind == 'more' %}
+<a href="/search" class="nav-menu-link {% if request.path.startswith('/search') %}is-active{% endif %}" {% if request.path.startswith('/search') %}aria-current="page"{% endif %}>통합 검색</a>
+{% if not owner_nav %}<a href="/bookmarks" class="nav-menu-link {% if request.path.startswith('/bookmarks') %}is-active{% endif %}" {% if request.path.startswith('/bookmarks') %}aria-current="page"{% endif %}>다시 볼 문제</a>{% endif %}
+<span class="nav-menu-heading">다른 문제풀이</span>
+<a href="/practice" class="nav-menu-link {% if request.path.startswith('/practice') %}is-active{% endif %}" {% if request.path.startswith('/practice') %}aria-current="page"{% endif %}>반복 학습</a>
+<a href="/descriptive-training" class="nav-menu-link {% if request.path.startswith('/descriptive-training') %}is-active{% endif %}" {% if request.path.startswith('/descriptive-training') %}aria-current="page"{% endif %}>서술형 훈련</a>
+<a href="/mock-exam" class="nav-menu-link {% if request.path.startswith('/mock-exam') %}is-active{% endif %}" {% if request.path.startswith('/mock-exam') %}aria-current="page"{% endif %}>실전 모의고사</a>
+{% if owner_nav %}<a href="{{ url_for('law_freshness.review_queue') }}" class="nav-menu-link {% if request.path.startswith('/law-freshness') %}is-active{% endif %}" {% if request.path.startswith('/law-freshness') %}aria-current="page"{% endif %}>법규 최신성</a>{% endif %}
+{% if admin_access_key_configured %}
+  {% if owner_nav %}
+  <form method="POST" action="/admin-logout" class="nav-menu-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="nav-menu-link">로그아웃</button>
+  </form>
+  {% else %}
+  <a href="/admin-login" class="nav-menu-link">로그인</a>
+  {% endif %}
+{% endif %}
+{% endif %}

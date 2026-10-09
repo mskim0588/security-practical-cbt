@@ -25,9 +25,10 @@ class TestGoal6BMobileResponsive(unittest.TestCase):
         self.assertIn(".exam-main", self.css_content)
         self.assertIn("min-width: 0", self.css_content, ".exam-main should declare min-width: 0")
 
-    def test_mob_002_bottom_nav_six_column_grid(self):
-        """MOB-002: .nav-mobile-grid defines 6 columns matching all 6 navigation items."""
-        self.assertIn("repeat(6, minmax(0, 1fr))", self.css_content, "Mobile bottom nav must have 6 columns")
+    def test_mob_002_bottom_nav_compact_grid(self):
+        """MOB-002: Goal 9A uses four Guest and five Owner mobile destinations."""
+        self.assertIn("repeat(4, minmax(0, 1fr))", self.css_content)
+        self.assertIn("repeat(5, minmax(0, 1fr))", self.css_content)
         self.assertIn(".nav-mobile-label", self.css_content)
 
     def test_mob_003_dashboard_responsive_class(self):

@@ -148,13 +148,13 @@ class TestGoal4CLearningContent(unittest.TestCase):
         self.assertNotIn('href="/concepts/CON-', html_rev, "Review screen must not link to concept study pages")
 
     def test_navigation_presence_of_concepts(self):
-        """Ensure 개념학습 appears in global navigation on home page."""
+        """Ensure the Concept library remains in global navigation."""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, 200)
         html = resp.get_data(as_text=True)
 
         self.assertIn('href="/concepts"', html)
-        self.assertIn("개념학습", html)
+        self.assertIn("개념정리", html)
 
         # When visiting /concepts, it should be active
         resp_c = self.client.get("/concepts")
@@ -275,4 +275,3 @@ class TestGoal4CLearningContent(unittest.TestCase):
         resp_exam = self.client.get("/exam")
         html_exam = resp_exam.get_data(as_text=True)
         self.assertNotIn('id="ai-prompt-modal"', html_exam)
-
