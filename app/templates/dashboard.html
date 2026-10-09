@@ -31,11 +31,13 @@
   </div>
 
   <!-- Learning Recommendation Banner (Goal 4E) -->
+  <section aria-labelledby="dashboard-next-title" class="dashboard-next-section">
+  <h2 id="dashboard-next-title" class="dashboard-summary-heading">다음 추천 학습</h2>
   {% if recommendation %}
   <div class="rec-banner rec-{{ recommendation.type }}">
     <div>
       <span class="rec-badge">{{ recommendation.badge }}</span>
-      <h2 class="rec-title">{{ recommendation.title }}</h2>
+      <h3 class="rec-title">{{ recommendation.title }}</h3>
       <p class="rec-message">{{ recommendation.message }}</p>
     </div>
     <div class="rec-actions">
@@ -48,6 +50,39 @@
     </div>
   </div>
   {% endif %}
+  </section>
+
+  <div class="dashboard-primary-grid">
+    <section class="card dashboard-summary-card" aria-labelledby="dashboard-weak-title">
+      <h2 id="dashboard-weak-title" class="dashboard-summary-heading">취약 개념 TOP 3</h2>
+      {% if weak_concepts %}
+      <ol class="dashboard-weak-list">
+        {% for concept in weak_concepts %}
+        <li>
+          <a href="{{ url_for('concepts.view_concept_detail', concept_id=concept.concept_id) }}">{{ concept.name }}</a>
+          <span class="dashboard-weak-meta">VI {{ "%.1f"|format(concept.vulnerability_index) }} · 풀이 {{ concept.attempts_count }}건 · 득점률 {{ "%.1f"|format(concept.score_rate) }}%</span>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p>아직 풀이 기록에 기반한 취약 개념이 없습니다.</p>
+      <a class="dashboard-summary-action" href="/concepts">개념 둘러보기 &rarr;</a>
+      {% endif %}
+    </section>
+    <section class="card dashboard-summary-card" aria-labelledby="dashboard-recent-title">
+      <h2 id="dashboard-recent-title" class="dashboard-summary-heading">최근 응시 점수</h2>
+      {% if recent_score %}
+      <p class="dashboard-recent-value">{{ "%.1f"|format(recent_score.total_score)|replace('.0', '') }} <span>/ 100점</span></p>
+      <p>{{ recent_score.date_str }} · {% if recent_score.is_passed %}합격{% else %}복습 필요{% endif %}</p>
+      <a class="dashboard-summary-action" href="/history/{{ recent_score.attempt_id }}">결과 보기 &rarr;</a>
+      {% else %}
+      <p>아직 완료한 시험 기록이 없습니다.</p>
+      <a class="dashboard-summary-action" href="/exam?mode=standard">시험 시작하기 &rarr;</a>
+      {% endif %}
+    </section>
+  </div>
+
+  <h2 class="dashboard-summary-heading dashboard-detail-heading">상세 학습 분석</h2>
 
   <!-- 4 Core Metric KPI Cards -->
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px;">
@@ -87,10 +122,10 @@
     <div class="card" style="padding: 18px; margin: 0; background: white; border-top: 4px solid #0284c7;">
       <div style="font-size: 12px; font-weight: 700; color: var(--neutral-600); text-transform: uppercase;">평균 획득 점수</div>
       <div style="font-size: 28px; font-weight: 800; color: var(--neutral-900); margin: 6px 0;">
-        {{ "%.1f"|format(summary.average_score)|replace('.0', '') }} <span style="font-size: 14px; color: var(--neutral-600); font-weight: normal;">/ 100점</span>
+        {% if summary.total_attempts %}{{ "%.1f"|format(summary.average_score)|replace('.0', '') }} <span style="font-size: 14px; color: var(--neutral-600); font-weight: normal;">/ 100점</span>{% else %}—{% endif %}
       </div>
       <div style="font-size: 12px; color: var(--neutral-600);">
-        최고 점수: <strong>{{ "%.1f"|format(summary.highest_score)|replace('.0', '') }}점</strong>
+        최고 점수: <strong>{% if summary.total_attempts %}{{ "%.1f"|format(summary.highest_score)|replace('.0', '') }}점{% else %}—{% endif %}</strong>
       </div>
     </div>
 

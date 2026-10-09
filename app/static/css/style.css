@@ -4352,6 +4352,75 @@ header.app-header {
    ========================================================================== */
 
 /* Learning Recommendation Banner */
+.dashboard-summary-heading {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin: 0 0 12px;
+  color: var(--neutral-900);
+}
+
+.dashboard-primary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.dashboard-summary-card {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-weak-list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.dashboard-weak-list li {
+  padding: 6px 0;
+}
+
+.dashboard-weak-list a {
+  font-weight: 700;
+}
+
+.dashboard-weak-meta {
+  display: block;
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+.dashboard-recent-value {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.dashboard-recent-value span {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.dashboard-summary-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+}
+
+.dashboard-detail-heading {
+  margin-top: 8px;
+}
+
+@media (max-width: 767px) {
+  .dashboard-primary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .rec-banner {
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-6);

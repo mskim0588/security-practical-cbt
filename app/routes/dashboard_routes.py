@@ -6,6 +6,7 @@ from app.services.wrong_answer_service import WrongAnswerService
 from app.services.auth_service import admin_required
 
 dashboard_bp = Blueprint("dashboard", __name__)
+SCORED_EXAM_MODES = frozenset(("standard", "random", "adaptive", "wrong_review"))
 
 def get_services():
     loader = DataLoader(current_app.config["DATA_DIR"])
@@ -60,17 +61,40 @@ def get_learning_recommendation(summary: Dict[str, Any], wrong_count: int, top_v
         }
 
     # Rule D: 전체적으로 안정된 상태
-    pass_rate = summary.get("pass_rate", 0.0)
     return {
         "type": "practice",
-        "badge": "실전 감각 유지",
-        "title": f"우수한 성취도를 안정적으로 유지하고 있습니다! (합격률 {pass_rate}%)",
-        "message": "모든 오답을 극복하고 안정적인 합격권에 도달했습니다. 랜덤 실전 모의고사로 다양한 실무 유형을 연습해보세요.",
+        "badge": "학습 이어가기",
+        "title": "다음 모의고사로 학습을 이어가세요",
+        "message": "현재 미해결 오답이 없습니다. 랜덤 모의고사로 다른 문제를 풀어보세요.",
         "primary_btn_text": "🎲 랜덤 실전 모의고사 응시하기 →",
         "primary_btn_url": "/exam?mode=random",
         "secondary_btn_text": "📜 과거 응시 이력 복기",
         "secondary_btn_url": "/history"
     }
+
+
+def build_dashboard_presentation(top_vulnerable: List[Dict[str, Any]], recent_trend: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Compose the quick summary from existing Owner analytics without recalculating scores or VI."""
+    weak_concepts = [
+        concept for concept in (top_vulnerable or [])
+        if concept.get("concept_id")
+        and isinstance(concept.get("attempts_count"), (int, float))
+        and concept["attempts_count"] > 0
+        and isinstance(concept.get("vulnerability_index"), (int, float))
+        and concept["vulnerability_index"] > 0
+    ]
+    weak_concepts.sort(key=lambda concept: (-concept["vulnerability_index"], concept["concept_id"]))
+
+    recent_score = next((
+        attempt for attempt in reversed(recent_trend or [])
+        if attempt.get("exam_mode") in SCORED_EXAM_MODES
+        and isinstance(attempt.get("attempt_id"), int)
+        and isinstance(attempt.get("total_score"), (int, float))
+        and 0 <= attempt["total_score"] <= 100
+        and isinstance(attempt.get("is_passed"), bool)
+        and attempt.get("date_str")
+    ), None)
+    return {"weak_concepts": weak_concepts[:3], "recent_score": recent_score}
 
 @dashboard_bp.route("/dashboard")
 @admin_required
@@ -91,6 +115,7 @@ def view_dashboard():
         score_delta = round(latest - prev, 1)
 
     recommendation = get_learning_recommendation(summary, wrong_count, top_vulnerable)
+    presentation = build_dashboard_presentation(top_vulnerable, recent_trend)
 
     return render_template(
         "dashboard.html",
@@ -100,5 +125,6 @@ def view_dashboard():
         recent_trend=recent_trend,
         wrong_count=wrong_count,
         score_delta=score_delta,
-        recommendation=recommendation
+        recommendation=recommendation,
+        **presentation
     )
