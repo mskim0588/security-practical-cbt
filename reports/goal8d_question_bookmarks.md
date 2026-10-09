@@ -2,9 +2,18 @@
 
 ## Checkpoint
 
-- Status: `GOAL_8D_READY_FOR_PHYSICAL_DEVICE_TEST`; functional PASS, physical Android `PENDING`.
-- Last Safe Step: feature commit `d682531` was pushed, Railway reached terminal `SUCCESS`, production health and real-browser bookmark smoke passed, full regression passed, and protected core hashes matched. Baseline was clean `master` at `b023e97e6d8d78fa223c15e76ab01e394910d42e`, equal to `origin/master`.
-- Next Step: user physical Android verification. Do not mark Goal 8D complete or create a Goal 8 release tag automatically.
+- Status: `GOAL_8D_COMPLETE`; functional PASS; physical Android PASS — USER CONFIRMED.
+- Last Safe Step: feature commit `d682531` and deployment checkpoint commit `85b775a` were pushed; Railway reached terminal `SUCCESS`, production health and real-browser bookmark smoke passed, the retained full regression passed, protected core hashes matched, and the user confirmed normal operation on a physical Android device.
+- Next Step: separate Goal 8 Integration QA & Release Closure. Do not create a Goal 8 release tag or start Goal 9 in this closure.
+
+## Final Closure — COMPLETE
+
+- Final Verdict: `GOAL_8D_COMPLETE`. Goal 8 Integration Readiness: `GOAL_8_INTEGRATION_READY`. Goal 9: NOT STARTED.
+- Persistence: browser `localStorage`; bookmark target: canonical `question_id`; guest and owner use separate browser-local keys. Cross-device synchronization: NOT SUPPORTED. Database schema change: NO.
+- Dedicated route: `/bookmarks`. Manual add/remove: PASS. Reload persistence: PASS in prior browser QA. A separate browser-restart test was not recorded; no independent restart result is claimed.
+- Wrong Notes separation: PASS. Goal 7C Review Flag separation: PASS. Analytics/VI/adaptive preservation: PASS. Anti-cheat: PASS. Mobile browser QA: PASS.
+- Retained regression, not rerun for this documentation-only closure: 318 ran / 317 passed / 1 skipped / 0 failures / 0 errors. Core data: 5 / 5 SHA-256 MATCH.
+- P0: 0. P1: 0. Remaining P2: `/favicon.ico` 404, 9 `REVIEW_REQUIRED` law-freshness records, and the existing Goal 5 operational/security backlog.
 
 ## A. Baseline — DONE
 
@@ -77,10 +86,10 @@
 - Goal 7A/7B/7C/7D suites pass in the full regression. No VI, adaptive, analytics, weakness, grading, dashboard, or Wrong Note service changes.
 - Law freshness remains 4 `VERIFIED` / 9 `REVIEW_REQUIRED`.
 
-## P. Mobile QA — DONE (browser); physical Android PENDING
+## P. Mobile QA — DONE (browser and user-confirmed physical Android)
 
 - Chrome checks at 360×740, 390×844, 430×932, and 1280×800. Cards, previews, filters, add/remove actions, and empty state fit; no horizontal overflow. At mobile widths, open/remove controls remain visible above the bottom navigation.
-- Real-browser add, navigation, reload persistence, type filter, Question destination, remove, and removed-state reload passed. Keyboard Enter activated filter and removal. Physical Android remains unverified.
+- Real-browser add, navigation, reload persistence, type filter, Question destination, remove, and removed-state reload passed. Keyboard Enter activated filter and removal. Physical Android: PASS — USER CONFIRMED. The user confirmed normal operation without reporting separate detailed device observations.
 
 ## Q. Tests — DONE
 
@@ -106,9 +115,8 @@
 - Guest access to owner `/dashboard`, `/history`, `/wrong-notes`, and `/law-freshness` retained the expected login redirect. Bookmark actions do not touch Wrong Notes or Review Flag server data.
 - P0: 0. P1: 0. Remaining P2: `/favicon.ico` 404, 9 `REVIEW_REQUIRED` law-freshness records, existing Goal 5 operational/security backlog.
 
-## T. Goal 8 Integration Readiness — PARTIAL
+## T. Goal 8 Integration Readiness — DONE
 
-- Goal 8D is `GOAL_8D_READY_FOR_PHYSICAL_DEVICE_TEST`; physical Android remains `PENDING`. Functional status: PASS. Do not mark Goal 8D complete or create a Goal 8 tag.
-- Physical device checklist: add, refresh persistence, `/bookmarks` list, remove, Wrong Notes distinction, mobile readability, and no horizontal overflow.
-- Goal 8 Integration status: `PENDING PHYSICAL GOAL 8D CLOSURE`.
-- Goal 8 Integration QA and release closure remain separate after physical Goal 8D verification. Existing `v0.7-learning-final` is unchanged.
+- Goal 8A, Goal 8B, Goal 8C, and Goal 8D are complete. Goal 8D functional status: PASS; physical Android: PASS — USER CONFIRMED.
+- Goal 8 Integration status: `GOAL_8_INTEGRATION_READY`.
+- Goal 8 Integration QA and Release Closure are a separate next task; only that task may create `v0.8-learning-final` after its release gates pass. Goal 9 is NOT STARTED. Existing `v0.7-learning-final` is unchanged.
