@@ -2,9 +2,9 @@
 
 ## Checkpoint
 
-- Status: PARTIAL — implementation, tests, protected hashes, and local responsive QA passed; commit, push, and deployment pending.
-- Last Safe Step: shared desktop/mobile navigation implemented; 31 focused/current navigation tests passed; full regression passed; Guest/Owner Chrome QA passed at four viewports; 5/5 protected hashes matched.
-- Next Step: final diff review, commit and push `master`, wait for exact-commit Railway `SUCCESS`, then production smoke.
+- Status: PARTIAL — implementation commit deployed and production checked; this checkpoint update still needs commit/push and exact-commit deployment verification.
+- Last Safe Step: implementation commit `2f74fd8cd0c9833dd89cb6b050631f597f740211` pushed with clean parity; Railway reported `SUCCESS` for that exact commit; production Guest smoke and `/healthz` passed at 2026-10-09 14:46 UTC.
+- Next Step: commit and push this report update, wait for its exact Railway deployment result, then report Goal 9A ready for physical Android testing if healthy.
 
 ## Baseline — DONE
 
@@ -49,9 +49,13 @@
 - Mobile bottom bar was 60px high with 76px body bottom padding in the 360×740 inspection; menu panel ended above the bar. Active Exam had no mobile bar, Bookmark link, Search link, or new navigation script. Practice and pre-submit Descriptive Training retained the restricted three-item mobile bar.
 - Protected JSON hashes: `questions.json` `661098ce80e957b033fbb1a2b540701815791169ecd57c0f367720b94f3d5dc9`; `concepts.json` `d33cdd63824c01c6537dd6f2cb6829b58bf121883a05eb406803bbe58bad5943`; `sources.json` `9ae37ce41f1b3bccf0047474fca8e8332ad18f1ead298ee2f17fe85574049a21`; `concept_contents.json` `025c54ca679ac3e15ac8f8d98a9bf7ae3f120577e13ee44a5911b6beac335171`; `explanations.json` `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696`. All 5/5 match the protected baseline.
 
-## Deployment — TODO
+## Deployment — PARTIAL (implementation commit verified)
 
-- Commit/push, exact-commit Railway terminal status, production smoke. Physical Android remains PENDING; Goal 9A must stop at `GOAL_9A_READY_FOR_PHYSICAL_DEVICE_TEST` if deployment succeeds.
+- Implementation commit `2f74fd8cd0c9833dd89cb6b050631f597f740211` pushed to `master`; local HEAD = `origin/master`, working tree clean before this checkpoint edit. Existing `v0.8-learning-final` still targets `2483cb01928282d6dd3f180b527771191773e59b`. No Goal 9 tag.
+- Railway GitHub commit status for `2f74fd8`: `security-practical-cbt - web` = `success`, updated 2026-10-09 14:44:02 UTC. This verifies the new implementation deployment, not an older build.
+- Production checks at 2026-10-09 14:46 UTC: `/` 200 with new Guest primary navigation and Search/Bookmark utility links; `/healthz` 200 with `database=healthy`, `environment=production`; `/static/js/navigation.js` 200. Guest browser clicked `더보기` → `/search` and `더보기` → `/bookmarks`; Bookmark empty state loaded without JavaScript errors.
+- Guest HTTP smoke: `/exam`, `/practice`, `/descriptive-training`, `/mock-exam`, `/concepts`, a Concept detail, a Topic detail, `/search?q=SQLi`, and `/bookmarks` all returned 200. `/dashboard`, `/history`, `/wrong-notes`, and `/law-freshness` redirected Guest to `/admin-login`. Active `/exam` lacked new Search/Bookmark utility controls.
+- Production Owner navigation was not exercised with real credentials. Isolated local Owner browser and direct-route tests passed; no production Owner data was altered. Physical Android remains PENDING. Goal 9A must stop at `GOAL_9A_READY_FOR_PHYSICAL_DEVICE_TEST` after the checkpoint commit deploys successfully.
 
 ## Outstanding issues — DONE (documented)
 
