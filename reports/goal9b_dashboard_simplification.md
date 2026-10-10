@@ -2,11 +2,11 @@
 
 ## Checkpoint
 
-- Status: PARTIAL — finalized `mock_exam` was added to the recent-score mode allowlist and verified locally. Deployment of this fix is pending. Physical Android PENDING; Goal 9C NOT STARTED.
+- Status: `GOAL_9B_READY_FOR_PHYSICAL_DEVICE_TEST` for implementation, local QA, and the recovered fix deployment. Documentation checkpoint deployment remains to be verified. Physical Android PENDING; Goal 9C NOT STARTED.
 - Baseline HEAD: `faf8ff2981e49e6cf88fec585e441cef8ee72fe1`, clean `master` = `origin/master`; Goal 9A `GOAL_9A_COMPLETE`, Goal 9B `GOAL_9B_READY`; `v0.8-learning-final` unchanged.
 - Recovery entry: HEAD `ad633ecd9ed88794fdfae637fb6bb700b6b1a29f` = `origin/master`; unstaged Goal 9B changes in `app/routes/dashboard_routes.py`, `tests/test_goal9b_dashboard.py`, and this report; no staged or untracked files and no unrelated changes. Existing feature commit `13a891c` and checkpoint commit `ad633ec` were preserved.
-- Last Safe Step: focused tests 5/5, full regression 327 ran / 326 passed / 1 skipped / 0 failures / 0 errors, and protected hashes 5/5 match after the local fix. Earlier responsive Chrome QA remains applicable because template, CSS, and JavaScript did not change. Earlier public/Guest production smoke and Railway `success` apply only to the already pushed commits.
-- Next Step: commit and push the fix, verify Railway `SUCCESS` for the exact new commit, recheck production, then request the user's physical Android verification. Do not finalize Goal 9B or begin Goal 9C until separate closure.
+- Last Safe Step: recovered fix `7ac40c72ae2f5649a57585004b119d4dd64372a7` pushed and Railway `success`; post-deployment public/Guest smoke and production health passed. Focused tests 5/5, full regression 327 ran / 326 passed / 1 skipped / 0 failures / 0 errors, protected hashes 5/5 match, and responsive Owner Chrome QA passed.
+- Next Step: commit and push this documentation checkpoint, verify Railway `SUCCESS` for its exact commit and recheck production health, then request the user's physical Android verification. Do not finalize Goal 9B or begin Goal 9C until separate closure.
 
 ## Recovery classification
 
@@ -17,14 +17,14 @@
 | H Recent valid score; I empty history; J low data; K detailed analytics; L presentation view-model | DONE | Finalized mock fix and focused tests pass; detailed sections remain below the summary. |
 | M Owner authorization; N Guest isolation; O Goal 9A navigation | DONE | Existing protected route, focused authorization test, and unchanged navigation files. |
 | P Goal 7; Q Goal 8; U anti-cheat; V targeted tests; W full regression | DONE | Fresh 5/5 focused and 327-test full regression pass. |
-| R mobile; S desktop; T accessibility; Y browser QA | DONE | Prior isolated Chrome viewport checks retained; layout and client code did not change in this recovery. Physical Android remains pending. |
+| R mobile; S desktop; T accessibility; Y browser QA | DONE | Earlier empty/populated full-app Chrome QA retained; fresh low-data CDP viewport and screenshot checks passed. Physical Android remains pending. |
 | X core data integrity | DONE | Fresh 5/5 SHA-256 match; inventory 20/67/180/39. |
-| Z checkpoint report | PARTIAL | Updated for recovery; final deployment result pending. |
-| AA feature commit; AB push; AC Railway deployment; AD production smoke | PARTIAL | Earlier feature/checkpoint commits deployed; local mock fix awaits these gates. |
-| AE physical Android readiness | TODO | Report ready status only after deployment and smoke; user device check remains pending. |
+| Z checkpoint report | PARTIAL | Updated for recovery; this documentation commit and deployment are pending. |
+| AA feature commit; AB push; AC Railway deployment; AD production smoke | DONE | Recovered fix `7ac40c7` pushed; exact-commit Railway success and fresh public/Guest smoke. |
+| AE physical Android readiness | DONE | Ready for user device check; physical Android result remains pending. |
 
-- Last Safe Completed Step: fresh local test and core-data gates for the recovered fix.
-- First Incomplete Step: commit and push the recovered fix.
+- Last Safe Completed Step: recovered fix deployed and post-deployment production smoke passed.
+- First Incomplete Step: commit and push this documentation checkpoint, then verify its deployment.
 
 ## Existing Dashboard inventory — DONE
 
@@ -65,17 +65,20 @@
 - Fresh focused `python -m unittest tests.test_goal9b_dashboard -v`: 5 ran, 5 passed, 0 skipped/failures/errors. The added case checks finalized mock-exam score and History link. The existing cases cover Owner/Guest access, rendered empty/low-data states, recommendation target, canonical VI and tie ordering, exclusion of unattempted/unselected practical data, latest valid Owner scored exam, training-mode isolation, detail link, and read-only attempt/answer counts.
 - Fresh `python -m unittest discover tests -v`: 327 ran, 326 passed, 1 skipped (`PRIVATE_SOURCE_DIR` absent), 0 failures, 0 errors. This includes existing Goal 7/8/9A tests.
 - Isolated local Chrome at 2026-10-09 15:13 UTC used a temporary SQLite database and a synthetic Owner login. Empty and populated Owner Dashboard checked at 360×740, 390×844, 430×932, 1280×800. Document widths were 345, 375, 415, and 1265 CSS pixels respectively, below viewport widths. New cards stacked on mobile and sat side by side on desktop; TOP 3 names, VI/sample metadata, recent score and result link, existing detailed sections, and long scrolling were readable. The 44px recent-result action and bottom-of-page exam actions remained reachable above the fixed 60px mobile navigation; no JavaScript error was reported. Existing detailed trend table retained its internal horizontal scrolling. Physical Android: PENDING.
+- Fresh low-data Owner Chrome CDP check at 2026-10-10 13:31 UTC used a rendered synthetic Owner Dashboard with one finalized mock exam (64/100), inlined repository CSS, and the unchanged layout. At 360×740, 390×844, 430×932, and 1280×800, browser CSS widths were exact and document widths were 345, 375, 415, and 1265; no page-level overflow. Recommendation action, honest weak-concept empty state, 64-point recent score and History link, and detailed analytics were present at each viewport. Mobile bottom navigation height was 60px; desktop had no mobile bar. Mobile and desktop screenshots were visually inspected. The existing full-app browser QA above supplies the interaction and JavaScript checks; this focused static rendering check does not separately exercise JavaScript or navigation.
 
-## Data and deployment — PARTIAL for recovered fix
+## Data and deployment — DONE for recovered fix; documentation checkpoint pending
 
 - Protected SHA-256 files: `questions.json` `661098CE80E957B033FBB1A2B540701815791169ECD57C0F367720B94F3D5DC9`; `concepts.json` `D33CDD63824C01C6537DD6F2CB6829B58BF121883A05EB406803BBE58BAD5943`; `sources.json` `9AE37CE41F1B3BCCF0047474FCA8E8332AD18F1EAD298EE2F17FE85574049A21`; `concept_contents.json` `025C54CA679AC3E15AC8F8D98A9BF7AE3F120577E13EE44A5911B6BEAC335171`; `explanations.json` `E62C2EF4D5EF92C3EC8279AE9F1A8EBE2AD23414BED6560C9FBEF4751D322696`. All 5 MATCH the Goal 8 release report. Fresh JSON counts: Concepts 20; Topics 67; Questions 180; Aliases 39; Question-to-Topic mappings 180.
 - Feature commit `13a891c8d6acc2299a0dce43a3e3c295eeff1d86` pushed to `origin/master`. Exact SHA Railway GitHub commit status `security-practical-cbt - web` = `success`, updated 2026-10-09 15:15:14 UTC. This confirms the feature build, not an older deployment.
+- Recovered fix commit `7ac40c72ae2f5649a57585004b119d4dd64372a7` pushed to `origin/master`; exact-commit Railway GitHub status `security-practical-cbt - web` = `success`, updated 2026-10-10 13:28:50 UTC. Local `master` = `origin/master` after push.
+- Post-success production smoke at 2026-10-10 13:30 UTC: `/`, `/healthz`, `/concepts`, `/search`, `/bookmarks`, `/practice`, `/descriptive-training`, `/mock-exam`, and `/exam` returned 200. `/healthz` reported `database=healthy`, `environment=production`; root retained Exam, Search, and Bookmark links. Guest `/dashboard`, `/history`, and `/wrong-notes` redirected 302 to `/admin-login`. Authenticated production Owner Dashboard remains `PRODUCTION_OWNER_NOT_VERIFIED`.
 - Production HTTP checks at 2026-10-09 15:15 UTC: `/`, `/healthz`, `/concepts`, `/search`, `/bookmarks`, `/practice`, `/descriptive-training`, `/mock-exam`, and `/exam` returned 200. `/healthz`: `status=ok`, `database=healthy`, `environment=production`. Root HTML retained `/`, `/exam`, `/concepts`, `/search`, and `/bookmarks` links. Guest `/dashboard` returned 302 to `/admin-login?next=/dashboard`.
 - Production authenticated Owner Dashboard: `NOT_VERIFIED`; no authorized production Owner session was used. Physical Android: PENDING.
 
 ## Remaining release gates — TODO
 
-- Recovered fix commit/push, exact-commit Railway `SUCCESS`, and fresh public/Guest production smoke; user physical Android verification. Authenticated production Owner QA remains `PRODUCTION_OWNER_NOT_VERIFIED` unless authorized access is actually available.
+- Documentation checkpoint commit/push and its exact-commit Railway `SUCCESS`, then user physical Android verification. Authenticated production Owner QA remains `PRODUCTION_OWNER_NOT_VERIFIED` unless authorized access is actually available.
 
 ## Existing non-blocking backlog — DONE (documented)
 
