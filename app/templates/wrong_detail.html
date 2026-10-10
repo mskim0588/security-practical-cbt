@@ -3,18 +3,27 @@
 {% block title %}문항 심층 복기 리포트 | {{ detail.question.id }} | 정보보안기사 실기 CBT{% endblock %}
 
 {% block header_actions %}
-<a href="/wrong-notes" class="btn btn-secondary header-action-btn">
-  &larr; <span class="header-btn-full">오답노트 </span>목록으로
-</a>
-<a href="/exam?mode=wrong_review" class="btn btn-warning header-action-btn" style="font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-  🔥 <span class="header-btn-full">오답 </span>집중 모의고사
-</a>
-<a href="/exam" class="btn btn-primary header-action-btn">
-  새 모의고사<span class="header-btn-full"> 응시</span>
-</a>
+<div class="wrong-detail-header-links">
+  <a href="/wrong-notes" class="btn btn-secondary header-action-btn">
+    &larr; <span class="header-btn-full">오답노트 </span>목록으로
+  </a>
+  <a href="/exam?mode=wrong_review" class="btn btn-warning header-action-btn">
+    🔥 <span class="header-btn-full">오답 </span>집중 모의고사
+  </a>
+  <a href="/exam" class="btn btn-primary header-action-btn">
+    새 모의고사<span class="header-btn-full"> 응시</span>
+  </a>
+</div>
 {% endblock %}
 
 {% block content %}
+<h1 class="wrong-detail-title">문항 심층 복기</h1>
+<nav class="wrong-detail-nav" aria-label="문항 상세 이동">
+  <a href="/wrong-notes">&larr; 오답노트 목록</a>
+  <a href="#wrong-detail-answer">정답과 해설</a>
+  {% if detail.deep_explanation %}<a href="#wrong-detail-explanation">심층 해설과 AI Helper</a>{% endif %}
+  <a href="#wrong-detail-history">응시 이력</a>
+</nav>
 <!-- Question Header Card -->
 <div class="card" style="margin-bottom: 24px;">
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -81,7 +90,7 @@
   {% include "components/law_freshness.html" %}
 
   <!-- Model Answer and Details -->
-  <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
+  <div id="wrong-detail-answer" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 16px; margin-bottom: 16px;">
     <h3 style="font-size: 14px; font-weight: 700; color: #1e40af; margin-bottom: 8px;">
       🎯 모범 정답 및 핵심 루브릭
     </h3>
@@ -108,20 +117,20 @@
   </div>
 
   <!-- Source PDF Reference -->
-  <div style="font-size: 12px; color: var(--neutral-600); font-family: var(--font-mono);">
+  {% if detail.question.source_info is mapping and detail.question.source_info.title %}
+  <div style="font-size: 12px; color: var(--neutral-600); font-family: var(--font-mono); overflow-wrap: anywhere;">
     📚 PDF 출처: 
-    {% if detail.question.source_info %}
-      {{ detail.question.source_info.title if detail.question.source_info is mapping else detail.question.source_info }}
-    {% endif %}
+    {{ detail.question.source_info.title }}
     {% if detail.question.source_page %}
       (p.{{ detail.question.source_page }})
     {% endif %}
   </div>
+  {% endif %}
 </div>
 
 <!-- Deep Explanation Accordion (Goal 4C & 4D) -->
 {% if detail.deep_explanation %}
-  <div style="margin-bottom: 24px;">
+  <div id="wrong-detail-explanation" style="margin-bottom: 24px;">
     {% set explanation = detail.deep_explanation %}
     {% set concept_id = detail.question.concept_id %}
     {% set question_id = detail.question.id %}
@@ -135,7 +144,7 @@
 {% endif %}
 
 <!-- Attempt History Timeline Card (Goal 4D) -->
-<div class="card" style="margin-bottom: 24px;">
+<div id="wrong-detail-history" class="card" style="margin-bottom: 24px;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
     <div>
       <h2 style="font-size: 18px; font-weight: 800; color: var(--neutral-900); margin: 0;">

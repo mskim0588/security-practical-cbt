@@ -125,7 +125,7 @@ class WrongAnswerService:
             )
             .where(AnswerRecord.question_id == question_id)
             .where(AnswerRecord.achievement_status != "unselected")
-            .order_by(desc(AnswerRecord.created_at))
+            .order_by(desc(AnswerRecord.created_at), desc(AnswerRecord.id))
         )
         records = list(db_session.scalars(stmt).all())
 

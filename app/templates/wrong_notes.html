@@ -2,15 +2,6 @@
 
 {% block title %}오답노트 & 취약 문항 복습 | 정보보안기사 실기 CBT{% endblock %}
 
-{% block header_actions %}
-<a href="/exam?mode=wrong_review" class="btn btn-warning" style="padding: 8px 16px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-  🔥 오답 집중 모의고사 시작
-</a>
-<a href="/exam" class="btn btn-primary" style="padding: 8px 16px; font-size: 14px; margin-left: 8px;">
-  + 새 모의고사 응시
-</a>
-{% endblock %}
-
 {% block content %}
 <div style="margin-bottom: 24px;">
   <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
@@ -163,132 +154,54 @@
   {% endif %}
 </div>
 {% else %}
-<div style="display: flex; flex-direction: column; gap: 16px;">
+<div class="wrong-note-list" aria-label="미해결 오답 문항 목록">
   {% for q in questions %}
-  <div class="card" style="border-left: 5px solid {% if q.latest_status == 'incorrect' %}var(--danger-color){% else %}var(--warning-color){% endif %}; padding: 20px;">
-    
-    <!-- Top Meta -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-        <span style="font-family: var(--font-mono); font-weight: 800; font-size: 14px; color: var(--neutral-800); background: var(--neutral-100); padding: 3px 8px; border-radius: 4px;">
-          {{ q.question_id }}
-        </span>
-        {% if q.type == 'short' %}
-          <span class="q-badge badge-short">단답형</span>
-        {% elif q.type == 'descriptive' %}
-          <span class="q-badge badge-desc">서술형</span>
-        {% else %}
-          <span class="q-badge badge-prac">실무형</span>
-        {% endif %}
-        
-        <span class="q-category">{{ q.category }}</span>
-
-        {% if q.fail_count >= 2 %}
-          <span class="badge-repeat-fail">
-            🔥 반복 오답 {{ q.fail_count }}회
-          </span>
-        {% endif %}
-
-        {% if q.concept_id %}
-        <a href="{{ url_for('concepts.view_concept_detail', concept_id=q.concept_id) }}" class="btn-concept-link" title="소속 개념 심층 학습서 이동">
-          📖 {{ q.concept_id }} {% if q.concept_name %}{{ q.concept_name }}{% endif %} &rarr;
-        </a>
-        {% elif q.concept_name %}
-        <span style="background: #ede9fe; color: #6d28d9; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-          {{ q.concept_name }}
-        </span>
-        {% endif %}
-      </div>
-
-      <div style="display: flex; align-items: center; gap: 10px;">
-        {% if q.latest_status == 'incorrect' %}
-          <span class="status-pill status-pill-incorrect">
-            ✕ 오답 (0 / {{ "%.1f"|format(q.max_score)|replace('.0', '') }}점)
-          </span>
-        {% else %}
-          <span class="status-pill status-pill-partial">
-            △ 부분 감점 ({{ "%.1f"|format(q.latest_earned)|replace('.0', '') }} / {{ "%.1f"|format(q.max_score)|replace('.0', '') }}점)
-          </span>
-        {% endif %}
-        
-        <span style="font-size: 12px; font-weight: 600; color: var(--neutral-600);">
-          총 {{ q.total_attempts }}회 중 {{ q.fail_count }}회 오답 (오답률 {{ q.fail_rate }}%)
-        </span>
-      </div>
+  <article class="card wrong-note-card {% if q.latest_status == 'incorrect' %}wrong-note-card-incorrect{% else %}wrong-note-card-partial{% endif %}" data-wrong-question-id="{{ q.question_id }}">
+    <div class="wrong-note-card-meta">
+      <span class="wrong-note-id">{{ q.question_id }}</span>
+      {% if q.type == 'short' %}
+        <span class="q-badge badge-short">단답형</span>
+      {% elif q.type == 'descriptive' %}
+        <span class="q-badge badge-desc">서술형</span>
+      {% else %}
+        <span class="q-badge badge-prac">실무형</span>
+      {% endif %}
+      {% if q.category %}<span class="q-category">{{ q.category }}</span>{% endif %}
     </div>
 
-    <!-- Question Body -->
-    <div style="font-size: 15px; font-weight: 600; color: var(--neutral-800); margin-bottom: 14px; line-height: 1.6; white-space: pre-line; background: var(--neutral-50); padding: 12px; border-radius: 6px;">
-      {{ q.question_text }}
-    </div>
+    <h2 class="wrong-note-card-title">
+      <a href="{{ url_for('wrong.view_wrong_detail', question_id=q.question_id) }}" class="wrong-note-card-preview">
+        {{ q.question_text or ('문항 ' ~ q.question_id) }}
+      </a>
+    </h2>
 
-    <!-- Latest Answer & Model Answer comparison -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 12px;">
-      <div style="background: white; border: 1px solid var(--neutral-200); border-radius: 6px; padding: 10px 14px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--neutral-600); margin-bottom: 4px;">
-          ✍️ 최근 작성한 수험자 답안:
-        </div>
-        <div style="font-size: 13px; color: var(--neutral-800); word-break: break-all;">
-          {% if q.latest_user_answer %}
-            {% if q.latest_user_answer is mapping %}
-              {% for k, v in q.latest_user_answer.items() %}
-                <div><strong>[{{ k }}]</strong> {{ v if v else '<미작성>' }}</div>
-              {% endfor %}
-            {% else %}
-              {{ q.latest_user_answer }}
-            {% endif %}
-          {% else %}
-            <span style="color: #94a3b8; font-style: italic;">&lt;미작성&gt;</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--primary-700); margin-bottom: 4px;">
-          🎯 정답 / 모범 답안:
-        </div>
-        <div style="font-size: 13px; color: var(--neutral-900); word-break: break-all;">
-          {% if q.sub_questions %}
-            {% for sub in q.sub_questions %}
-              <div style="margin-bottom: 2px;">
-                <strong>[{{ sub.label or sub.sub_id }}]</strong>
-                {{ sub.expected or sub.model_answer }}
-                {% if sub.accepted_answers %}
-                  <span style="font-size: 11px; color: var(--neutral-500);">(인정: {{ sub.accepted_answers | join(', ') }})</span>
-                {% endif %}
-              </div>
-            {% endfor %}
-          {% elif q.model_answer %}
-            {{ q.model_answer }}
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Deep Explanation Accordion (Goal 4C & 4D) -->
-    {% if q.deep_explanation %}
-      {% set explanation = q.deep_explanation %}
-      {% set concept_id = q.concept_id %}
-      {% set question_id = q.question_id %}
-      {% set question_text = q.question_text %}
-      {% set model_answer = q.model_answer %}
-      {% set user_answer = q.latest_user_answer %}
-      {% include "components/explanation_card.html" %}
+    {% if q.concept_id %}
+    <p class="wrong-note-card-concept">
+      연계 개념:
+      <a href="{{ url_for('concepts.view_concept_detail', concept_id=q.concept_id) }}">
+        {{ q.concept_name or q.concept_id }}
+      </a>
+    </p>
+    {% elif q.concept_name %}
+    <p class="wrong-note-card-concept">연계 개념: {{ q.concept_name }}</p>
     {% endif %}
 
-    <!-- Footer: Source and Action -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--neutral-100); padding-top: 12px; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
-      <div style="font-size: 12px; color: var(--neutral-600); font-family: var(--font-mono);">
-        {% if q.source_info %}출처: {{ q.source_info.title if q.source_info is mapping else q.source_info }}{% if q.source_page %} p.{{ q.source_page }}{% endif %}{% endif %}
-      </div>
-      <div>
-        <a href="/wrong-notes/{{ q.question_id }}" class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px; text-decoration: none; font-weight: 600;">
-          📊 상세 학습 리포트 & 타임라인 &rarr;
-        </a>
-      </div>
+    <div class="wrong-note-card-facts">
+      {% if q.latest_status == 'incorrect' %}
+      <span class="status-pill status-pill-incorrect">✕ 최근 오답 ({{ "%.1f"|format(q.latest_earned)|replace('.0', '') }} / {{ "%.1f"|format(q.max_score)|replace('.0', '') }}점)</span>
+      {% else %}
+      <span class="status-pill status-pill-partial">△ 최근 부분 감점 ({{ "%.1f"|format(q.latest_earned)|replace('.0', '') }} / {{ "%.1f"|format(q.max_score)|replace('.0', '') }}점)</span>
+      {% endif %}
+      <span>오답·부분 감점 {{ q.fail_count }}회 / 총 응시 {{ q.total_attempts }}회 (오답률 {{ q.fail_rate }}%)</span>
+      {% if q.latest_date %}<time datetime="{{ q.latest_date.isoformat() }}">최근 응시 {{ q.latest_date.strftime('%Y-%m-%d') }}</time>{% endif %}
     </div>
 
-  </div>
+    <div class="wrong-note-card-footer">
+      {% if q.fail_count >= 2 %}<span class="badge-repeat-fail">🔥 반복 오답 {{ q.fail_count }}회</span>{% endif %}
+      <a href="{{ url_for('wrong.view_wrong_detail', question_id=q.question_id) }}" class="btn btn-secondary wrong-note-detail-link"
+         aria-label="{{ q.question_id }} 제출 답안, 해설, 응시 이력 상세 보기">제출 답안 · 해설 · 응시 이력 보기 &rarr;</a>
+    </div>
+  </article>
   {% endfor %}
 </div>
 {% endif %}
