@@ -6,7 +6,7 @@ from app.services.wrong_answer_service import WrongAnswerService
 from app.services.auth_service import admin_required
 
 dashboard_bp = Blueprint("dashboard", __name__)
-SCORED_EXAM_MODES = frozenset(("standard", "random", "adaptive", "wrong_review"))
+SCORED_EXAM_MODES = frozenset(("standard", "random", "adaptive", "wrong_review", "mock_exam"))
 
 def get_services():
     loader = DataLoader(current_app.config["DATA_DIR"])

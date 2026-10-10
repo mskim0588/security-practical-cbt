@@ -160,6 +160,15 @@ class Goal9BDashboardTests(unittest.TestCase):
         self.assertEqual(get_learning_recommendation({"total_attempts": 1}, 0, [])["primary_btn_url"],
                          "/exam?mode=random")
 
+    def test_finalized_mock_exam_counts_as_recent_score(self):
+        mock_id = self.save(64, mode="mock_exam")
+        self.owner()
+        html = self.client.get("/dashboard").get_data(as_text=True)
+        recent = self.summary_section(html, "dashboard-recent-title")
+        self.assertIn("64", recent)
+        self.assertIn(f'/history/{mock_id}', recent)
+        self.assertNotIn("아직 완료한 시험 기록이 없습니다.", recent)
+
 
 if __name__ == "__main__":
     unittest.main()
