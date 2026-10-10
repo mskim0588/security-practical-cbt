@@ -2,10 +2,10 @@
 
 ## Checkpoint
 
-- Status: LOCAL VERIFIED; deployment pending. Baseline HEAD: `9f1b512f3377f5722daef1ef96ea83053a5c9ac2`.
+- Status: FEATURE DEPLOYED; report-only closure deployment pending. Baseline HEAD: `9f1b512f3377f5722daef1ef96ea83053a5c9ac2`.
 - Entry gate: clean `master` = `origin/master`; Goal 9A/B/C COMPLETE; Goal 9D READY; `v0.8-learning-final` still points to `2483cb01928282d6dd3f180b527771191773e59b`.
-- Last Safe Step: small shared mapper, focused tests, full regression, protected-data checks, and local Chrome QA passed. Fixed fixture projections match the baseline commit exactly.
-- Next Step: review and commit the local changes, push `master`, verify exact-commit Railway `SUCCESS`, then run production smoke. Physical Android remains pending.
+- Last Safe Step: feature commit `5a1af4e3617197bc5f0d2ddb8daf1b6c6fdadbd5` was pushed with local/remote parity, reached exact-SHA Railway `success` at 2026-10-10 14:33:47 UTC, and passed subsequent public/Guest production smoke. Local tests, browser QA, protected data, and baseline fixture comparison passed.
+- Next Step: commit and push this report-only checkpoint, verify Railway `SUCCESS` for that final SHA and recheck production health. Then report physical Android readiness; user device testing remains pending.
 
 ## Architecture and verified duplication
 
@@ -39,9 +39,9 @@
 | R Targeted tests | DONE | `python -m unittest tests.test_goal9d_result_history_viewmodel tests.test_history_persistence tests.test_goal9c_wrong_notes tests.test_goal9b_dashboard tests.test_goal7c_realistic_mock_exam -v`: 38 ran / 38 passed / 0 skipped / 0 failures / 0 errors. Goal 9D contributes six new tests. |
 | S Full regression | DONE | `python -m unittest discover tests -v`: 338 ran / 337 passed / 1 skipped (`PRIVATE_SOURCE_DIR` unavailable) / 0 failures / 0 errors. Covers Goal 9A, Goal 7A–D, Goal 8A–D and remaining tests. |
 | T Core data integrity | DONE | Fresh 5/5 SHA-256 MATCH against Goal 8 release: Questions `661098ce80e957b033fbb1a2b540701815791169ecd57c0f367720b94f3d5dc9`; Concepts `d33cdd63824c01c6537dd6f2cb6829b58bf121883a05eb406803bbe58bad5943`; Sources `9ae37ce41f1b3bccf0047474fca8e8332ad18f1ead298ee2f17fe85574049a21`; Contents `025c54ca679ac3e15ac8f8d98a9bf7ae3f120577e13ee44a5911b6beac335171`; Explanations `e62c2ef4d5ef92c3ec8279ae9f1a8ebe2ad23414bed6560c9fbef4751d322696`. Inventory 20 Concepts / 67 Topics / 180 Questions / 39 Aliases / 180 mappings. |
-| U Git/deployment | TODO | Local diff reviewed; commit, push, exact final SHA Railway and production smoke pending. |
+| U Git/deployment | PARTIAL | Feature commit `5a1af4e3617197bc5f0d2ddb8daf1b6c6fdadbd5` pushed; `master` = `origin/master` and clean before this report edit. Exact Railway `security-practical-cbt - web` status `success` at 2026-10-10 14:33:47 UTC. Post-success `/` and `/healthz` 200; health `status=ok`, `database=healthy`, `environment=production`. `/concepts`, `/search`, `/bookmarks`, `/practice`, `/descriptive-training`, `/mock-exam`, `/exam` 200. Guest `/history`, `/dashboard`, `/wrong-notes` 302 to login; invalid direct Result 403. Root retained Exam/Concept/Search navigation. No 5xx in checked paths. Report-only final commit/deployment pending. |
 | V Backlog | DONE | P0 0, P1 0; retain `/favicon.ico` 404, nine `REVIEW_REQUIRED` law records, Goal 5 backlog. |
-| W Physical Android readiness | TODO | Device testing is pending; set `GOAL_9D_READY_FOR_PHYSICAL_DEVICE_TEST` only after deployment gates pass. |
+| W Physical Android readiness | PARTIAL | Feature gates passed; verify final report-only deployment and health before externally reporting `GOAL_9D_READY_FOR_PHYSICAL_DEVICE_TEST`. Physical device test remains pending. |
 
 ## Release boundaries
 
