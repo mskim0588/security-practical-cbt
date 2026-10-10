@@ -2,10 +2,10 @@
 
 ## Checkpoint
 
-- Status: PARTIAL — lean list/detail presentation, targeted tests, full regression, protected data, and four-viewport local browser QA pass; Git synchronization and deployment pending. Goal 9D/9E NOT STARTED.
+- Status: `GOAL_9C_READY_FOR_PHYSICAL_DEVICE_TEST` — feature commit, targeted/full tests, protected data, local browser QA, push, exact-commit Railway `SUCCESS`, and production public/Guest smoke pass. Physical Android PENDING; Goal 9D/9E NOT STARTED.
 - Baseline HEAD: `df9b72977969899cb40f29de8c2e93ad0af42db8`; clean `master` = `origin/master`; Goal 9A and 9B COMPLETE; `v0.8-learning-final` remains at `2483cb01928282d6dd3f180b527771191773e59b`.
-- Last Safe Step: concise Question cards and minimal detail anchors implemented without changing grading or aggregation; local Chrome QA passed at four requested viewports, including the fixed mobile header overlap. Focused tests passed 21/21. Final full regression: 332 ran / 331 passed / 1 skipped / 0 failures / 0 errors. Protected hashes 5/5 MATCH.
-- Next Step: review and commit intended files, push, verify exact Railway deployment and production smoke. Physical Android remains PENDING.
+- Last Safe Step: feature commit `11a74fbb07afca2c34b555915cae7bde79a3889e` pushed with clean `master` = `origin/master`; exact-commit Railway `SUCCESS` and public/Guest production smoke passed. Local Chrome QA passed at four requested viewports. Focused tests passed 21/21; final full regression: 332 ran / 331 passed / 1 skipped / 0 failures / 0 errors; protected hashes 5/5 MATCH.
+- Next Step: user checks Goal 9C on a physical Android device. Do not mark Goal 9C complete before that confirmation.
 
 ## Existing architecture and old-to-new mapping
 
@@ -35,10 +35,17 @@
 | Targeted tests | DONE | New Goal 9C tests 5/5; existing Wrong Notes/history tests 16/16. |
 | Full regression, core hashes | DONE | Final post-edit run: 332 ran / 331 passed / 1 skipped / 0 failures / 0 errors. Fresh 5/5 SHA-256 MATCH against Goal 8 release hashes; 20 Concepts / 67 Topics / 180 Questions / 39 Aliases. |
 | Browser QA | DONE locally | Headless Chrome DevTools on synthetic authenticated Owner: empty and populated list/detail at 360×740, 390×844, 430×932, 1280×800. Long Question/explanation, multiple attempts, mobile/desktop filter click, reachable bottom actions, no page overflow, no JavaScript errors. Screenshots visually checked. Not physical Android or production Owner QA. |
-| Commit, push, Railway, production smoke | TODO | Verify exact new commit, not the prior healthy deployment. |
+| Commit, push, Railway, production smoke | DONE for feature commit | `11a74fb` pushed; exact Railway status `success` at 2026-10-10 14:01:40 UTC; production public/Guest smoke passed. |
 | Physical Android | TODO | User verification after ready status. |
 
 ## Known boundaries
 
 - Production Owner QA: `PRODUCTION_OWNER_NOT_VERIFIED` unless separately authorized. P0 0; P1 0. Existing P2 backlog: `/favicon.ico` 404, nine `REVIEW_REQUIRED` law records, and Goal 5 items.
 - Expected DB schema change: NO. Protected JSON files must stay unchanged. No Goal 9 release tag and no Goal 9D/9E work.
+
+## Deployment and production smoke
+
+- Feature commit `11a74fbb07afca2c34b555915cae7bde79a3889e` reached exact-SHA Railway GitHub status `security-practical-cbt - web: success` at 2026-10-10 14:01:40 UTC. Local `master` and `origin/master` matched with a clean working tree after the feature push.
+- HTTP smoke at 2026-10-10 14:02 UTC: `/`, `/healthz`, `/concepts`, `/search`, `/bookmarks`, `/practice`, `/descriptive-training`, `/mock-exam`, and `/exam` returned 200. `/healthz` reported `database=healthy`, `environment=production`, `status=ok`.
+- Guest `/wrong-notes` and `/dashboard` returned 302 to `/admin-login` with the expected next path. Authenticated production Owner Wrong Notes and Dashboard remain `PRODUCTION_OWNER_NOT_VERIFIED`; local Owner fixtures cover functional QA without bypassing production login.
+- Physical Android: PENDING. Final verdict: `GOAL_9C_READY_FOR_PHYSICAL_DEVICE_TEST`; Goal 9D NOT STARTED.
