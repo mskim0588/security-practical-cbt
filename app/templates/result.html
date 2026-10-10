@@ -7,6 +7,7 @@
   <div style="font-size: 15px; font-weight: 700; color: var(--neutral-600); text-transform: uppercase; letter-spacing: 0.5px;">
     정보보안기사 실기 모의고사 채점 결과
   </div>
+  {% if attempt_view %}<span class="badge-mode{% if attempt_view.mode_class %} badge-mode-{{ attempt_view.mode_class }}{% endif %}">{{ attempt_view.mode_label }}</span>{% endif %}
 
   <div class="score-main">
     {{ result.total_score }} <span class="unit">/ 100점</span>
@@ -61,7 +62,7 @@
       <span>이번 모의고사 응시 기록이 성공적으로 저장되었습니다 (회차 #{{ attempt_id }})</span>
     </div>
     <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-      <a href="/history/{{ attempt_id }}" class="btn btn-primary btn-lg">
+      <a href="{{ attempt_view.history_url if attempt_view and attempt_view.history_url else '/history/' ~ attempt_id }}" class="btn btn-primary btn-lg">
         📋 상세 복기 리포트 &rarr;
       </a>
       <a href="/wrong-notes" class="btn btn-secondary btn-lg">

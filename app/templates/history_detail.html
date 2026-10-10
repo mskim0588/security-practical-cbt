@@ -18,40 +18,32 @@
       <span style="font-size: 16px; font-weight: 800; color: var(--neutral-800);">
         제{{ attempt.id }}회차 모의고사 복기 리포트
       </span>
-      {% if attempt.exam_mode == 'standard' %}
-        <span class="badge-mode badge-mode-standard">📘 표준 모의고사</span>
-      {% elif attempt.exam_mode == 'random' %}
-        <span class="badge-mode badge-mode-random">🎲 랜덤 모의고사</span>
-      {% elif attempt.exam_mode == 'wrong_review' %}
-        <span class="badge-mode badge-mode-wrong_review">🔥 오답 집중 모의고사</span>
-      {% elif attempt.exam_mode == 'adaptive' %}
-        <span class="badge-mode badge-mode-adaptive">🎯 취약점 맞춤 모의고사</span>
-      {% else %}
-        <span class="badge-mode">{{ attempt.exam_mode }}</span>
-      {% endif %}
+      <span class="badge-mode{% if attempt_view.mode_class %} badge-mode-{{ attempt_view.mode_class }}{% endif %}">{{ attempt_view.mode_label }}</span>
     </div>
     <div style="font-size: 13px; color: var(--neutral-600);">
-      응시 일시: {{ attempt.created_at[:16].replace('T', ' ') if attempt.created_at else '-' }}
+      응시 일시: {{ attempt_view.created_at_text }}
     </div>
   </div>
 
   <div class="score-main">
-    {{ "%.1f"|format(attempt.total_score)|replace('.0', '') }} <span class="unit">/ 100점</span>
+    {% if attempt_view.is_scored %}{{ "%.1f"|format(attempt_view.total_score)|replace('.0', '') }} <span class="unit">/ {{ attempt_view.max_score|int }}점</span>{% else %}{{ attempt_view.status_label }}{% endif %}
   </div>
 
   <div>
-    {% if attempt.is_passed %}
+    {% if not attempt_view.is_scored %}
+      <span class="pass-badge">{{ attempt_view.status_label }}</span>
+    {% elif attempt_view.is_passed %}
       <span class="pass-badge pass">🎉 합격 기준(60점) 달성</span>
     {% else %}
-      <span class="pass-badge fail">기준 미달 (60점 이상 필요)</span>
+      <span class="pass-badge fail">불합격 · 기준 미달 (60점 이상 필요)</span>
     {% endif %}
   </div>
 
-  <div class="section-score-grid">
+  {% if attempt_view.is_scored %}<div class="section-score-grid">
     <div class="section-score-box">
       <div style="font-size: 13px; color: var(--primary-700); font-weight: 700;">1. 단답형</div>
       <div style="font-size: 22px; font-weight: 800; color: var(--neutral-900); margin: 4px 0;">
-        {{ "%.1f"|format(attempt.short_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 36점</span>
+        {{ "%.1f"|format(attempt_view.short_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 36점</span>
       </div>
       <div style="font-size: 12px; color: var(--neutral-600);">12문항 (문항당 3점)</div>
     </div>
@@ -59,7 +51,7 @@
     <div class="section-score-box">
       <div style="font-size: 13px; color: #b45309; font-weight: 700;">2. 서술형</div>
       <div style="font-size: 22px; font-weight: 800; color: var(--neutral-900); margin: 4px 0;">
-        {{ "%.1f"|format(attempt.descriptive_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 48점</span>
+        {{ "%.1f"|format(attempt_view.descriptive_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 48점</span>
       </div>
       <div style="font-size: 12px; color: var(--neutral-600);">4문항 (문항당 12점)</div>
     </div>
@@ -67,13 +59,13 @@
     <div class="section-score-box">
       <div style="font-size: 13px; color: #15803d; font-weight: 700;">3. 실무형</div>
       <div style="font-size: 22px; font-weight: 800; color: var(--neutral-900); margin: 4px 0;">
-        {{ "%.1f"|format(attempt.practical_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 16점</span>
+        {{ "%.1f"|format(attempt_view.practical_score)|replace('.0', '') }} <span style="font-size: 13px; color: var(--neutral-600);">/ 16점</span>
       </div>
       <div style="font-size: 12px; color: var(--neutral-600);">
-        선택: {{ attempt.selected_practical_id if attempt.selected_practical_id else '선택 안 함' }}
+        선택: {{ attempt_view.selected_practical_id if attempt_view.selected_practical_id else '선택 안 함' }}
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   {% set wrong_items = attempt.answers | selectattr('achievement_status', 'in', ['incorrect', 'partial']) | list %}
   {% if wrong_items | length > 0 %}

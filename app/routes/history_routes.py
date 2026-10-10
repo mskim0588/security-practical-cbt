@@ -3,6 +3,7 @@ from app.services.data_loader import DataLoader
 from app.services.history_service import HistoryService
 from app.models.history import LEARNING_ONLY_EXAM_MODES
 from app.services.auth_service import admin_required
+from app.services.attempt_view_model import map_attempt_summary
 
 history_bp = Blueprint("history", __name__)
 
@@ -21,11 +22,13 @@ def list_history():
     
     total_count = service.get_attempt_count()
     attempts = service.get_attempts(limit=per_page, offset=offset)
+    attempt_views = {attempt.id: map_attempt_summary(attempt) for attempt in attempts}
     total_pages = (total_count + per_page - 1) // per_page if total_count > 0 else 1
 
     return render_template(
         "history_list.html",
         attempts=attempts,
+        attempt_views=attempt_views,
         total_count=total_count,
         current_page=page,
         total_pages=total_pages
@@ -42,7 +45,8 @@ def view_history_detail(attempt_id: int):
     detail = service.get_attempt_detail(attempt_id)
     return render_template(
         "history_detail.html",
-        attempt=detail
+        attempt=detail,
+        attempt_view=map_attempt_summary(detail)
     )
 
 from app.services.csrf_service import csrf_protect

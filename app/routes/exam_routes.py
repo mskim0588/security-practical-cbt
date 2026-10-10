@@ -6,6 +6,7 @@ from app.services.grader import Grader
 from app.services.csrf_service import csrf_protect
 from app.services.auth_service import is_admin_authenticated
 from app.services.law_freshness_service import LawFreshnessService
+from app.services.attempt_view_model import map_attempt_summary
 
 exam_bp = Blueprint("exam", __name__)
 
@@ -201,16 +202,22 @@ def view_result(attempt_id: int):
     if not detail:
         abort(404, description="요청하신 시험 결과를 찾을 수 없습니다.")
 
+    if not is_admin and detail.get("is_owner", False):
+        abort(403, description="접근 권한이 없습니다: 관리자 응시 기록은 로그인 후 열람할 수 있습니다.")
+
     # 관리자라도 세션 소유권이 없는 다른 게스트의 Attempt는 열람 차단
     if is_admin and not is_session_owner and not detail.get("is_owner", False):
         abort(403, description="접근 권한이 없습니다: 관리자는 본인의 학습 기록 또는 현재 세션 응시 결과만 열람할 수 있습니다.")
 
-    short_earned = detail.get("short_score", 0.0)
-    desc_earned = detail.get("descriptive_score", 0.0)
-    prac_earned = detail.get("practical_score", 0.0)
-    total_score = detail.get("total_score", 0.0)
-    is_passed = detail.get("is_passed", False)
-    selected_prac_id = detail.get("selected_practical_id")
+    attempt_view = map_attempt_summary(detail)
+    if not attempt_view["is_scored"]:
+        abort(404, description="채점이 완료된 시험 결과를 찾을 수 없습니다.")
+    short_earned = attempt_view["short_score"]
+    desc_earned = attempt_view["descriptive_score"]
+    prac_earned = attempt_view["practical_score"]
+    total_score = attempt_view["total_score"]
+    is_passed = attempt_view["is_passed"]
+    selected_prac_id = attempt_view["selected_practical_id"]
 
     details = []
     for ans in detail.get("answers", []):
@@ -269,6 +276,6 @@ def view_result(attempt_id: int):
         "details": details
     }
 
-    response = make_response(render_template("result.html", result=result_dict, attempt_id=attempt_id))
+    response = make_response(render_template("result.html", result=result_dict, attempt_id=attempt_id, attempt_view=attempt_view))
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
     return response

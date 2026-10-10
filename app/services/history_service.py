@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 from sqlalchemy import select, func, desc
+from sqlalchemy.orm import selectinload
 from app.models.database import db_session
 from app.models.history import AnswerRecord, ExamAttempt, LEARNING_ONLY_EXAM_MODES
 from app.services.data_loader import DataLoader
@@ -134,6 +135,7 @@ class HistoryService:
         """응시 이력 목록을 최신순으로 조회합니다 (기본적으로 Owner 전용)."""
         stmt = (
             select(ExamAttempt)
+            .options(selectinload(ExamAttempt.answers))
             .where(
                 ExamAttempt.is_owner == is_owner,
                 ExamAttempt.exam_mode.notin_(LEARNING_ONLY_EXAM_MODES),
